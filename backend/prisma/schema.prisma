@@ -1,0 +1,99 @@
+// E-Gaming Database Schema - Phase 1
+// https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model - stores auth and contact info for admin
+model User {
+  id                   String    @id @default(cuid())
+  email                String    @unique
+  phone                String?   // Optional phone for admin contact
+  passwordHash         String    @map("password_hash")
+  name                 String?   // Optional display name
+  role                 UserRole  @default(USER)
+  isActive             Boolean   @default(true) @map("is_active")
+  emailVerified        Boolean   @default(false) @map("email_verified")
+  failedLoginAttempts  Int       @default(0) @map("failed_login_attempts")
+  lockedUntil          DateTime? @map("locked_until")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+  lastLoginAt          DateTime? @map("last_login_at")
+
+  authLogs         AuthLog[]
+  verificationCodes VerificationCode[]
+  refreshTokens    RefreshToken[]
+}
+
+// Email verification codes (signup, login 2FA, password reset)
+model VerificationCode {
+  id        String   @id @default(cuid())
+  userId    String?  @map("user_id")
+  email     String
+  code      String
+  type      VerificationCodeType
+  expiresAt DateTime @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum VerificationCodeType {
+  EMAIL_VERIFY
+  LOGIN_OTP
+  PASSWORD_RESET
+}
+
+// Refresh tokens for secure token rotation
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  tokenHash String   @map("token_hash")
+  expiresAt DateTime @map("expires_at")
+  revokedAt DateTime? @map("revoked_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+// Tracks signup and signin events for admin dashboard
+model AuthLog {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  action    AuthAction
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum AuthAction {
+  SIGNUP
+  SIGNIN
+}
+
+// Games displayed on landing page
+model Game {
+  id          String   @id @default(cuid())
+  title       String
+  description String?  @db.Text
+  thumbnailUrl String? @map("thumbnail_url")
+  gameLink    String   @map("game_link")
+  sortOrder   Int      @default(0) @map("sort_order")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+}
