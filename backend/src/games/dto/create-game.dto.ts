@@ -9,8 +9,18 @@ export class CreateGameDto {
   description?: string;
 
   @IsOptional()
-  @IsUrl()
+  @IsUrl({
+    require_protocol: true,
+    require_tld: false,
+  })
   thumbnailUrl?: string;
+
+  @IsOptional()
+  @IsUrl({
+    require_protocol: true,
+    require_tld: false,
+  })
+  videoUrl?: string;
 
   @IsString()
   gameLink: string; // URL or path to game
@@ -22,4 +32,5 @@ export class CreateGameDto {
 
   @IsOptional()
   isActive?: boolean;
+
 }

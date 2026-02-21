@@ -1,0 +1,27 @@
+{
+  "contacts": {
+    "facebook": "",
+    "whatsapp": "",
+    "instagram": "",
+    "email": ""
+  },
+  "blogs": [
+    {
+      "id": "66cebf6d-67e8-4acd-9e69-080be4f74666",
+      "title": "HI",
+      "excerpt": "hi",
+      "content": "hellcghdfjksdgfgskd",
+      "createdAt": "2026-02-21T16:37:29.190Z",
+      "updatedAt": "2026-02-21T16:37:29.190Z"
+    }
+  ],
+  "faqs": [
+    {
+      "id": "177f56cc-0d12-481a-94a8-a913ec6e5f38",
+      "question": "HKSDYKKKKK",
+      "answer": "UDIWEYDVCM",
+      "createdAt": "2026-02-21T16:37:42.243Z",
+      "updatedAt": "2026-02-21T16:37:42.243Z"
+    }
+  ]
+}

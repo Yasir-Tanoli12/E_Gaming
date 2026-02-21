@@ -5,6 +5,7 @@ export interface Game {
   title: string;
   description: string | null;
   thumbnailUrl: string | null;
+  videoUrl: string | null;
   gameLink: string;
   sortOrder: number;
   isActive?: boolean;
@@ -14,6 +15,7 @@ export interface CreateGameInput {
   title: string;
   description?: string;
   thumbnailUrl?: string;
+  videoUrl?: string;
   gameLink: string;
   sortOrder?: number;
   isActive?: boolean;
@@ -29,6 +31,17 @@ export const gamesApi = {
 
   listAdmin() {
     return apiRequest<Game[]>("/games/admin");
+  },
+
+  listTop() {
+    return apiRequest<Game[]>("/games/top");
+  },
+
+  setTopGames(ids: string[]) {
+    return apiRequest<{ topGameIds: string[] }>("/games/top-selection", {
+      method: "POST",
+      body: JSON.stringify({ ids }),
+    });
   },
 
   async uploadMedia(file: File): Promise<{ url: string }> {

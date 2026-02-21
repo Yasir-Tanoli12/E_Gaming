@@ -64,6 +64,71 @@ body {
   animation-delay: 1.2s;
 }
 
+@keyframes orbit {
+  0% {
+    transform: translateX(-20px) translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateX(25px) translateY(-15px) scale(1.1);
+  }
+  100% {
+    transform: translateX(-20px) translateY(0px) scale(1);
+  }
+}
+
+@keyframes orbit-reverse {
+  0% {
+    transform: translateX(20px) translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateX(-25px) translateY(15px) scale(1.08);
+  }
+  100% {
+    transform: translateX(20px) translateY(0px) scale(1);
+  }
+}
+
+.animate-orbit {
+  animation: orbit 10s ease-in-out infinite;
+}
+
+.animate-orbit-reverse {
+  animation: orbit-reverse 12s ease-in-out infinite;
+}
+
+@keyframes qa-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.qa-marquee-container {
+  overflow: hidden;
+}
+
+.qa-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: qa-marquee 35s linear infinite;
+}
+
+.qa-marquee-container:hover .qa-marquee-track {
+  animation-play-state: paused;
+}
+
+.qa-marquee-card {
+  width: min(360px, 86vw);
+  flex-shrink: 0;
+  margin-right: 14px;
+  border: 1px solid rgb(217 70 239 / 0.25);
+  border-radius: 0.9rem;
+  background: rgb(15 18 48 / 0.9);
+  padding: 1rem;
+}
+
 /* Auth card: dark inputs and labels when inside .auth-card */
 .auth-card label {
   color: rgb(212 212 212);

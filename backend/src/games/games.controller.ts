@@ -15,6 +15,7 @@ import {
 import { GamesService } from './games.service';
 import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
+import { SetTopGamesDto } from './dto/set-top-games.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
@@ -33,6 +34,19 @@ export class GamesController {
   @Get()
   findAll() {
     return this.gamesService.findAll();
+  }
+
+  @Public()
+  @Get('top')
+  findTopGames() {
+    return this.gamesService.findTopGames();
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Post('top-selection')
+  setTopSelection(@Body() dto: SetTopGamesDto) {
+    return this.gamesService.setTopGames(dto.ids ?? []);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

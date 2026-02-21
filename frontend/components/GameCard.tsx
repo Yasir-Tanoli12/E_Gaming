@@ -5,18 +5,23 @@ import type { Game } from "@/lib/games-api";
 
 interface GameCardProps {
   game: Game;
+  isTop?: boolean;
 }
 
-export function GameCard({ game }: GameCardProps) {
+export function GameCard({ game, isTop = false }: GameCardProps) {
   const [hovered, setHovered] = useState(false);
+  const [thumbError, setThumbError] = useState(false);
+  const [videoError, setVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const mediaUrl = game.thumbnailUrl;
-  const isVideo =
-    !!mediaUrl &&
-    (mediaUrl.endsWith(".mp4") ||
-      mediaUrl.endsWith(".webm") ||
-      mediaUrl.endsWith(".ogg") ||
-      mediaUrl.includes("/video"));
+  const thumbnailUrl = game.thumbnailUrl;
+  const maybeThumbIsVideo =
+    !!thumbnailUrl &&
+    (thumbnailUrl.toLowerCase().includes(".mp4") ||
+      thumbnailUrl.toLowerCase().includes(".webm") ||
+      thumbnailUrl.toLowerCase().includes(".ogg"));
+  // Backward compatibility: if old records stored video in thumbnailUrl
+  const videoUrl = game.videoUrl ?? (maybeThumbIsVideo ? thumbnailUrl : null);
+  const imageUrl = maybeThumbIsVideo ? null : thumbnailUrl;
 
   function handlePlay() {
     if (game.gameLink) {
@@ -26,14 +31,14 @@ export function GameCard({ game }: GameCardProps) {
 
   function handleMouseEnter() {
     setHovered(true);
-    if (isVideo && videoRef.current) {
+    if (videoRef.current && videoUrl && !videoError) {
       videoRef.current.play().catch(() => {});
     }
   }
 
   function handleMouseLeave() {
     setHovered(false);
-    if (isVideo && videoRef.current) {
+    if (videoRef.current) {
       videoRef.current.pause();
       videoRef.current.currentTime = 0;
     }
@@ -47,28 +52,44 @@ export function GameCard({ game }: GameCardProps) {
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(236,72,153,0.3),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.28),transparent_45%)] opacity-70" />
       <div className="aspect-video w-full overflow-hidden bg-[#0c1025]">
-        {isVideo ? (
+        {imageUrl && !thumbError ? (
+          <img
+            src={imageUrl}
+            alt={game.title}
+            onError={() => setThumbError(true)}
+            className={`absolute inset-0 h-full w-full object-cover transition-all duration-500 ${
+              hovered && videoUrl && !videoError ? "opacity-0 scale-105" : "opacity-100 scale-100"
+            }`}
+          />
+        ) : null}
+
+        {videoUrl && !videoError ? (
           <video
             ref={videoRef}
-            src={mediaUrl!}
+            src={videoUrl}
             muted
             loop
             playsInline
-            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+            preload="metadata"
+            onError={() => setVideoError(true)}
+            onLoadedData={() => {
+              if (hovered) {
+                videoRef.current?.play().catch(() => {});
+              }
+            }}
+            className={`absolute inset-0 h-full w-full object-cover transition-all duration-500 ${
+              hovered ? "opacity-100 scale-100" : "opacity-0 scale-105"
+            }`}
           />
-        ) : mediaUrl ? (
-          <img
-            src={mediaUrl}
-            alt={game.title}
-            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
-          />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#1a1f3f] to-[#090d20]">
+        ) : null}
+
+        {!imageUrl && (!videoUrl || videoError) ? (
+          <div className="absolute inset-0 flex h-full w-full items-center justify-center bg-gradient-to-br from-[#1a1f3f] to-[#090d20]">
             <span className="text-4xl font-black text-cyan-300/70">
               {game.title.charAt(0)}
             </span>
           </div>
-        )}
+        ) : null}
       </div>
 
       <div
@@ -101,9 +122,15 @@ export function GameCard({ game }: GameCardProps) {
         )}
       </div>
 
-      <div className="absolute right-3 top-3 rounded-full border border-cyan-300/50 bg-[#07142f]/80 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-cyan-300">
-        Hot
-      </div>
+      {isTop ? (
+        <div className="absolute right-3 top-3 rounded-full border border-amber-300/70 bg-amber-400/20 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-200 shadow-[0_0_18px_rgba(251,191,36,0.45)]">
+          TOP
+        </div>
+      ) : (
+        <div className="absolute right-3 top-3 rounded-full border border-cyan-300/50 bg-[#07142f]/80 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-cyan-300">
+          Hot
+        </div>
+      )}
     </div>
   );
 }

@@ -10,6 +10,8 @@ import { AuthModule } from './auth/auth.module';
 import { GamesModule } from './games/games.module';
 import { UsersModule } from './users/users.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { NewsModule } from './news/news.module';
+import { ContentModule } from './content/content.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { JwtAuthGuard } from './auth/jwt-auth.guard';
     AuthModule,
     GamesModule,
     UsersModule,
+    NewsModule,
+    ContentModule,
   ],
   controllers: [AppController],
   providers: [

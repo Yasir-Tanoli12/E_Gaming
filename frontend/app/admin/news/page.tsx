@@ -1,0 +1,192 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { newsApi, type NewsPoster } from "@/lib/news-api";
+import { gamesApi } from "@/lib/games-api";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+
+export default function AdminNewsPage() {
+  const [items, setItems] = useState<NewsPoster[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState("");
+  const [form, setForm] = useState({
+    title: "",
+    imageUrl: "",
+    linkUrl: "",
+    isActive: true,
+  });
+
+  async function load() {
+    setLoading(true);
+    setError("");
+    try {
+      setItems(await newsApi.list());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load news");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  async function handleUpload(file: File | null) {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const { url } = await gamesApi.uploadMedia(file);
+      setForm((p) => ({ ...p, imageUrl: url }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function save() {
+    setSaving(true);
+    setError("");
+    try {
+      await newsApi.create({
+        title: form.title || undefined,
+        imageUrl: form.imageUrl,
+        linkUrl: form.linkUrl || undefined,
+        isActive: form.isActive,
+      });
+      setForm({ title: "", imageUrl: "", linkUrl: "", isActive: true });
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to save");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function toggleActive(item: NewsPoster) {
+    try {
+      await newsApi.update(item.id, { isActive: !item.isActive });
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Update failed");
+    }
+  }
+
+  async function remove(id: string) {
+    if (!confirm("Delete this poster?")) return;
+    try {
+      await newsApi.remove(id);
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Delete failed");
+    }
+  }
+
+  return (
+    <div className="text-white">
+      <h1 className="text-3xl font-black">News Poster</h1>
+      <p className="mt-1 text-zinc-400">
+        This poster appears when the website loads for users.
+      </p>
+
+      {error && (
+        <div className="mt-4 rounded-lg bg-red-500/10 px-4 py-3 text-sm text-red-400">
+          {error}
+        </div>
+      )}
+
+      <div className="auth-card mt-6 space-y-4 rounded-2xl border border-zinc-700/40 bg-zinc-900/60 p-6">
+        <Input
+          label="Title (optional)"
+          value={form.title}
+          onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))}
+        />
+        <Input
+          label="Image URL"
+          value={form.imageUrl}
+          onChange={(e) => setForm((p) => ({ ...p, imageUrl: e.target.value }))}
+          placeholder="https://..."
+        />
+        <div>
+          <label className="mb-1 block text-sm font-medium text-zinc-300">
+            Or upload poster image
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => handleUpload(e.target.files?.[0] ?? null)}
+            className="rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-sm text-zinc-200"
+          />
+          {uploading && <p className="mt-1 text-xs text-cyan-300">Uploading...</p>}
+        </div>
+        <Input
+          label="Target Link (optional)"
+          value={form.linkUrl}
+          onChange={(e) => setForm((p) => ({ ...p, linkUrl: e.target.value }))}
+          placeholder="https://..."
+        />
+        <label className="inline-flex items-center gap-2 text-sm text-zinc-200">
+          <input
+            type="checkbox"
+            checked={form.isActive}
+            onChange={(e) => setForm((p) => ({ ...p, isActive: e.target.checked }))}
+          />
+          Active (show on first load)
+        </label>
+        <div>
+          <Button onClick={save} loading={saving} disabled={!form.imageUrl}>
+            Add Poster
+          </Button>
+        </div>
+      </div>
+
+      <div className="mt-8 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50">
+        {loading ? (
+          <div className="p-6 text-zinc-400">Loading...</div>
+        ) : items.length === 0 ? (
+          <div className="p-6 text-zinc-500">No posters yet.</div>
+        ) : (
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-zinc-800 text-left text-sm text-zinc-400">
+                <th className="px-4 py-3">Preview</th>
+                <th className="px-4 py-3">Title</th>
+                <th className="px-4 py-3">Status</th>
+                <th className="px-4 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {items.map((item) => (
+                <tr key={item.id} className="border-b border-zinc-800/70 last:border-0">
+                  <td className="px-4 py-3">
+                    <img src={item.imageUrl} alt="" className="h-12 w-24 rounded object-cover" />
+                  </td>
+                  <td className="px-4 py-3 text-zinc-200">{item.title ?? "—"}</td>
+                  <td className="px-4 py-3">
+                    <span className={`rounded px-2 py-1 text-xs ${item.isActive ? "bg-emerald-500/20 text-emerald-300" : "bg-zinc-700 text-zinc-400"}`}>
+                      {item.isActive ? "Active" : "Hidden"}
+                    </span>
+                  </td>
+                  <td className="px-4 py-3">
+                    <div className="flex gap-2">
+                      <Button variant="secondary" onClick={() => toggleActive(item)}>
+                        {item.isActive ? "Hide" : "Show"}
+                      </Button>
+                      <Button variant="secondary" onClick={() => remove(item.id)}>
+                        Delete
+                      </Button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}

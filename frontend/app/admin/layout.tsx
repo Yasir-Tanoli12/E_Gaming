@@ -48,6 +48,12 @@ export default function AdminLayout({
             <Link href="/admin/games" className="text-sm text-zinc-400 hover:text-zinc-200">
               Games
             </Link>
+            <Link href="/admin/news" className="text-sm text-zinc-400 hover:text-zinc-200">
+              News
+            </Link>
+            <Link href="/admin/content" className="text-sm text-zinc-400 hover:text-zinc-200">
+              Content
+            </Link>
           </div>
           <nav className="flex items-center gap-4">
             <Link

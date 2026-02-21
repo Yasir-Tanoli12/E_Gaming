@@ -16,6 +16,7 @@ export default function AdminGamesPage() {
     title: "",
     description: "",
     thumbnailUrl: "",
+    videoUrl: "",
     gameLink: "",
     sortOrder: 0,
     isActive: true,
@@ -23,13 +24,16 @@ export default function AdminGamesPage() {
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [topIds, setTopIds] = useState<string[]>([]);
+  const [togglingTopId, setTogglingTopId] = useState<string | null>(null);
 
   async function loadGames() {
     setLoading(true);
     setError("");
     try {
-      const data = await gamesApi.listAdmin();
+      const [data, top] = await Promise.all([gamesApi.listAdmin(), gamesApi.listTop()]);
       setGames(data);
+      setTopIds(top.map((g) => g.id));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load games");
     } finally {
@@ -47,6 +51,7 @@ export default function AdminGamesPage() {
       title: "",
       description: "",
       thumbnailUrl: "",
+      videoUrl: "",
       gameLink: "",
       sortOrder: games.length,
       isActive: true,
@@ -60,6 +65,7 @@ export default function AdminGamesPage() {
       title: game.title,
       description: game.description ?? "",
       thumbnailUrl: game.thumbnailUrl ?? "",
+      videoUrl: game.videoUrl ?? "",
       gameLink: game.gameLink,
       sortOrder: game.sortOrder,
       isActive: game.isActive ?? true,
@@ -81,6 +87,7 @@ export default function AdminGamesPage() {
         ...form,
         description: form.description || undefined,
         thumbnailUrl: form.thumbnailUrl || undefined,
+        videoUrl: form.videoUrl || undefined,
       };
       if (editing) {
         await gamesApi.update(editing.id, payload);
@@ -110,13 +117,27 @@ export default function AdminGamesPage() {
     }
   }
 
-  async function handleFileUpload(file: File | null) {
+  async function handleThumbnailUpload(file: File | null) {
     if (!file) return;
     setUploading(true);
     setError("");
     try {
       const { url } = await gamesApi.uploadMedia(file);
       setForm((prev) => ({ ...prev, thumbnailUrl: url }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  async function handleVideoUpload(file: File | null) {
+    if (!file) return;
+    setUploading(true);
+    setError("");
+    try {
+      const { url } = await gamesApi.uploadMedia(file);
+      setForm((prev) => ({ ...prev, videoUrl: url }));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {
@@ -167,7 +188,7 @@ export default function AdminGamesPage() {
               placeholder="Short description"
             />
             <Input
-              label="Card media URL (image or video)"
+              label="Thumbnail URL (image)"
               value={form.thumbnailUrl}
               onChange={(e) =>
                 setForm({ ...form, thumbnailUrl: e.target.value })
@@ -176,13 +197,13 @@ export default function AdminGamesPage() {
             />
             <div>
               <label className="mb-1 block text-sm font-medium text-zinc-300">
-                Or upload from local system
+                Upload thumbnail from local system
               </label>
               <div className="flex flex-wrap items-center gap-3">
                 <input
                   type="file"
-                  accept="video/*,image/*"
-                  onChange={(e) => handleFileUpload(e.target.files?.[0] ?? null)}
+                  accept="image/*"
+                  onChange={(e) => handleThumbnailUpload(e.target.files?.[0] ?? null)}
                   className="rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-sm text-zinc-200"
                 />
                 {uploading && (
@@ -190,7 +211,29 @@ export default function AdminGamesPage() {
                 )}
               </div>
               <p className="mt-1 text-xs text-zinc-500">
-                Upload image/video and it will auto-fill the media URL.
+                Upload image and it will auto-fill the thumbnail URL.
+              </p>
+            </div>
+            <Input
+              label="Hover video URL (video)"
+              value={form.videoUrl}
+              onChange={(e) => setForm({ ...form, videoUrl: e.target.value })}
+              placeholder="https://..."
+            />
+            <div>
+              <label className="mb-1 block text-sm font-medium text-zinc-300">
+                Upload hover video from local system
+              </label>
+              <div className="flex flex-wrap items-center gap-3">
+                <input
+                  type="file"
+                  accept="video/*"
+                  onChange={(e) => handleVideoUpload(e.target.files?.[0] ?? null)}
+                  className="rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-sm text-zinc-200"
+                />
+              </div>
+              <p className="mt-1 text-xs text-zinc-500">
+                Upload video and it will auto-fill the hover video URL.
               </p>
             </div>
             <Input
@@ -241,6 +284,9 @@ export default function AdminGamesPage() {
                   Title
                 </th>
                 <th className="px-4 py-3 text-sm font-medium text-cyan-100/70">
+                  Top
+                </th>
+                <th className="px-4 py-3 text-sm font-medium text-cyan-100/70">
                   Game link
                 </th>
                 <th className="px-4 py-3 text-sm font-medium text-cyan-100/70">
@@ -257,27 +303,26 @@ export default function AdminGamesPage() {
                   <td className="px-4 py-3">
                     {g.thumbnailUrl ? (
                       <div className="h-12 w-20 overflow-hidden rounded bg-zinc-800">
-                        {g.thumbnailUrl.endsWith(".mp4") ||
-                        g.thumbnailUrl.endsWith(".webm") ||
-                        g.thumbnailUrl.endsWith(".ogg") ? (
-                          <video
-                            src={g.thumbnailUrl}
-                            muted
-                            className="h-full w-full object-cover"
-                          />
-                        ) : (
-                          <img
-                            src={g.thumbnailUrl!}
-                            alt=""
-                            className="h-full w-full object-cover"
-                          />
-                        )}
+                        <img
+                          src={g.thumbnailUrl}
+                          alt=""
+                          className="h-full w-full object-cover"
+                        />
                       </div>
                     ) : (
                       <span className="text-zinc-600">—</span>
                     )}
                   </td>
                   <td className="px-4 py-3 text-zinc-200">{g.title}</td>
+                  <td className="px-4 py-3">
+                    {topIds.includes(g.id) ? (
+                      <span className="rounded-full bg-amber-400/20 px-2 py-1 text-xs text-amber-300">
+                        TOP
+                      </span>
+                    ) : (
+                      <span className="text-zinc-600 text-xs">—</span>
+                    )}
+                  </td>
                   <td className="px-4 py-3">
                     <a
                       href={g.gameLink}
@@ -298,6 +343,30 @@ export default function AdminGamesPage() {
                       </Button>
                       <Button
                         variant="secondary"
+                        loading={togglingTopId === g.id}
+                        onClick={async () => {
+                          setTogglingTopId(g.id);
+                          setError("");
+                          try {
+                            const isTop = topIds.includes(g.id);
+                            const next = isTop
+                              ? topIds.filter((id) => id !== g.id)
+                              : Array.from(new Set([...topIds, g.id]));
+                            await gamesApi.setTopGames(next);
+                            setTopIds(next);
+                          } catch (err) {
+                            setError(
+                              err instanceof Error ? err.message : "Failed to update top game",
+                            );
+                          } finally {
+                            setTogglingTopId(null);
+                          }
+                        }}
+                      >
+                        {topIds.includes(g.id) ? "Remove Top" : "Make Top Game"}
+                      </Button>
+                      <Button
+                        variant="secondary"
                         onClick={() => handleDelete(g.id)}
                         loading={deletingId === g.id}
                       >
@@ -311,6 +380,9 @@ export default function AdminGamesPage() {
           </table>
         </div>
       )}
+      <div className="mt-4 text-xs text-zinc-400">
+        Use <span className="text-amber-300">Make Top Game</span> in each row. Top games are shown first in the user grid.
+      </div>
     </div>
   );
 }
