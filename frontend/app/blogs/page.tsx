@@ -47,17 +47,30 @@ export default function BlogsPage() {
     return null;
   }
 
+  const blogs = content?.blogs ?? [];
+  const [featuredBlog, ...otherBlogs] = blogs;
+  const sideBlogs = otherBlogs.slice(0, 3);
+  const remainingBlogs = otherBlogs.slice(3);
+
   return (
-    <div className="min-h-screen bg-[#050814] px-4 py-10 text-white">
-      <div className="mx-auto max-w-7xl">
-        <div className="mb-8 flex items-center justify-between gap-3">
+    <div className="blog-radiant-page min-h-screen px-4 py-10 text-white">
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="blog-radiant-orb blog-radiant-orb-left" />
+        <div className="blog-radiant-orb blog-radiant-orb-right" />
+      </div>
+
+      <div className="relative mx-auto max-w-7xl">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">Content</p>
-            <h1 className="mt-2 text-4xl font-black">Blogs</h1>
+            <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">Neon Editorial</p>
+            <h1 className="mt-2 text-4xl font-black md:text-5xl">Blogs</h1>
+            <p className="mt-2 max-w-2xl text-sm text-cyan-100/70">
+              Fresh posts, updates, and stories with a glowing E-Gaming vibe.
+            </p>
           </div>
           <Link
             href="/dashboard"
-            className="rounded-full border border-cyan-300/40 bg-cyan-500/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-500/20"
+            className="rounded-full border border-cyan-300/40 bg-cyan-500/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:-translate-y-0.5 hover:bg-cyan-500/25 hover:shadow-[0_0_24px_rgba(34,211,238,0.35)]"
           >
             Back to Dashboard
           </Link>
@@ -71,33 +84,93 @@ export default function BlogsPage() {
           <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-6 py-4 text-red-400">
             {error}
           </div>
-        ) : !content?.blogs?.length ? (
+        ) : blogs.length === 0 ? (
           <div className="rounded-xl border border-zinc-700/50 bg-zinc-900/30 p-5 text-sm text-zinc-400">
             No blogs published yet.
           </div>
         ) : (
-          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {content.blogs.map((blog) => (
-              <article
-                key={blog.id}
-                className="rounded-xl border border-cyan-300/20 bg-[#0b1331]/70 p-4"
-              >
-                {blog.imageUrl && (
-                  <img
-                    src={blog.imageUrl}
-                    alt={blog.title}
-                    className="mb-3 h-44 w-full rounded-lg object-cover"
-                  />
-                )}
-                <h2 className="text-xl font-bold">{blog.title}</h2>
-                {blog.excerpt && (
-                  <p className="mt-2 text-sm text-cyan-100/70">{blog.excerpt}</p>
-                )}
-                {blog.content && (
-                  <p className="mt-3 text-sm text-zinc-300">{blog.content}</p>
-                )}
-              </article>
-            ))}
+          <div className="space-y-8">
+            {featuredBlog && (
+              <section className="grid gap-5 lg:grid-cols-[1.45fr_1fr]">
+                <article className="blog-feature-card group">
+                  <div className="relative overflow-hidden rounded-2xl">
+                    {featuredBlog.imageUrl ? (
+                      <img
+                        src={featuredBlog.imageUrl}
+                        alt={featuredBlog.title}
+                        className="blog-feature-image h-[290px] w-full object-cover md:h-[360px]"
+                      />
+                    ) : (
+                      <div className="h-[290px] w-full bg-[radial-gradient(circle_at_20%_20%,rgba(217,70,239,0.35),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(34,211,238,0.35),transparent_38%),linear-gradient(120deg,#0b1331,#121f47)] md:h-[360px]" />
+                    )}
+                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#050814] via-[#050814]/35 to-transparent" />
+                  </div>
+                  <div className="relative z-10 mt-4">
+                    <p className="text-xs uppercase tracking-[0.2em] text-fuchsia-200/90">Featured Story</p>
+                    <h2 className="mt-2 text-2xl font-black md:text-3xl">{featuredBlog.title}</h2>
+                    {featuredBlog.excerpt && (
+                      <p className="mt-2 text-sm text-cyan-100/80">{featuredBlog.excerpt}</p>
+                    )}
+                    {featuredBlog.content && (
+                      <p className="mt-3 line-clamp-4 text-sm text-zinc-300">{featuredBlog.content}</p>
+                    )}
+                  </div>
+                </article>
+
+                <div className="space-y-4">
+                  {sideBlogs.map((blog) => (
+                    <article key={blog.id} className="blog-side-card group">
+                      <div className="flex gap-3">
+                        <div className="h-20 w-24 flex-shrink-0 overflow-hidden rounded-xl">
+                          {blog.imageUrl ? (
+                            <img
+                              src={blog.imageUrl}
+                              alt={blog.title}
+                              className="blog-thumb-image h-full w-full object-cover"
+                            />
+                          ) : (
+                            <div className="h-full w-full bg-[linear-gradient(135deg,#6d28d9,#0891b2)] opacity-70" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="truncate text-base font-bold">{blog.title}</h3>
+                          {blog.excerpt && (
+                            <p className="mt-1 line-clamp-2 text-xs text-cyan-100/75">{blog.excerpt}</p>
+                          )}
+                        </div>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            {remainingBlogs.length > 0 && (
+              <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+                {remainingBlogs.map((blog) => (
+                  <article key={blog.id} className="blog-grid-card group">
+                    <div className="overflow-hidden rounded-xl">
+                      {blog.imageUrl ? (
+                        <img
+                          src={blog.imageUrl}
+                          alt={blog.title}
+                          className="blog-thumb-image h-44 w-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-44 w-full bg-[radial-gradient(circle_at_10%_20%,rgba(217,70,239,0.35),transparent_40%),radial-gradient(circle_at_90%_80%,rgba(34,211,238,0.35),transparent_38%),#0f1a3a]" />
+                      )}
+                    </div>
+                    <h3 className="mt-3 text-lg font-bold">{blog.title}</h3>
+                    {blog.excerpt && (
+                      <p className="mt-1 text-sm text-cyan-100/75">{blog.excerpt}</p>
+                    )}
+                    {blog.content && (
+                      <p className="mt-2 line-clamp-3 text-sm text-zinc-300">{blog.content}</p>
+                    )}
+                  </article>
+                ))}
+              </section>
+            )}
           </div>
         )}
       </div>

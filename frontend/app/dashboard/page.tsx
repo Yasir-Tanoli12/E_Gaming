@@ -307,23 +307,27 @@ export default function UserDashboardPage() {
             </section>
 
             <section id="qa">
-              <h2 className="mb-4 text-2xl font-black">Q/A</h2>
+              <div className="mb-4 flex items-center justify-between">
+                <h2 className="text-2xl font-black">Q/A</h2>
+                <span className="text-xs text-cyan-200/70">Live community feed</span>
+              </div>
               {faqItems.length === 0 ? (
                 <div className="rounded-xl border border-zinc-700/50 bg-zinc-900/30 p-5 text-sm text-zinc-400">
                   No questions added yet.
                 </div>
               ) : (
-                <div className="qa-marquee-container rounded-2xl border border-fuchsia-300/20 bg-[#0f1230]/70 py-4">
+                <div className="qa-marquee-shell">
+                  <div className="qa-marquee-glow" />
                   <div className="qa-marquee-track">
                     {movingFaqItems.map((item, index) => (
                       <article
                         key={`${item.id}-${index}`}
                         className="qa-marquee-card"
                       >
-                        <p className="text-sm font-semibold uppercase tracking-wide text-fuchsia-100">
+                        <p className="text-sm font-bold tracking-wide text-white">
                           {item.question}
                         </p>
-                        <p className="mt-2 text-sm text-zinc-300">{item.answer}</p>
+                        <p className="mt-2 text-sm italic text-cyan-100/85">{item.answer}</p>
                       </article>
                     ))}
                   </div>
