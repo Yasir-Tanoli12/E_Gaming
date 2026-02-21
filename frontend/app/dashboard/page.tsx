@@ -54,15 +54,21 @@ export default function UserDashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950">
-      {/* Header */}
-      <header className="sticky top-0 z-50 border-b border-zinc-800/80 bg-zinc-950/90 backdrop-blur-xl">
+    <div className="min-h-screen bg-[#050814] text-white">
+      <div className="pointer-events-none fixed inset-0 overflow-hidden">
+        <div className="absolute -left-24 top-20 h-80 w-80 animate-float rounded-full bg-fuchsia-500/20 blur-[100px]" />
+        <div className="absolute right-0 top-40 h-96 w-96 animate-float-delayed rounded-full bg-cyan-400/20 blur-[110px]" />
+      </div>
+
+      <header className="sticky top-0 z-50 border-b border-cyan-300/20 bg-[#0a1330]/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
-          <Link href="/dashboard" className="text-xl font-bold text-white">
+          <Link href="/dashboard" className="text-xl font-black tracking-wide text-white">
             E-Gaming
           </Link>
-          <nav className="flex items-center gap-6">
-            <span className="text-sm text-zinc-400">{user.email}</span>
+          <nav className="flex items-center gap-4">
+            <span className="hidden rounded-full border border-cyan-300/30 bg-cyan-400/10 px-3 py-1 text-xs text-cyan-200 md:block">
+              {user.email}
+            </span>
             <Button variant="secondary" onClick={logout}>
               Sign out
             </Button>
@@ -70,21 +76,32 @@ export default function UserDashboardPage() {
         </div>
       </header>
 
-      {/* Hero section with subtle animation */}
-      <section className="relative overflow-hidden border-b border-zinc-800/50 bg-gradient-to-b from-zinc-900 to-zinc-950 px-4 py-16">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-500/5 via-transparent to-transparent" />
-        <div className="relative mx-auto max-w-7xl text-center">
-          <h1 className="animate-fade-in text-4xl font-bold tracking-tight text-white md:text-5xl">
-            Play Now
-          </h1>
-          <p className="mt-3 animate-fade-in animation-delay-200 text-lg text-zinc-400">
-            Hover over a game card and click play to start
-          </p>
+      <section className="relative overflow-hidden border-b border-cyan-300/20 bg-gradient-to-r from-fuchsia-600/20 via-purple-600/20 to-cyan-500/20 px-4 py-16">
+        <div className="mx-auto grid max-w-7xl items-center gap-8 md:grid-cols-2">
+          <div className="animate-fade-in">
+            <h1 className="text-4xl font-black leading-tight md:text-5xl">
+              PLAY. WIN. DOMINATE.
+            </h1>
+            <p className="mt-4 max-w-xl text-cyan-100/80">
+              Neon-styled arcade experience. Hover any game card and hit play.
+              Smooth previews, animated effects, and fast launch.
+            </p>
+          </div>
+          <div className="relative h-48 animate-fade-in animation-delay-200 rounded-3xl border border-fuchsia-300/40 bg-gradient-to-br from-fuchsia-500/20 to-cyan-500/20 p-4 shadow-[0_0_40px_rgba(217,70,239,0.35)]">
+            <div className="h-full w-full rounded-2xl border border-cyan-300/30 bg-[#061028]/70 p-4">
+              <p className="text-xs uppercase tracking-[0.25em] text-cyan-300">
+                Live Lobby
+              </p>
+              <p className="mt-3 text-2xl font-black text-white">Game Arena</p>
+              <p className="mt-2 text-sm text-cyan-100/70">
+                Animated cards with video/media previews.
+              </p>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Games grid */}
-      <main className="mx-auto max-w-7xl px-4 py-12">
+      <main className="relative z-10 mx-auto max-w-7xl px-4 py-12">
         {loading ? (
           <div className="flex justify-center py-24">
             <div className="h-12 w-12 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
@@ -94,9 +111,9 @@ export default function UserDashboardPage() {
             {error}
           </div>
         ) : games.length === 0 ? (
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-16 text-center">
-            <p className="text-zinc-500">No games available yet.</p>
-            <p className="mt-2 text-sm text-zinc-600">
+          <div className="rounded-2xl border border-cyan-300/20 bg-[#0a1432]/60 p-16 text-center">
+            <p className="text-cyan-200/80">No games available yet.</p>
+            <p className="mt-2 text-sm text-cyan-100/60">
               Admins can add games from the admin dashboard.
             </p>
           </div>

@@ -7,6 +7,10 @@ import {
   Param,
   Delete,
   UseGuards,
+  UseInterceptors,
+  UploadedFile,
+  BadRequestException,
+  Req,
 } from '@nestjs/common';
 import { GamesService } from './games.service';
 import { CreateGameDto } from './dto/create-game.dto';
@@ -16,6 +20,10 @@ import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Public } from '../auth/public.decorator';
 import { UserRole } from '@prisma/client';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname, join } from 'path';
+import { existsSync, mkdirSync } from 'fs';
 
 @Controller('games')
 export class GamesController {
@@ -39,6 +47,52 @@ export class GamesController {
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.gamesService.findOne(id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Post('upload-media')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: (_req, _file, cb) => {
+          const dir = join(process.cwd(), 'uploads', 'games');
+          if (!existsSync(dir)) {
+            mkdirSync(dir, { recursive: true });
+          }
+          cb(null, dir);
+        },
+        filename: (_req, file, cb) => {
+          const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+          cb(null, `${unique}${extname(file.originalname)}`);
+        },
+      }),
+      fileFilter: (_req, file, cb) => {
+        const allowed = [
+          'video/mp4',
+          'video/webm',
+          'video/ogg',
+          'image/jpeg',
+          'image/png',
+          'image/webp',
+          'image/gif',
+        ];
+        cb(null, allowed.includes(file.mimetype));
+      },
+      limits: { fileSize: 100 * 1024 * 1024 },
+    }),
+  )
+  uploadMedia(
+    @UploadedFile() file: { filename: string } | undefined,
+    @Req() req: { protocol: string; get(name: string): string | undefined },
+  ) {
+    if (!file) {
+      throw new BadRequestException('No file uploaded');
+    }
+    const host = req.get('host') ?? 'localhost:3001';
+    return {
+      url: `${req.protocol}://${host}/uploads/games/${file.filename}`,
+    };
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

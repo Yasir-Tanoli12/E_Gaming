@@ -45,6 +45,25 @@ body {
   animation-delay: 200ms;
 }
 
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-18px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float 8s ease-in-out infinite;
+  animation-delay: 1.2s;
+}
+
 /* Auth card: dark inputs and labels when inside .auth-card */
 .auth-card label {
   color: rgb(212 212 212);

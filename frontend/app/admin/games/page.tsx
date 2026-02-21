@@ -16,13 +16,13 @@ export default function AdminGamesPage() {
     title: "",
     description: "",
     thumbnailUrl: "",
-    videoUrl: "",
     gameLink: "",
     sortOrder: 0,
     isActive: true,
   });
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   async function loadGames() {
     setLoading(true);
@@ -47,7 +47,6 @@ export default function AdminGamesPage() {
       title: "",
       description: "",
       thumbnailUrl: "",
-      videoUrl: "",
       gameLink: "",
       sortOrder: games.length,
       isActive: true,
@@ -61,10 +60,9 @@ export default function AdminGamesPage() {
       title: game.title,
       description: game.description ?? "",
       thumbnailUrl: game.thumbnailUrl ?? "",
-      videoUrl: game.videoUrl ?? "",
       gameLink: game.gameLink,
       sortOrder: game.sortOrder,
-      isActive: true,
+      isActive: game.isActive ?? true,
     });
     setShowForm(true);
   }
@@ -83,7 +81,6 @@ export default function AdminGamesPage() {
         ...form,
         description: form.description || undefined,
         thumbnailUrl: form.thumbnailUrl || undefined,
-        videoUrl: form.videoUrl || undefined,
       };
       if (editing) {
         await gamesApi.update(editing.id, payload);
@@ -113,20 +110,35 @@ export default function AdminGamesPage() {
     }
   }
 
+  async function handleFileUpload(file: File | null) {
+    if (!file) return;
+    setUploading(true);
+    setError("");
+    try {
+      const { url } = await gamesApi.uploadMedia(file);
+      setForm((prev) => ({ ...prev, thumbnailUrl: url }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
+
   return (
-    <div>
-      <div className="mb-6 flex items-center justify-between">
+    <div className="text-white">
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-white">Game cards</h1>
-          <p className="mt-1 text-zinc-400">
-            Add, edit, or remove game cards. Use video URLs for preview and game
-            links for play.
+          <h1 className="text-3xl font-black tracking-wide text-white">Game Card Studio</h1>
+          <p className="mt-1 text-cyan-100/70">
+            Build an attractive game lobby with image/video cards and local uploads.
           </p>
         </div>
-        <Link href="/admin/dashboard">
-          <Button variant="ghost">← Users</Button>
-        </Link>
-        <Button onClick={openAdd}>+ Add game</Button>
+        <div className="flex items-center gap-2">
+          <Link href="/admin/dashboard">
+            <Button variant="ghost">← Users</Button>
+          </Link>
+          <Button onClick={openAdd}>+ Add game</Button>
+        </div>
       </div>
 
       {error && (
@@ -136,7 +148,7 @@ export default function AdminGamesPage() {
       )}
 
       {showForm && (
-        <div className="auth-card mb-8 rounded-2xl border border-zinc-700/50 bg-zinc-800/80 p-6">
+        <div className="auth-card mb-8 rounded-3xl border border-fuchsia-400/30 bg-gradient-to-br from-[#121736] to-[#0b1028] p-6 shadow-[0_0_40px_rgba(168,85,247,0.2)]">
           <h2 className="mb-4 text-lg font-semibold text-white">
             {editing ? "Edit game" : "Add game"}
           </h2>
@@ -155,19 +167,32 @@ export default function AdminGamesPage() {
               placeholder="Short description"
             />
             <Input
-              label="Thumbnail URL (optional)"
+              label="Card media URL (image or video)"
               value={form.thumbnailUrl}
               onChange={(e) =>
                 setForm({ ...form, thumbnailUrl: e.target.value })
               }
               placeholder="https://..."
             />
-            <Input
-              label="Video URL (optional) – preview on card"
-              value={form.videoUrl}
-              onChange={(e) => setForm({ ...form, videoUrl: e.target.value })}
-              placeholder="https://..."
-            />
+            <div>
+              <label className="mb-1 block text-sm font-medium text-zinc-300">
+                Or upload from local system
+              </label>
+              <div className="flex flex-wrap items-center gap-3">
+                <input
+                  type="file"
+                  accept="video/*,image/*"
+                  onChange={(e) => handleFileUpload(e.target.files?.[0] ?? null)}
+                  className="rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-sm text-zinc-200"
+                />
+                {uploading && (
+                  <span className="text-sm text-cyan-300">Uploading...</span>
+                )}
+              </div>
+              <p className="mt-1 text-xs text-zinc-500">
+                Upload image/video and it will auto-fill the media URL.
+              </p>
+            </div>
             <Input
               label="Game link (play URL)"
               value={form.gameLink}
@@ -201,24 +226,24 @@ export default function AdminGamesPage() {
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
         </div>
       ) : games.length === 0 ? (
-        <div className="rounded-xl border border-zinc-800 bg-zinc-900/50 p-12 text-center text-zinc-500">
+        <div className="rounded-xl border border-cyan-300/20 bg-[#0a1330]/70 p-12 text-center text-cyan-100/70">
           No games yet. Click &quot;Add game&quot; to create one.
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50">
+        <div className="overflow-hidden rounded-xl border border-cyan-300/20 bg-[#091129]/75">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-zinc-800 text-left">
-                <th className="px-4 py-3 text-sm font-medium text-zinc-400">
+              <tr className="border-b border-cyan-300/15 text-left">
+                <th className="px-4 py-3 text-sm font-medium text-cyan-100/70">
                   Preview
                 </th>
-                <th className="px-4 py-3 text-sm font-medium text-zinc-400">
+                <th className="px-4 py-3 text-sm font-medium text-cyan-100/70">
                   Title
                 </th>
-                <th className="px-4 py-3 text-sm font-medium text-zinc-400">
+                <th className="px-4 py-3 text-sm font-medium text-cyan-100/70">
                   Game link
                 </th>
-                <th className="px-4 py-3 text-sm font-medium text-zinc-400">
+                <th className="px-4 py-3 text-sm font-medium text-cyan-100/70">
                   Actions
                 </th>
               </tr>
@@ -227,14 +252,16 @@ export default function AdminGamesPage() {
               {games.map((g) => (
                 <tr
                   key={g.id}
-                  className="border-b border-zinc-800/80 last:border-0"
+                  className="border-b border-cyan-300/10 last:border-0"
                 >
                   <td className="px-4 py-3">
-                    {(g.videoUrl || g.thumbnailUrl) ? (
+                    {g.thumbnailUrl ? (
                       <div className="h-12 w-20 overflow-hidden rounded bg-zinc-800">
-                        {g.videoUrl ? (
+                        {g.thumbnailUrl.endsWith(".mp4") ||
+                        g.thumbnailUrl.endsWith(".webm") ||
+                        g.thumbnailUrl.endsWith(".ogg") ? (
                           <video
-                            src={g.videoUrl}
+                            src={g.thumbnailUrl}
                             muted
                             className="h-full w-full object-cover"
                           />
@@ -256,7 +283,7 @@ export default function AdminGamesPage() {
                       href={g.gameLink}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm text-emerald-400 hover:underline"
+                      className="text-sm text-cyan-300 hover:underline"
                     >
                       {g.gameLink.slice(0, 40)}...
                     </a>

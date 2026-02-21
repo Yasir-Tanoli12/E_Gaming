@@ -9,11 +9,14 @@ interface GameCardProps {
 
 export function GameCard({ game }: GameCardProps) {
   const [hovered, setHovered] = useState(false);
-  const [videoPlaying, setVideoPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-
-  const mediaUrl = game.videoUrl ?? game.thumbnailUrl;
-  const isVideo = Boolean(game.videoUrl);
+  const mediaUrl = game.thumbnailUrl;
+  const isVideo =
+    !!mediaUrl &&
+    (mediaUrl.endsWith(".mp4") ||
+      mediaUrl.endsWith(".webm") ||
+      mediaUrl.endsWith(".ogg") ||
+      mediaUrl.includes("/video"));
 
   function handlePlay() {
     if (game.gameLink) {
@@ -25,7 +28,6 @@ export function GameCard({ game }: GameCardProps) {
     setHovered(true);
     if (isVideo && videoRef.current) {
       videoRef.current.play().catch(() => {});
-      setVideoPlaying(true);
     }
   }
 
@@ -34,52 +36,50 @@ export function GameCard({ game }: GameCardProps) {
     if (isVideo && videoRef.current) {
       videoRef.current.pause();
       videoRef.current.currentTime = 0;
-      setVideoPlaying(false);
     }
   }
 
   return (
     <div
-      className="group relative overflow-hidden rounded-2xl border border-zinc-700/50 bg-zinc-900 shadow-xl transition-all duration-300 hover:scale-[1.02] hover:border-emerald-500/50 hover:shadow-emerald-500/20"
+      className="group relative overflow-hidden rounded-3xl border border-cyan-400/30 bg-[#0b1330] shadow-[0_0_0_1px_rgba(34,211,238,0.15),0_20px_45px_rgba(6,182,212,0.2)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_0_0_1px_rgba(244,114,182,0.45),0_25px_55px_rgba(236,72,153,0.28)]"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <div className="aspect-video w-full overflow-hidden bg-zinc-800">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(236,72,153,0.3),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.28),transparent_45%)] opacity-70" />
+      <div className="aspect-video w-full overflow-hidden bg-[#0c1025]">
         {isVideo ? (
           <video
             ref={videoRef}
-            src={game.videoUrl!}
-            poster={game.thumbnailUrl ?? undefined}
+            src={mediaUrl!}
             muted
             loop
             playsInline
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
         ) : mediaUrl ? (
           <img
             src={mediaUrl}
             alt={game.title}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-zinc-800 to-zinc-900">
-            <span className="text-4xl font-bold text-zinc-600">
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-[#1a1f3f] to-[#090d20]">
+            <span className="text-4xl font-black text-cyan-300/70">
               {game.title.charAt(0)}
             </span>
           </div>
         )}
       </div>
 
-      {/* Hover overlay with play button */}
       <div
-        className={`absolute inset-0 flex items-center justify-center bg-black/50 transition-opacity duration-300 ${
+        className={`absolute inset-0 flex items-center justify-center bg-gradient-to-t from-[#080e22]/90 via-[#0b1739]/40 to-transparent transition-opacity duration-300 ${
           hovered ? "opacity-100" : "opacity-0"
         }`}
         onClick={handlePlay}
       >
         <button
           type="button"
-          className="flex h-16 w-16 items-center justify-center rounded-full bg-emerald-500/90 shadow-lg transition-all duration-300 hover:scale-110 hover:bg-emerald-500"
+          className="flex h-16 w-16 items-center justify-center rounded-full border border-white/50 bg-gradient-to-r from-fuchsia-500 to-cyan-400 shadow-[0_0_35px_rgba(217,70,239,0.6)] transition-all duration-300 hover:scale-110"
           aria-label={`Play ${game.title}`}
         >
           <svg
@@ -92,14 +92,17 @@ export function GameCard({ game }: GameCardProps) {
         </button>
       </div>
 
-      {/* Title overlay at bottom */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent p-4">
-        <h3 className="font-semibold text-white drop-shadow-lg">{game.title}</h3>
+      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#050a18] via-[#050a18]/60 to-transparent p-4">
+        <h3 className="font-bold tracking-wide text-white drop-shadow-lg">{game.title}</h3>
         {game.description && (
-          <p className="mt-1 line-clamp-2 text-sm text-zinc-300">
+          <p className="mt-1 line-clamp-2 text-sm text-cyan-100/80">
             {game.description}
           </p>
         )}
+      </div>
+
+      <div className="absolute right-3 top-3 rounded-full border border-cyan-300/50 bg-[#07142f]/80 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-cyan-300">
+        Hot
       </div>
     </div>
   );
