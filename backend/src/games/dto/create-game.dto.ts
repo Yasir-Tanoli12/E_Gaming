@@ -12,6 +12,10 @@ export class CreateGameDto {
   @IsUrl()
   thumbnailUrl?: string;
 
+  @IsOptional()
+  @IsUrl()
+  videoUrl?: string;
+
   @IsString()
   gameLink: string; // URL or path to game
 

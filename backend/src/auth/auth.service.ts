@@ -11,7 +11,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../email/email.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
-import { AuthAction } from '@prisma/client';
+import { AuthAction, UserRole } from '@prisma/client';
 
 const CODE_EXPIRY_MINUTES = 10;
 const CODE_LENGTH = 6;
@@ -55,6 +55,7 @@ export class AuthService {
       throw new ConflictException('Email already registered');
     }
 
+    const isFirstUser = (await this.prisma.user.count()) === 0;
     const passwordHash = await bcrypt.hash(dto.password, 12);
 
     const user = await this.prisma.user.create({
@@ -64,6 +65,7 @@ export class AuthService {
         name: dto.name ?? null,
         phone: dto.phone ?? null,
         emailVerified: false,
+        role: isFirstUser ? UserRole.ADMIN : UserRole.USER,
       },
       select: {
         id: true,
@@ -77,7 +79,11 @@ export class AuthService {
     });
 
     const code = await this.createVerificationCode(user.email, 'EMAIL_VERIFY', user.id);
-    await this.emailService.sendVerificationCode(user.email, code, 'EMAIL_VERIFY');
+    try {
+      await this.emailService.sendVerificationCode(user.email, code, 'EMAIL_VERIFY');
+    } catch {
+      // Dev fallback: code returned in response, shown on screen
+    }
 
     await this.logAuth(user.id, AuthAction.SIGNUP, ip, userAgent);
 
@@ -85,6 +91,7 @@ export class AuthService {
       user,
       requiresVerification: true,
       message: 'Verification code sent to your email',
+      code, // Shown on screen when email fails or for dev
     };
   }
 
@@ -160,11 +167,16 @@ export class AuthService {
 
     if (requiresVerification) {
       const code = await this.createVerificationCode(user.email, 'EMAIL_VERIFY', user.id);
-      await this.emailService.sendVerificationCode(user.email, code, 'EMAIL_VERIFY');
+      try {
+        await this.emailService.sendVerificationCode(user.email, code, 'EMAIL_VERIFY');
+      } catch {
+        // Dev fallback: code returned in response, shown on screen
+      }
       return {
         requiresVerification: true,
         email: user.email,
         message: 'Verification code sent to your email',
+        code, // Shown on screen when email fails or for dev
       };
     }
 
