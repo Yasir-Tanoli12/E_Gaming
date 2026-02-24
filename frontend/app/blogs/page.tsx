@@ -2,24 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
 import { contentApi, type SiteContent } from "@/lib/content-api";
 
 export default function BlogsPage() {
-  const router = useRouter();
-  const { user, isInitialized } = useAuth();
   const [content, setContent] = useState<SiteContent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (!isInitialized) return;
-    if (!user) {
-      router.replace("/login");
-      return;
-    }
-  }, [user, isInitialized, router]);
 
   useEffect(() => {
     async function load() {
@@ -34,18 +22,6 @@ export default function BlogsPage() {
     }
     load();
   }, []);
-
-  if (!isInitialized) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-950">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
-      </div>
-    );
-  }
-
-  if (!user) {
-    return null;
-  }
 
   const blogs = content?.blogs ?? [];
   const [featuredBlog, ...otherBlogs] = blogs;

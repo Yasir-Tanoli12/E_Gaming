@@ -41,6 +41,52 @@ model NewsPoster {
   updatedAt DateTime @updatedAt @map("updated_at")
 }
 
+model Contact {
+  id        String   @id @default("default")
+  facebook  String   @default("")
+  whatsapp  String   @default("")
+  instagram String   @default("")
+  email     String   @default("")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model Blog {
+  id        String   @id @default(cuid())
+  title     String
+  excerpt   String?
+  content   String?  @db.Text
+  imageUrl  String?  @map("image_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model Faq {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  reviewer   String
+  message    String   @db.Text
+  rating     Int      @default(5)
+  isFeatured Boolean  @default(true) @map("is_featured")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+}
+
+model PrivacyPolicy {
+  id        String   @id @default("default")
+  content   String   @db.Text
+  updatedBy String?  @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
 // Email verification codes (signup, login 2FA, password reset)
 model VerificationCode {
   id        String   @id @default(cuid())

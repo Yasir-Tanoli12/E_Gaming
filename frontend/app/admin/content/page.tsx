@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { gamesApi } from "@/lib/games-api";
 import {
   contentApi,
   type BlogItem,
-  type FaqItem,
+  type ReviewItem,
   type SiteContacts,
 } from "@/lib/content-api";
 
@@ -14,7 +15,9 @@ export default function AdminContentPage() {
   const [loading, setLoading] = useState(true);
   const [savingContacts, setSavingContacts] = useState(false);
   const [savingBlog, setSavingBlog] = useState(false);
-  const [savingFaq, setSavingFaq] = useState(false);
+  const [savingReview, setSavingReview] = useState(false);
+  const [savingPolicy, setSavingPolicy] = useState(false);
+  const [uploadingBlogImage, setUploadingBlogImage] = useState(false);
   const [error, setError] = useState("");
 
   const [contacts, setContacts] = useState<SiteContacts>({
@@ -24,7 +27,8 @@ export default function AdminContentPage() {
     email: "",
   });
   const [blogs, setBlogs] = useState<BlogItem[]>([]);
-  const [faqs, setFaqs] = useState<FaqItem[]>([]);
+  const [reviews, setReviews] = useState<ReviewItem[]>([]);
+  const [privacyPolicy, setPrivacyPolicy] = useState("");
 
   const [blogForm, setBlogForm] = useState({
     title: "",
@@ -32,9 +36,11 @@ export default function AdminContentPage() {
     content: "",
     imageUrl: "",
   });
-  const [faqForm, setFaqForm] = useState({
-    question: "",
-    answer: "",
+  const [reviewForm, setReviewForm] = useState({
+    reviewer: "",
+    message: "",
+    rating: 5,
+    isFeatured: true,
   });
 
   async function load() {
@@ -44,7 +50,8 @@ export default function AdminContentPage() {
       const data = await contentApi.getAdmin();
       setContacts(data.contacts);
       setBlogs(data.blogs);
-      setFaqs(data.faqs);
+      setReviews(data.reviews);
+      setPrivacyPolicy(data.privacyPolicy || "");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load content");
     } finally {
@@ -99,31 +106,60 @@ export default function AdminContentPage() {
     }
   }
 
-  async function addFaq() {
-    if (!faqForm.question.trim() || !faqForm.answer.trim()) return;
-    setSavingFaq(true);
+  async function uploadBlogImage(file: File | null) {
+    if (!file) return;
+    setUploadingBlogImage(true);
     setError("");
     try {
-      await contentApi.createFaq({
-        question: faqForm.question.trim(),
-        answer: faqForm.answer.trim(),
-      });
-      setFaqForm({ question: "", answer: "" });
-      await load();
+      const { url } = await gamesApi.uploadMedia(file);
+      setBlogForm((p) => ({ ...p, imageUrl: url }));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to create Q/A");
+      setError(err instanceof Error ? err.message : "Failed to upload image");
     } finally {
-      setSavingFaq(false);
+      setUploadingBlogImage(false);
     }
   }
 
-  async function deleteFaq(id: string) {
-    if (!confirm("Delete this Q/A item?")) return;
+  async function addReview() {
+    if (!reviewForm.reviewer.trim() || !reviewForm.message.trim()) return;
+    setSavingReview(true);
+    setError("");
     try {
-      await contentApi.removeFaq(id);
+      await contentApi.createReview({
+        reviewer: reviewForm.reviewer.trim(),
+        message: reviewForm.message.trim(),
+        rating: reviewForm.rating,
+        isFeatured: reviewForm.isFeatured,
+      });
+      setReviewForm({ reviewer: "", message: "", rating: 5, isFeatured: true });
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to delete Q/A");
+      setError(err instanceof Error ? err.message : "Failed to create review");
+    } finally {
+      setSavingReview(false);
+    }
+  }
+
+  async function deleteReview(id: string) {
+    if (!confirm("Delete this review?")) return;
+    try {
+      await contentApi.removeReview(id);
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete review");
+    }
+  }
+
+  async function savePrivacyPolicy() {
+    setSavingPolicy(true);
+    setError("");
+    try {
+      await contentApi.updatePrivacyPolicy(privacyPolicy);
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update privacy policy");
+    } finally {
+      setSavingPolicy(false);
     }
   }
 
@@ -136,7 +172,7 @@ export default function AdminContentPage() {
       <div>
         <h1 className="text-3xl font-black">Site Content Manager</h1>
         <p className="mt-1 text-zinc-400">
-          Manage contacts, blog section, and Q/A section.
+          Manage contacts, blogs, reviews, and privacy policy.
         </p>
       </div>
 
@@ -202,14 +238,23 @@ export default function AdminContentPage() {
               setBlogForm((p) => ({ ...p, excerpt: e.target.value }))
             }
           />
-          <Input
-            label="Image URL (optional)"
-            value={blogForm.imageUrl}
-            onChange={(e) =>
-              setBlogForm((p) => ({ ...p, imageUrl: e.target.value }))
-            }
-            placeholder="https://..."
-          />
+          <div>
+            <label className="mb-1 block text-sm font-medium text-zinc-300">
+              Upload blog image (optional)
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => uploadBlogImage(e.target.files?.[0] ?? null)}
+              className="rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-sm text-zinc-200"
+            />
+            {uploadingBlogImage && (
+              <p className="mt-1 text-xs text-cyan-300">Uploading...</p>
+            )}
+            <p className="mt-1 text-xs text-zinc-500">
+              Manual image URLs are disabled. Use local upload only.
+            </p>
+          </div>
           <div>
             <label className="mb-1 block text-sm font-medium text-zinc-300">
               Full blog content
@@ -255,54 +300,100 @@ export default function AdminContentPage() {
       </section>
 
       <section className="auth-card space-y-4 rounded-2xl border border-zinc-700/40 bg-zinc-900/60 p-6">
-        <h2 className="text-xl font-bold">Q/A</h2>
+        <h2 className="text-xl font-bold">Reviews</h2>
         <div className="grid gap-4">
           <Input
-            label="Question"
-            value={faqForm.question}
-            onChange={(e) => setFaqForm((p) => ({ ...p, question: e.target.value }))}
+            label="Reviewer name"
+            value={reviewForm.reviewer}
+            onChange={(e) => setReviewForm((p) => ({ ...p, reviewer: e.target.value }))}
           />
           <div>
             <label className="mb-1 block text-sm font-medium text-zinc-300">
-              Answer
+              Review message
             </label>
             <textarea
-              value={faqForm.answer}
-              onChange={(e) => setFaqForm((p) => ({ ...p, answer: e.target.value }))}
+              value={reviewForm.message}
+              onChange={(e) => setReviewForm((p) => ({ ...p, message: e.target.value }))}
               rows={4}
               className="w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-zinc-100"
             />
           </div>
+          <Input
+            label="Rating (1 to 5)"
+            type="number"
+            min={1}
+            max={5}
+            value={String(reviewForm.rating)}
+            onChange={(e) =>
+              setReviewForm((p) => ({
+                ...p,
+                rating: Math.min(5, Math.max(1, parseInt(e.target.value || "5", 10))),
+              }))
+            }
+          />
+          <label className="inline-flex items-center gap-2 text-sm text-zinc-200">
+            <input
+              type="checkbox"
+              checked={reviewForm.isFeatured}
+              onChange={(e) =>
+                setReviewForm((p) => ({ ...p, isFeatured: e.target.checked }))
+              }
+            />
+            Show on landing page
+          </label>
           <div>
             <Button
-              onClick={addFaq}
-              loading={savingFaq}
-              disabled={!faqForm.question.trim() || !faqForm.answer.trim()}
+              onClick={addReview}
+              loading={savingReview}
+              disabled={!reviewForm.reviewer.trim() || !reviewForm.message.trim()}
             >
-              Add Q/A
+              Add Review
             </Button>
           </div>
         </div>
 
         <div className="space-y-3">
-          {faqs.length === 0 ? (
-            <p className="text-sm text-zinc-500">No Q/A entries yet.</p>
+          {reviews.length === 0 ? (
+            <p className="text-sm text-zinc-500">No reviews yet.</p>
           ) : (
-            faqs.map((item) => (
+            reviews.map((item) => (
               <div
                 key={item.id}
                 className="flex items-center justify-between rounded-lg border border-zinc-700 bg-zinc-800/60 px-4 py-3"
               >
                 <div>
-                  <p className="font-medium">{item.question}</p>
-                  <p className="text-sm text-zinc-400">{item.answer}</p>
+                  <p className="font-medium">
+                    {item.reviewer} <span className="text-xs text-amber-300">({item.rating}/5)</span>
+                  </p>
+                  <p className="text-sm text-zinc-400">{item.message}</p>
+                  <p className="text-xs text-zinc-500">
+                    {item.isFeatured ? "Featured on landing" : "Hidden from landing"}
+                  </p>
                 </div>
-                <Button variant="secondary" onClick={() => deleteFaq(item.id)}>
+                <Button variant="secondary" onClick={() => deleteReview(item.id)}>
                   Delete
                 </Button>
               </div>
             ))
           )}
+        </div>
+      </section>
+
+      <section className="auth-card space-y-4 rounded-2xl border border-zinc-700/40 bg-zinc-900/60 p-6">
+        <h2 className="text-xl font-bold">Privacy Policy</h2>
+        <p className="text-sm text-zinc-400">
+          This content is shown on the public privacy policy page.
+        </p>
+        <textarea
+          value={privacyPolicy}
+          onChange={(e) => setPrivacyPolicy(e.target.value)}
+          rows={10}
+          className="w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-zinc-100"
+        />
+        <div>
+          <Button onClick={savePrivacyPolicy} loading={savingPolicy}>
+            Save Privacy Policy
+          </Button>
         </div>
       </section>
     </div>

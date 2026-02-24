@@ -28,7 +28,10 @@ export class GamesService {
     let existing: Record<string, unknown> = {};
     if (existsSync(this.configPath)) {
       try {
-        existing = JSON.parse(readFileSync(this.configPath, 'utf-8')) as Record<string, unknown>;
+        existing = JSON.parse(readFileSync(this.configPath, 'utf-8')) as Record<
+          string,
+          unknown
+        >;
       } catch {
         existing = {};
       }

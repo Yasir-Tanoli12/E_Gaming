@@ -1,4 +1,11 @@
-import { IsString, IsOptional, IsUrl, IsInt, Min } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsUrl,
+  IsInt,
+  Min,
+  Matches,
+} from 'class-validator';
 
 export class CreateGameDto {
   @IsString()
@@ -23,7 +30,10 @@ export class CreateGameDto {
   videoUrl?: string;
 
   @IsString()
-  gameLink: string; // URL or path to game
+  @Matches(/^(?!https?:\/\/).+/i, {
+    message: 'gameLink must be a local path, not an external URL',
+  })
+  gameLink: string; // Local route/path to game
 
   @IsOptional()
   @IsInt()
@@ -32,5 +42,4 @@ export class CreateGameDto {
 
   @IsOptional()
   isActive?: boolean;
-
 }

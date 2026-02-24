@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { UserRole } from '@prisma/client';
@@ -16,9 +17,12 @@ import { RolesGuard } from '../auth/roles.guard';
 import { ContentService } from './content.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { CreateFaqDto } from './dto/create-faq.dto';
+import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import { UpdateContactsDto } from './dto/update-contacts.dto';
 import { UpdateFaqDto } from './dto/update-faq.dto';
+import { UpdatePrivacyPolicyDto } from './dto/update-privacy-policy.dto';
+import { UpdateReviewDto } from './dto/update-review.dto';
 
 @Controller('content')
 export class ContentController {
@@ -84,5 +88,36 @@ export class ContentController {
   @Delete('faqs/:id')
   removeFaq(@Param('id') id: string) {
     return this.contentService.removeFaq(id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Post('reviews')
+  createReview(@Body() dto: CreateReviewDto) {
+    return this.contentService.createReview(dto);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Patch('reviews/:id')
+  updateReview(@Param('id') id: string, @Body() dto: UpdateReviewDto) {
+    return this.contentService.updateReview(id, dto);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Delete('reviews/:id')
+  removeReview(@Param('id') id: string) {
+    return this.contentService.removeReview(id);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Patch('privacy-policy')
+  updatePrivacyPolicy(
+    @Body() dto: UpdatePrivacyPolicyDto,
+    @Req() req: { user?: { email?: string } },
+  ) {
+    return this.contentService.updatePrivacyPolicy(dto, req.user?.email);
   }
 }

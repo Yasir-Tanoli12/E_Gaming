@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useAuth } from "@/contexts/AuthContext";
 import { gamesApi, type Game } from "@/lib/games-api";
 import { newsApi, type NewsPoster } from "@/lib/news-api";
 import { contentApi, type SiteContent } from "@/lib/content-api";
@@ -11,28 +9,16 @@ import { GameCard } from "@/components/GameCard";
 import { Button } from "@/components/ui/Button";
 
 export default function UserDashboardPage() {
-  const router = useRouter();
-  const { user, isInitialized, logout } = useAuth();
   const [games, setGames] = useState<Game[]>([]);
   const [topGames, setTopGames] = useState<Game[]>([]);
   const [content, setContent] = useState<SiteContent | null>(null);
   const [newsPoster, setNewsPoster] = useState<NewsPoster | null>(null);
   const [showNews, setShowNews] = useState(false);
   const [showAgeWarning, setShowAgeWarning] = useState(true);
+  const [selectedGame, setSelectedGame] = useState<Game | null>(null);
+  const [showCredentialOptions, setShowCredentialOptions] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    if (!isInitialized) return;
-    if (!user) {
-      router.replace("/login");
-      return;
-    }
-    if (user.role === "ADMIN") {
-      router.replace("/admin/dashboard");
-      return;
-    }
-  }, [user, isInitialized, router]);
 
   useEffect(() => {
     async function load() {
@@ -61,18 +47,6 @@ export default function UserDashboardPage() {
     load();
   }, []);
 
-  if (!isInitialized) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-950">
-        <div className="h-10 w-10 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
-      </div>
-    );
-  }
-
-  if (!user || user.role === "ADMIN") {
-    return null;
-  }
-
   const topIds = new Set(topGames.map((g) => g.id));
   const orderedGames = [...games].sort((a, b) => {
     const aTop = topIds.has(a.id) ? 1 : 0;
@@ -81,9 +55,14 @@ export default function UserDashboardPage() {
     return (a.sortOrder ?? 0) - (b.sortOrder ?? 0);
   });
   const contacts = content?.contacts;
+  const whatsappLink = contacts?.whatsapp
+    ? contacts.whatsapp.startsWith("http")
+      ? contacts.whatsapp
+      : `https://wa.me/${contacts.whatsapp.replace(/\D/g, "")}`
+    : "";
   const heroVideo = orderedGames.find((game) => game.videoUrl)?.videoUrl ?? null;
-  const faqItems = content?.faqs ?? [];
-  const movingFaqItems = faqItems.length > 0 ? [...faqItems, ...faqItems] : [];
+  const reviewItems = content?.reviews ?? [];
+  const movingReviewItems = reviewItems.length > 0 ? [...reviewItems, ...reviewItems] : [];
 
   return (
     <div className="min-h-screen bg-[#050814] text-white">
@@ -106,7 +85,8 @@ export default function UserDashboardPage() {
               { label: "Lobby", href: "/dashboard", active: true },
               { label: "Games", href: "#games" },
               { label: "Blogs", href: "/blogs" },
-              { label: "Q/A", href: "#qa" },
+              { label: "Reviews", href: "#reviews" },
+              { label: "Privacy", href: "/privacy-policy" },
               { label: "Support", href: "#support" },
             ].map((item) => (
               <Link
@@ -149,12 +129,9 @@ export default function UserDashboardPage() {
                 WhatsApp
               </a>
             )}
-            <span className="hidden rounded-full border border-cyan-300/30 bg-cyan-400/10 px-3 py-1 text-xs text-cyan-200 md:block">
-              {user.email}
-            </span>
-            <Button variant="secondary" onClick={logout}>
-              Sign out
-            </Button>
+            <Link href="/login">
+              <Button variant="secondary">Admin Login</Button>
+            </Link>
           </div>
         </div>
       </header>
@@ -249,12 +226,105 @@ export default function UserDashboardPage() {
                   ✕
                 </button>
               </div>
-              {newsPoster.linkUrl ? (
-                <a href={newsPoster.linkUrl} target="_blank" rel="noopener noreferrer">
-                  <img src={newsPoster.imageUrl} alt={newsPoster.title ?? "News"} className="max-h-[70vh] w-full object-cover" />
-                </a>
+              <img src={newsPoster.imageUrl} alt={newsPoster.title ?? "News"} className="max-h-[70vh] w-full object-cover" />
+            </div>
+          </div>
+        )}
+
+        {selectedGame && (
+          <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/80 p-4 backdrop-blur-[2px]">
+            <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-amber-300/40 bg-[#0b0904]/95 p-6 shadow-[0_0_70px_rgba(251,191,36,0.2)] md:p-8">
+              <div className="pointer-events-none absolute -left-16 top-4 h-48 w-48 rounded-full bg-fuchsia-500/20 blur-[80px]" />
+              <div className="pointer-events-none absolute -right-12 bottom-2 h-56 w-56 rounded-full bg-cyan-400/20 blur-[90px]" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(251,191,36,0.16),transparent_45%)]" />
+              <div className="flex items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.24em] text-amber-300">
+                    Game Access
+                  </p>
+                  <h3 className="mt-2 text-2xl font-black text-white">
+                    {selectedGame.title}
+                  </h3>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedGame(null);
+                    setShowCredentialOptions(false);
+                  }}
+                  className="rounded px-2 py-1 text-zinc-300 transition hover:bg-white/10"
+                >
+                  ✕
+                </button>
+              </div>
+
+              {!showCredentialOptions ? (
+                <>
+                  <p className="mt-3 text-base text-amber-100/85">
+                    Where do you want to go?
+                  </p>
+                  <div className="mt-5 flex flex-wrap gap-3">
+                    <Button
+                      onClick={() => {
+                        if (selectedGame.gameLink) {
+                          window.open(
+                            selectedGame.gameLink,
+                            "_blank",
+                            "noopener,noreferrer"
+                          );
+                        }
+                        setSelectedGame(null);
+                        setShowCredentialOptions(false);
+                      }}
+                    >
+                      Play Now
+                    </Button>
+                    <Button
+                      variant="secondary"
+                      onClick={() => setShowCredentialOptions(true)}
+                    >
+                      Buy Credentials
+                    </Button>
+                  </div>
+                </>
               ) : (
-                <img src={newsPoster.imageUrl} alt={newsPoster.title ?? "News"} className="max-h-[70vh] w-full object-cover" />
+                <>
+                  <p className="mt-3 text-base text-amber-100/85">
+                    Contact admin for credentials:
+                  </p>
+                  <div className="mt-5 flex flex-wrap gap-3">
+                    <a
+                      href={contacts?.facebook || "#"}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition ${
+                        contacts?.facebook
+                          ? "border border-fuchsia-300/50 bg-fuchsia-500/20 text-fuchsia-100 shadow-[0_0_20px_rgba(217,70,239,0.28)] hover:-translate-y-0.5 hover:bg-fuchsia-500/30"
+                          : "pointer-events-none border border-zinc-700 bg-zinc-800 text-zinc-500"
+                      }`}
+                    >
+                      Messenger
+                    </a>
+                    <a
+                      href={whatsappLink || "#"}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition ${
+                        whatsappLink
+                          ? "border border-emerald-300/50 bg-emerald-500/20 text-emerald-100 shadow-[0_0_20px_rgba(16,185,129,0.28)] hover:-translate-y-0.5 hover:bg-emerald-500/30"
+                          : "pointer-events-none border border-zinc-700 bg-zinc-800 text-zinc-500"
+                      }`}
+                    >
+                      WhatsApp
+                    </a>
+                    <Button
+                      variant="secondary"
+                      onClick={() => setShowCredentialOptions(false)}
+                    >
+                      Back
+                    </Button>
+                  </div>
+                </>
               )}
             </div>
           </div>
@@ -284,50 +354,41 @@ export default function UserDashboardPage() {
                   className="animate-fade-in"
                   style={{ animationDelay: `${i * 80}ms` }}
                 >
-                  <GameCard game={game} isTop={topIds.has(game.id)} />
+                  <GameCard
+                    game={game}
+                    isTop={topIds.has(game.id)}
+                    onPlayRequest={(clickedGame) => {
+                      setSelectedGame(clickedGame);
+                      setShowCredentialOptions(false);
+                    }}
+                  />
                 </div>
               ))}
             </div>
 
-            <section className="rounded-2xl border border-cyan-300/20 bg-[#0a1432]/60 p-6">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <h2 className="text-2xl font-black">Blogs</h2>
-                  <p className="mt-1 text-sm text-cyan-100/70">
-                    Read all updates and posts on the separate blogs page.
-                  </p>
-                </div>
-                <Link
-                  href="/blogs"
-                  className="rounded-full border border-fuchsia-300/40 bg-fuchsia-500/10 px-4 py-2 text-sm font-semibold text-fuchsia-100 transition hover:bg-fuchsia-500/20"
-                >
-                  Open Blogs Page
-                </Link>
-              </div>
-            </section>
-
-            <section id="qa">
+            <section id="reviews">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-2xl font-black">Q/A</h2>
-                <span className="text-xs text-cyan-200/70">Live community feed</span>
+                <h2 className="text-2xl font-black">Reviews</h2>
+                <span className="text-xs text-cyan-200/70">What players are saying</span>
               </div>
-              {faqItems.length === 0 ? (
+              {reviewItems.length === 0 ? (
                 <div className="rounded-xl border border-zinc-700/50 bg-zinc-900/30 p-5 text-sm text-zinc-400">
-                  No questions added yet.
+                  No reviews added yet.
                 </div>
               ) : (
                 <div className="qa-marquee-shell">
                   <div className="qa-marquee-glow" />
                   <div className="qa-marquee-track">
-                    {movingFaqItems.map((item, index) => (
+                    {movingReviewItems.map((item, index) => (
                       <article
                         key={`${item.id}-${index}`}
                         className="qa-marquee-card"
                       >
                         <p className="text-sm font-bold tracking-wide text-white">
-                          {item.question}
+                          {item.reviewer}
                         </p>
-                        <p className="mt-2 text-sm italic text-cyan-100/85">{item.answer}</p>
+                        <p className="mt-2 text-sm italic text-cyan-100/85">{item.message}</p>
+                        <p className="mt-2 text-xs text-amber-300/90">Rating: {item.rating}/5</p>
                       </article>
                     ))}
                   </div>
@@ -357,6 +418,7 @@ export default function UserDashboardPage() {
               <div className="mt-3 space-y-2 text-sm">
                 <a href="#games" className="block text-cyan-100/70 transition hover:text-white">Games</a>
                 <Link href="/blogs" className="block text-cyan-100/70 transition hover:text-white">Blogs</Link>
+                <Link href="/privacy-policy" className="block text-cyan-100/70 transition hover:text-white">Privacy Policy</Link>
                 <a href="#leaderboard" className="block text-cyan-100/70 transition hover:text-white">Leaderboard</a>
                 <a href="#rewards" className="block text-cyan-100/70 transition hover:text-white">Rewards</a>
               </div>

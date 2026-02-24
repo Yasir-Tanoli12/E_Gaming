@@ -4,7 +4,6 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { getDashboardPath } from "@/lib/types/auth";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
@@ -13,7 +12,7 @@ export default function VerifyEmailPage() {
   const searchParams = useSearchParams();
   const { verifyEmail, verifyLogin, isLoading } = useAuth();
   const emailParam = searchParams.get("email") ?? "";
-  const flow = searchParams.get("flow") ?? "register";
+  const flow = searchParams.get("flow") ?? "login";
   const codeParam = searchParams.get("code") ?? "";
 
   const [email, setEmail] = useState(emailParam);
@@ -43,7 +42,11 @@ export default function VerifyEmailPage() {
       } else {
         user = await verifyEmail({ email: email.trim(), code });
       }
-      router.push(getDashboardPath(user));
+      if (user.role !== "ADMIN") {
+        setError("Only admin accounts can sign in.");
+        return;
+      }
+      router.push("/admin/dashboard");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Verification failed");
     }
@@ -90,8 +93,8 @@ export default function VerifyEmailPage() {
         </Button>
       </form>
       <p className="mt-6 text-center text-sm text-zinc-400">
-        <Link href={flow === "login" ? "/login" : "/register"} className="text-emerald-400 hover:text-emerald-300">
-          Back to {flow === "login" ? "sign in" : "sign up"}
+        <Link href="/login" className="text-emerald-400 hover:text-emerald-300">
+          Back to sign in
         </Link>
       </p>
     </div>

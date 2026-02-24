@@ -12,12 +12,5 @@ export class CreateNewsDto {
   imageUrl: string;
 
   @IsOptional()
-  @IsUrl({
-    require_protocol: true,
-    require_tld: false,
-  })
-  linkUrl?: string;
-
-  @IsOptional()
   isActive?: boolean;
 }

@@ -15,7 +15,6 @@ export default function AdminNewsPage() {
   const [form, setForm] = useState({
     title: "",
     imageUrl: "",
-    linkUrl: "",
     isActive: true,
   });
 
@@ -55,10 +54,9 @@ export default function AdminNewsPage() {
       await newsApi.create({
         title: form.title || undefined,
         imageUrl: form.imageUrl,
-        linkUrl: form.linkUrl || undefined,
         isActive: form.isActive,
       });
-      setForm({ title: "", imageUrl: "", linkUrl: "", isActive: true });
+      setForm({ title: "", imageUrl: "", isActive: true });
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save");
@@ -105,15 +103,9 @@ export default function AdminNewsPage() {
           value={form.title}
           onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))}
         />
-        <Input
-          label="Image URL"
-          value={form.imageUrl}
-          onChange={(e) => setForm((p) => ({ ...p, imageUrl: e.target.value }))}
-          placeholder="https://..."
-        />
         <div>
           <label className="mb-1 block text-sm font-medium text-zinc-300">
-            Or upload poster image
+            Upload poster image (local file)
           </label>
           <input
             type="file"
@@ -122,13 +114,10 @@ export default function AdminNewsPage() {
             className="rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-sm text-zinc-200"
           />
           {uploading && <p className="mt-1 text-xs text-cyan-300">Uploading...</p>}
+          <p className="mt-1 text-xs text-zinc-500">
+            Manual image/link URLs are disabled. Use local upload only.
+          </p>
         </div>
-        <Input
-          label="Target Link (optional)"
-          value={form.linkUrl}
-          onChange={(e) => setForm((p) => ({ ...p, linkUrl: e.target.value }))}
-          placeholder="https://..."
-        />
         <label className="inline-flex items-center gap-2 text-sm text-zinc-200">
           <input
             type="checkbox"

@@ -16,7 +16,8 @@ export class EmailService {
       return;
     }
 
-    const from = this.config.get<string>('MAIL_FROM') ?? 'E-Gaming <noreply@egaming.com>';
+    const from =
+      this.config.get<string>('MAIL_FROM') ?? 'E-Gaming <noreply@egaming.com>';
     const appName = this.config.get<string>('APP_NAME') ?? 'E-Gaming';
 
     const subject =

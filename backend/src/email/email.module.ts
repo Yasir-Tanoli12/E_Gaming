@@ -22,7 +22,10 @@ import { EmailService } from './email.service';
               }
             : { jsonTransport: true },
           defaults: {
-            from: config.get<string>('MAIL_FROM', '"E-Gaming" <noreply@egaming.com>'),
+            from: config.get<string>(
+              'MAIL_FROM',
+              '"E-Gaming" <noreply@egaming.com>',
+            ),
           },
         };
       },

@@ -2,11 +2,21 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usersApi, type ApiUser } from "@/lib/users-api";
+import {
+  usersApi,
+  type ApiUser,
+  type AdminAllowlistEntry,
+} from "@/lib/users-api";
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 
 export default function AdminDashboardPage() {
   const [users, setUsers] = useState<ApiUser[]>([]);
+  const [allowedAdmins, setAllowedAdmins] = useState<AdminAllowlistEntry[]>([]);
+  const [allowEmail, setAllowEmail] = useState("");
+  const [allowlistLoading, setAllowlistLoading] = useState(true);
+  const [savingAllowEmail, setSavingAllowEmail] = useState(false);
+  const [removingAllowEmail, setRemovingAllowEmail] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -26,7 +36,20 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     loadUsers();
+    loadAllowlist();
   }, []);
+
+  async function loadAllowlist() {
+    setAllowlistLoading(true);
+    try {
+      const data = await usersApi.listAdminAllowlist();
+      setAllowedAdmins(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load allowlist");
+    } finally {
+      setAllowlistLoading(false);
+    }
+  }
 
   async function toggleRole(u: ApiUser) {
     if (updatingId) return;
@@ -42,6 +65,37 @@ export default function AdminDashboardPage() {
       setError(err instanceof Error ? err.message : "Failed to update role");
     } finally {
       setUpdatingId(null);
+    }
+  }
+
+  async function addAllowedAdminEmail(e: React.FormEvent) {
+    e.preventDefault();
+    if (!allowEmail.trim()) return;
+    setSavingAllowEmail(true);
+    setError("");
+    try {
+      const res = await usersApi.addAdminAllowlist(allowEmail.trim());
+      if (!res.alreadyExists) {
+        await loadAllowlist();
+      }
+      setAllowEmail("");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to add admin email");
+    } finally {
+      setSavingAllowEmail(false);
+    }
+  }
+
+  async function removeAllowedAdminEmail(email: string) {
+    setRemovingAllowEmail(email);
+    setError("");
+    try {
+      await usersApi.removeAdminAllowlist(email);
+      setAllowedAdmins((prev) => prev.filter((x) => x.email !== email));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to remove admin email");
+    } finally {
+      setRemovingAllowEmail(null);
     }
   }
 
@@ -64,6 +118,53 @@ export default function AdminDashboardPage() {
           {error}
         </div>
       )}
+
+      <section className="mt-6 rounded-xl border border-zinc-800 bg-zinc-900/50 p-5">
+        <h2 className="text-lg font-semibold text-white">Admin allowlist</h2>
+        <p className="mt-1 text-sm text-zinc-400">
+          Add an email here to allow that person to create an admin account from the register page.
+        </p>
+        <form onSubmit={addAllowedAdminEmail} className="mt-4 flex flex-wrap items-end gap-3">
+          <div className="min-w-[280px] flex-1">
+            <Input
+              label="Allowed admin email"
+              type="email"
+              value={allowEmail}
+              onChange={(e) => setAllowEmail(e.target.value)}
+              placeholder="admin@example.com"
+              required
+            />
+          </div>
+          <Button type="submit" loading={savingAllowEmail}>
+            Add email
+          </Button>
+        </form>
+
+        {allowlistLoading ? (
+          <p className="mt-4 text-sm text-zinc-400">Loading allowlist...</p>
+        ) : allowedAdmins.length === 0 ? (
+          <p className="mt-4 text-sm text-zinc-500">No allowlisted emails yet.</p>
+        ) : (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {allowedAdmins.map((item) => (
+              <div
+                key={item.email}
+                className="flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-800/70 px-3 py-1.5"
+              >
+                <span className="text-sm text-zinc-200">{item.email}</span>
+                <button
+                  type="button"
+                  className="text-xs text-red-300 hover:text-red-200"
+                  onClick={() => removeAllowedAdminEmail(item.email)}
+                  disabled={removingAllowEmail === item.email}
+                >
+                  {removingAllowEmail === item.email ? "Removing..." : "Remove"}
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
 
       {loading ? (
         <div className="mt-8 flex justify-center">

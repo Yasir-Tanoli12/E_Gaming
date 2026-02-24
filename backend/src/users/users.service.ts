@@ -1,10 +1,52 @@
 import { Injectable, ForbiddenException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserRole } from '@prisma/client';
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
+
+type AdminAllowlistEntry = {
+  email: string;
+  addedAt: string;
+};
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
+  private readonly allowlistPath = join(
+    process.cwd(),
+    'data',
+    'admin-allowlist.json',
+  );
+
+  private normalizeEmail(email: string) {
+    return email.trim().toLowerCase();
+  }
+
+  private readAdminAllowlist(): AdminAllowlistEntry[] {
+    try {
+      if (!existsSync(this.allowlistPath)) return [];
+      const raw = readFileSync(this.allowlistPath, 'utf-8');
+      const parsed = JSON.parse(raw) as AdminAllowlistEntry[];
+      if (!Array.isArray(parsed)) return [];
+      return parsed
+        .filter((x) => typeof x?.email === 'string')
+        .map((x) => ({
+          email: this.normalizeEmail(x.email),
+          addedAt:
+            typeof x?.addedAt === 'string'
+              ? x.addedAt
+              : new Date().toISOString(),
+        }));
+    } catch {
+      return [];
+    }
+  }
+
+  private writeAdminAllowlist(items: AdminAllowlistEntry[]) {
+    const dir = join(process.cwd(), 'data');
+    if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+    writeFileSync(this.allowlistPath, JSON.stringify(items, null, 2), 'utf-8');
+  }
 
   async findAll() {
     return this.prisma.user.findMany({
@@ -64,5 +106,41 @@ export class UsersService {
         },
       },
     });
+  }
+
+  getAdminAllowlist() {
+    return this.readAdminAllowlist().sort((a, b) =>
+      b.addedAt.localeCompare(a.addedAt),
+    );
+  }
+
+  addAdminAllowlist(email: string) {
+    const normalized = this.normalizeEmail(email);
+    const items = this.readAdminAllowlist();
+    if (items.some((x) => x.email === normalized)) {
+      return { email: normalized, alreadyExists: true };
+    }
+    const next: AdminAllowlistEntry = {
+      email: normalized,
+      addedAt: new Date().toISOString(),
+    };
+    items.unshift(next);
+    this.writeAdminAllowlist(items);
+    return { ...next, alreadyExists: false };
+  }
+
+  removeAdminAllowlist(email: string) {
+    const normalized = this.normalizeEmail(email);
+    const items = this.readAdminAllowlist();
+    const before = items.length;
+    const filtered = items.filter((x) => x.email !== normalized);
+    this.writeAdminAllowlist(filtered);
+    return { removed: before !== filtered.length };
+  }
+
+  isEmailAllowedForAdminSignup(email: string) {
+    const normalized = this.normalizeEmail(email);
+    const items = this.readAdminAllowlist();
+    return items.some((x) => x.email === normalized);
   }
 }

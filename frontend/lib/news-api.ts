@@ -4,7 +4,6 @@ export interface NewsPoster {
   id: string;
   title: string | null;
   imageUrl: string;
-  linkUrl: string | null;
   isActive: boolean;
   createdAt: string;
 }
@@ -12,7 +11,6 @@ export interface NewsPoster {
 export interface NewsInput {
   title?: string;
   imageUrl: string;
-  linkUrl?: string;
   isActive?: boolean;
 }
 

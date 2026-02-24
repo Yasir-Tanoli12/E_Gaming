@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import { getDashboardPath } from "@/lib/types/auth";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
@@ -27,9 +26,9 @@ export default function LoginPage() {
         return;
       }
       if (result.user) {
-        router.push(getDashboardPath(result.user));
+        router.push("/admin/dashboard");
       } else {
-        router.push("/");
+        router.push("/admin/dashboard");
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
@@ -38,9 +37,9 @@ export default function LoginPage() {
 
   return (
     <div className="auth-card rounded-2xl border border-zinc-700/50 bg-zinc-800/80 p-8 shadow-xl backdrop-blur">
-      <h1 className="text-2xl font-bold text-white">Sign in</h1>
+      <h1 className="text-2xl font-bold text-white">Admin sign in</h1>
       <p className="mt-1 text-zinc-400">
-        Enter your email and password. We&apos;ll send a code to your email if verification is needed.
+        Enter admin email and password. We&apos;ll send a code to your email if verification is needed.
       </p>
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <Input
@@ -79,9 +78,9 @@ export default function LoginPage() {
         </Button>
       </form>
       <p className="mt-6 text-center text-sm text-zinc-400">
-        Don&apos;t have an account?{" "}
-        <Link href="/register" className="text-emerald-400 hover:text-emerald-300 font-medium">
-          Sign up
+        Invited admin?{" "}
+        <Link href="/register" className="font-medium text-emerald-400 hover:text-emerald-300">
+          Create your account
         </Link>
       </p>
     </div>

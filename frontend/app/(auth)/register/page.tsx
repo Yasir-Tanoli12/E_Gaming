@@ -41,9 +41,9 @@ export default function RegisterPage() {
 
   return (
     <div className="auth-card rounded-2xl border border-zinc-700/50 bg-zinc-800/80 p-8 shadow-xl backdrop-blur">
-      <h1 className="text-2xl font-bold text-white">Create account</h1>
+      <h1 className="text-2xl font-bold text-white">Admin account registration</h1>
       <p className="mt-1 text-zinc-400">
-        We&apos;ll send a 6-digit code to your email to verify your account.
+        Your email must be allowlisted by an existing admin before signup.
       </p>
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <Input
@@ -86,7 +86,7 @@ export default function RegisterPage() {
           <p className="text-sm text-red-400">{error}</p>
         )}
         <Button type="submit" fullWidth loading={isLoading}>
-          Sign up
+          Create admin account
         </Button>
       </form>
       <p className="mt-6 text-center text-sm text-zinc-400">

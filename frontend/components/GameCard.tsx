@@ -6,9 +6,10 @@ import type { Game } from "@/lib/games-api";
 interface GameCardProps {
   game: Game;
   isTop?: boolean;
+  onPlayRequest?: (game: Game) => void;
 }
 
-export function GameCard({ game, isTop = false }: GameCardProps) {
+export function GameCard({ game, isTop = false, onPlayRequest }: GameCardProps) {
   const [hovered, setHovered] = useState(false);
   const [thumbError, setThumbError] = useState(false);
   const [videoError, setVideoError] = useState(false);
@@ -24,6 +25,10 @@ export function GameCard({ game, isTop = false }: GameCardProps) {
   const imageUrl = maybeThumbIsVideo ? null : thumbnailUrl;
 
   function handlePlay() {
+    if (onPlayRequest) {
+      onPlayRequest(game);
+      return;
+    }
     if (game.gameLink) {
       window.open(game.gameLink, "_blank", "noopener,noreferrer");
     }

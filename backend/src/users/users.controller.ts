@@ -1,10 +1,21 @@
-import { Controller, Get, Param, Patch, Body, UseGuards, Req } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Patch,
+  Body,
+  UseGuards,
+  Req,
+  Post,
+  Delete,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { UserRole } from '@prisma/client';
 import { UpdateRoleDto } from './dto/update-role.dto';
+import { AddAdminEmailDto } from './dto/add-admin-email.dto';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -29,6 +40,21 @@ export class UsersController {
   @Get('auth-logs')
   getAuthLogs() {
     return this.usersService.getAuthLogs();
+  }
+
+  @Get('admin-allowlist')
+  getAdminAllowlist() {
+    return this.usersService.getAdminAllowlist();
+  }
+
+  @Post('admin-allowlist')
+  addAdminAllowlist(@Body() dto: AddAdminEmailDto) {
+    return this.usersService.addAdminAllowlist(dto.email);
+  }
+
+  @Delete('admin-allowlist/:email')
+  removeAdminAllowlist(@Param('email') email: string) {
+    return this.usersService.removeAdminAllowlist(decodeURIComponent(email));
   }
 
   @Get(':id/auth-logs')

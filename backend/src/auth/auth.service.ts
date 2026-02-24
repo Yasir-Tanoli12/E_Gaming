@@ -3,12 +3,14 @@ import {
   UnauthorizedException,
   ConflictException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { EmailService } from '../email/email.service';
+import { UsersService } from '../users/users.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { AuthAction, UserRole } from '@prisma/client';
@@ -25,6 +27,7 @@ export class AuthService {
     private prisma: PrismaService,
     private jwtService: JwtService,
     private emailService: EmailService,
+    private usersService: UsersService,
   ) {}
 
   private generateCode(): string {
@@ -47,25 +50,36 @@ export class AuthService {
   }
 
   async register(dto: RegisterDto, ip?: string, userAgent?: string) {
+    const userCount = await this.prisma.user.count();
+    const normalizedEmail = dto.email.toLowerCase();
+
+    if (
+      userCount > 0 &&
+      !this.usersService.isEmailAllowedForAdminSignup(normalizedEmail)
+    ) {
+      throw new ForbiddenException(
+        'Signup not allowed for this email. Ask an admin to allowlist your email first.',
+      );
+    }
+
     const existing = await this.prisma.user.findUnique({
-      where: { email: dto.email.toLowerCase() },
+      where: { email: normalizedEmail },
     });
 
     if (existing) {
       throw new ConflictException('Email already registered');
     }
 
-    const isFirstUser = (await this.prisma.user.count()) === 0;
     const passwordHash = await bcrypt.hash(dto.password, 12);
 
     const user = await this.prisma.user.create({
       data: {
-        email: dto.email.toLowerCase(),
+        email: normalizedEmail,
         passwordHash,
         name: dto.name ?? null,
         phone: dto.phone ?? null,
         emailVerified: false,
-        role: isFirstUser ? UserRole.ADMIN : UserRole.USER,
+        role: UserRole.ADMIN,
       },
       select: {
         id: true,
@@ -78,9 +92,17 @@ export class AuthService {
       },
     });
 
-    const code = await this.createVerificationCode(user.email, 'EMAIL_VERIFY', user.id);
+    const code = await this.createVerificationCode(
+      user.email,
+      'EMAIL_VERIFY',
+      user.id,
+    );
     try {
-      await this.emailService.sendVerificationCode(user.email, code, 'EMAIL_VERIFY');
+      await this.emailService.sendVerificationCode(
+        user.email,
+        code,
+        'EMAIL_VERIFY',
+      );
     } catch {
       // Dev fallback: code returned in response, shown on screen
     }
@@ -95,7 +117,12 @@ export class AuthService {
     };
   }
 
-  async verifyEmail(email: string, code: string, ip?: string, userAgent?: string) {
+  async verifyEmail(
+    email: string,
+    code: string,
+    ip?: string,
+    userAgent?: string,
+  ) {
     const record = await this.prisma.verificationCode.findFirst({
       where: {
         email: email.toLowerCase(),
@@ -157,6 +184,10 @@ export class AuthService {
       throw new UnauthorizedException('Account is disabled');
     }
 
+    if (user.role !== UserRole.ADMIN) {
+      throw new UnauthorizedException('Admin access required');
+    }
+
     if (user.lockedUntil && new Date() < user.lockedUntil) {
       throw new UnauthorizedException(
         `Account locked. Try again after ${user.lockedUntil.toISOString()}`,
@@ -166,9 +197,17 @@ export class AuthService {
     const requiresVerification = !user.emailVerified;
 
     if (requiresVerification) {
-      const code = await this.createVerificationCode(user.email, 'EMAIL_VERIFY', user.id);
+      const code = await this.createVerificationCode(
+        user.email,
+        'EMAIL_VERIFY',
+        user.id,
+      );
       try {
-        await this.emailService.sendVerificationCode(user.email, code, 'EMAIL_VERIFY');
+        await this.emailService.sendVerificationCode(
+          user.email,
+          code,
+          'EMAIL_VERIFY',
+        );
       } catch {
         // Dev fallback: code returned in response, shown on screen
       }
@@ -200,7 +239,12 @@ export class AuthService {
     });
   }
 
-  async verifyLogin(email: string, code: string, ip?: string, userAgent?: string) {
+  async verifyLogin(
+    email: string,
+    code: string,
+    ip?: string,
+    userAgent?: string,
+  ) {
     const record = await this.prisma.verificationCode.findFirst({
       where: {
         email: email.toLowerCase(),
@@ -224,6 +268,10 @@ export class AuthService {
 
     if (!user.isActive) {
       throw new UnauthorizedException('Account is disabled');
+    }
+
+    if (user.role !== UserRole.ADMIN) {
+      throw new UnauthorizedException('Admin access required');
     }
 
     await this.prisma.$transaction([
@@ -262,8 +310,16 @@ export class AuthService {
       return { message: 'If the email exists, a reset code has been sent' };
     }
 
-    const code = await this.createVerificationCode(user.email, 'PASSWORD_RESET', user.id);
-    await this.emailService.sendVerificationCode(user.email, code, 'PASSWORD_RESET');
+    const code = await this.createVerificationCode(
+      user.email,
+      'PASSWORD_RESET',
+      user.id,
+    );
+    await this.emailService.sendVerificationCode(
+      user.email,
+      code,
+      'PASSWORD_RESET',
+    );
 
     return { message: 'If the email exists, a reset code has been sent' };
   }
@@ -303,7 +359,10 @@ export class AuthService {
   }
 
   async refreshTokens(refreshToken: string) {
-    const tokenHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
+    const tokenHash = crypto
+      .createHash('sha256')
+      .update(refreshToken)
+      .digest('hex');
 
     const record = await this.prisma.refreshToken.findFirst({
       where: {
@@ -316,6 +375,10 @@ export class AuthService {
 
     if (!record) {
       throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+
+    if (record.user.role !== UserRole.ADMIN) {
+      throw new UnauthorizedException('Admin access required');
     }
 
     await this.prisma.refreshToken.update({
@@ -342,8 +405,13 @@ export class AuthService {
     const payload = { sub: user.id, email: user.email, role: user.role };
     const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
     const refreshToken = crypto.randomBytes(40).toString('hex');
-    const refreshHash = crypto.createHash('sha256').update(refreshToken).digest('hex');
-    const expiresAt = new Date(Date.now() + REFRESH_TOKEN_DAYS * 24 * 60 * 60 * 1000);
+    const refreshHash = crypto
+      .createHash('sha256')
+      .update(refreshToken)
+      .digest('hex');
+    const expiresAt = new Date(
+      Date.now() + REFRESH_TOKEN_DAYS * 24 * 60 * 60 * 1000,
+    );
 
     await this.prisma.refreshToken.create({
       data: { userId: user.id, tokenHash: refreshHash, expiresAt },
@@ -364,7 +432,9 @@ export class AuthService {
   }
 
   private async incrementFailedAttempts(userId: string) {
-    const user = await this.prisma.user.findUniqueOrThrow({ where: { id: userId } });
+    const user = await this.prisma.user.findUniqueOrThrow({
+      where: { id: userId },
+    });
     const attempts = user.failedLoginAttempts + 1;
     const lockedUntil =
       attempts >= FAILED_ATTEMPT_LIMIT

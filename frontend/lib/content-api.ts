@@ -25,10 +25,22 @@ export interface FaqItem {
   updatedAt: string;
 }
 
+export interface ReviewItem {
+  id: string;
+  reviewer: string;
+  message: string;
+  rating: number;
+  isFeatured: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export interface SiteContent {
   contacts: SiteContacts;
   blogs: BlogItem[];
   faqs: FaqItem[];
+  reviews: ReviewItem[];
+  privacyPolicy: string;
 }
 
 export const contentApi = {
@@ -77,5 +89,31 @@ export const contentApi = {
     return apiRequest<{ removed: boolean }>(`/content/faqs/${id}`, {
       method: "DELETE",
     });
+  },
+  createReview(body: Omit<ReviewItem, "id" | "createdAt" | "updatedAt">) {
+    return apiRequest<ReviewItem>("/content/reviews", {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+  },
+  updateReview(id: string, body: Partial<ReviewItem>) {
+    return apiRequest<ReviewItem>(`/content/reviews/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    });
+  },
+  removeReview(id: string) {
+    return apiRequest<{ removed: boolean }>(`/content/reviews/${id}`, {
+      method: "DELETE",
+    });
+  },
+  updatePrivacyPolicy(content: string) {
+    return apiRequest<{ id: string; content: string; updatedAt: string }>(
+      "/content/privacy-policy",
+      {
+        method: "PATCH",
+        body: JSON.stringify({ content }),
+      }
+    );
   },
 };

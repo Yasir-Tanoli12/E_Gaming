@@ -83,6 +83,10 @@ export default function AdminGamesPage() {
     setSubmitting(true);
     setError("");
     try {
+      if (/^https?:\/\//i.test(form.gameLink.trim())) {
+        setError("Game link must be a local path (for example: /games/snake).");
+        return;
+      }
       const payload = {
         ...form,
         description: form.description || undefined,
@@ -187,14 +191,6 @@ export default function AdminGamesPage() {
               onChange={(e) => setForm({ ...form, description: e.target.value })}
               placeholder="Short description"
             />
-            <Input
-              label="Thumbnail URL (image)"
-              value={form.thumbnailUrl}
-              onChange={(e) =>
-                setForm({ ...form, thumbnailUrl: e.target.value })
-              }
-              placeholder="https://..."
-            />
             <div>
               <label className="mb-1 block text-sm font-medium text-zinc-300">
                 Upload thumbnail from local system
@@ -211,15 +207,9 @@ export default function AdminGamesPage() {
                 )}
               </div>
               <p className="mt-1 text-xs text-zinc-500">
-                Upload image and it will auto-fill the thumbnail URL.
+                Upload image from your machine. Manual URL links are disabled.
               </p>
             </div>
-            <Input
-              label="Hover video URL (video)"
-              value={form.videoUrl}
-              onChange={(e) => setForm({ ...form, videoUrl: e.target.value })}
-              placeholder="https://..."
-            />
             <div>
               <label className="mb-1 block text-sm font-medium text-zinc-300">
                 Upload hover video from local system
@@ -233,14 +223,14 @@ export default function AdminGamesPage() {
                 />
               </div>
               <p className="mt-1 text-xs text-zinc-500">
-                Upload video and it will auto-fill the hover video URL.
+                Upload video from your machine. Manual URL links are disabled.
               </p>
             </div>
             <Input
-              label="Game link (play URL)"
+              label="Game link (local path)"
               value={form.gameLink}
               onChange={(e) => setForm({ ...form, gameLink: e.target.value })}
-              placeholder="https://..."
+              placeholder="/games/your-game"
               required
             />
             <Input
