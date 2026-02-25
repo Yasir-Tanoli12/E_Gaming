@@ -1,13 +1,22 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 
+const GAMES_CACHE_KEY = 'games:public';
+const TOP_GAMES_CACHE_KEY = 'games:top';
+const CACHE_TTL_MS = 60 * 1000;
+
 @Injectable()
 export class GamesService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cache: Cache,
+  ) {}
 
   private configPath = join(process.cwd(), 'data', 'site-config.json');
 
@@ -43,9 +52,11 @@ export class GamesService {
     );
   }
 
-  // Public: get active games for landing page
+  // Public: get active games for landing page (cached 60s)
   async findAll() {
-    return this.prisma.withPoolRetry(() =>
+    const cached = await this.cache.get<Awaited<ReturnType<typeof this.findAll>>>(GAMES_CACHE_KEY);
+    if (cached) return cached;
+    const result = await this.prisma.withPoolRetry(() =>
       this.prisma.game.findMany({
         where: { isActive: true },
         orderBy: { sortOrder: 'asc' },
@@ -60,12 +71,17 @@ export class GamesService {
         },
       }),
     );
+    await this.cache.set(GAMES_CACHE_KEY, result, CACHE_TTL_MS);
+    return result;
   }
 
   async findTopGames() {
     const ids = this.readTopGameIds();
     if (!ids.length) return [];
-    return this.prisma.withPoolRetry(() =>
+    const cacheKey = `${TOP_GAMES_CACHE_KEY}:${ids.join(',')}`;
+    const cached = await this.cache.get<Awaited<ReturnType<typeof this.findTopGames>>>(cacheKey);
+    if (cached) return cached;
+    const result = await this.prisma.withPoolRetry(() =>
       this.prisma.game.findMany({
         where: { isActive: true, id: { in: ids } },
         orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
@@ -81,10 +97,13 @@ export class GamesService {
         },
       }),
     );
+    await this.cache.set(cacheKey, result, CACHE_TTL_MS);
+    return result;
   }
 
-  setTopGames(ids: string[]) {
+  async setTopGames(ids: string[]) {
     this.writeTopGameIds(ids);
+    await this.cache.del(GAMES_CACHE_KEY);
     return { topGameIds: ids };
   }
 
@@ -130,7 +149,7 @@ export class GamesService {
   }
 
   async create(dto: CreateGameDto) {
-    return this.prisma.game.create({
+    const result = await this.prisma.game.create({
       data: {
         title: dto.title,
         description: dto.description ?? null,
@@ -141,20 +160,26 @@ export class GamesService {
         isActive: dto.isActive ?? true,
       },
     });
+    await this.cache.del(GAMES_CACHE_KEY);
+    return result;
   }
 
   async update(id: string, dto: UpdateGameDto) {
     await this.findOne(id);
-    return this.prisma.game.update({
+    const result = await this.prisma.game.update({
       where: { id },
       data: dto as Record<string, unknown>,
     });
+    await this.cache.del(GAMES_CACHE_KEY);
+    return result;
   }
 
   async remove(id: string) {
     await this.findOne(id);
-    return this.prisma.game.delete({
+    const result = await this.prisma.game.delete({
       where: { id },
     });
+    await this.cache.del(GAMES_CACHE_KEY);
+    return result;
   }
 }

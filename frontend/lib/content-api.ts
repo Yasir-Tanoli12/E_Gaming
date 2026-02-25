@@ -6,6 +6,7 @@ export interface SiteContacts {
   instagram: string;
   email: string;
   logoUrl?: string | null;
+  lobbyVideoUrl?: string | null;
 }
 
 export interface BlogItem {
@@ -55,6 +56,25 @@ export interface SiteContent {
 }
 
 export const contentApi = {
+  async uploadLobbyVideo(file: File): Promise<{ lobbyVideoUrl: string | null; updatedAt: string }> {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch(`${baseUrl}/content/lobby-video`, {
+      method: "POST",
+      headers: {
+        ...getAuthHeaders(),
+      },
+      body: formData,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const message =
+        typeof data.message === "string" ? data.message : "Lobby video upload failed";
+      throw new Error(message);
+    }
+    return data as { lobbyVideoUrl: string | null; updatedAt: string };
+  },
   async uploadLogo(file: File): Promise<{ logoUrl: string | null; updatedAt: string }> {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
     const formData = new FormData();

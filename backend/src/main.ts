@@ -1,6 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
+import compression from 'compression';
 import { AppModule } from './app.module';
 import { join } from 'path';
 import * as express from 'express';
@@ -8,6 +9,7 @@ import * as express from 'express';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
+  app.use(compression());
   app.use(
     helmet({
       crossOriginResourcePolicy: { policy: 'cross-origin' },

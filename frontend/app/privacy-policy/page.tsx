@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { contentApi } from "@/lib/content-api";
+import { PublicNavbar } from "@/components/PublicNavbar";
 
 export default function PrivacyPolicyPage() {
   const [content, setContent] = useState("");
@@ -25,8 +26,9 @@ export default function PrivacyPolicyPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#050814] px-4 py-10 text-white">
-      <div className="mx-auto max-w-4xl">
+    <div className="min-h-screen bg-[#050814] text-white">
+      <PublicNavbar />
+      <div className="mx-auto max-w-4xl px-4 py-10">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             {logoUrl ? (

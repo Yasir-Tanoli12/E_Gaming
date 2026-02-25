@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/Input";
 const PASSWORD_HINT =
   "At least 8 characters, with uppercase, lowercase, and a number.";
 
-export default function ResetPasswordPage() {
+function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { resetPassword, isLoading } = useAuth();
@@ -90,5 +90,13 @@ export default function ResetPasswordPage() {
         </Link>
       </p>
     </div>
+  );
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <Suspense fallback={<div className="auth-card rounded-2xl border border-zinc-700/50 bg-zinc-800/80 p-8 animate-pulse" />}>
+      <ResetPasswordForm />
+    </Suspense>
   );
 }

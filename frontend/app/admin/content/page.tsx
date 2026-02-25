@@ -21,6 +21,7 @@ export default function AdminContentPage() {
   const [savingPolicy, setSavingPolicy] = useState(false);
   const [uploadingBlogImage, setUploadingBlogImage] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingLobbyVideo, setUploadingLobbyVideo] = useState(false);
   const [uploadingPrivacyPdf, setUploadingPrivacyPdf] = useState(false);
   const [uploadingSocialPdf, setUploadingSocialPdf] = useState(false);
   const [error, setError] = useState("");
@@ -31,6 +32,7 @@ export default function AdminContentPage() {
     instagram: "",
     email: "",
     logoUrl: "",
+    lobbyVideoUrl: "",
   });
   const [blogs, setBlogs] = useState<BlogItem[]>([]);
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
@@ -86,7 +88,13 @@ export default function AdminContentPage() {
     setSavingContacts(true);
     setError("");
     try {
-      await contentApi.updateContacts(contacts);
+      await contentApi.updateContacts({
+        facebook: contacts.facebook,
+        whatsapp: contacts.whatsapp,
+        instagram: contacts.instagram,
+        email: contacts.email,
+        logoUrl: contacts.logoUrl || undefined,
+      });
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to update contacts");
@@ -154,6 +162,25 @@ export default function AdminContentPage() {
       setError(err instanceof Error ? err.message : "Failed to upload logo");
     } finally {
       setUploadingLogo(false);
+    }
+  }
+
+  async function uploadLobbyVideo(file: File | null) {
+    if (!file) return;
+    if (!file.type.startsWith("video/")) {
+      setError("Only video files (MP4, WebM, OGG) are allowed for lobby.");
+      return;
+    }
+    setUploadingLobbyVideo(true);
+    setError("");
+    try {
+      const res = await contentApi.uploadLobbyVideo(file);
+      setContacts((p) => ({ ...p, lobbyVideoUrl: res.lobbyVideoUrl ?? "" }));
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to upload lobby video");
+    } finally {
+      setUploadingLobbyVideo(false);
     }
   }
 
@@ -290,6 +317,32 @@ export default function AdminContentPage() {
                 className="h-10 w-10 rounded-lg object-cover ring-1 ring-cyan-300/40"
               />
               <p className="text-xs text-cyan-100/80">Logo is active site-wide</p>
+            </div>
+          )}
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium text-zinc-300">
+            Lobby video (hero section on dashboard)
+          </label>
+          <input
+            type="file"
+            accept="video/mp4,video/webm,video/ogg"
+            onChange={(e) => uploadLobbyVideo(e.target.files?.[0] ?? null)}
+            className="rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-sm text-zinc-200"
+          />
+          {uploadingLobbyVideo && (
+            <p className="mt-1 text-xs text-cyan-300">Uploading lobby video...</p>
+          )}
+          {contacts.lobbyVideoUrl && (
+            <div className="mt-3 inline-flex items-center gap-3 rounded-xl border border-fuchsia-300/30 bg-fuchsia-500/10 px-3 py-2">
+              <video
+                src={contacts.lobbyVideoUrl}
+                className="h-16 w-28 rounded-lg object-cover ring-1 ring-fuchsia-300/40"
+                muted
+                playsInline
+                preload="metadata"
+              />
+              <p className="text-xs text-cyan-100/80">Lobby video is active on dashboard hero</p>
             </div>
           )}
         </div>

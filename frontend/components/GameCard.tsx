@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import type { Game } from "@/lib/games-api";
+import { OptimizedImage } from "./OptimizedImage";
 
 interface GameCardProps {
   game: Game;
@@ -56,13 +57,15 @@ export function GameCard({ game, isTop = false, onPlayRequest }: GameCardProps) 
       onMouseLeave={handleMouseLeave}
     >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(236,72,153,0.3),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(34,211,238,0.28),transparent_45%)] opacity-70" />
-      <div className="aspect-video w-full overflow-hidden bg-[#0c1025]">
+      <div className="relative aspect-video w-full overflow-hidden bg-[#0c1025]">
         {imageUrl && !thumbError ? (
-          <img
+          <OptimizedImage
             src={imageUrl}
             alt={game.title}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             onError={() => setThumbError(true)}
-            className={`absolute inset-0 h-full w-full object-cover transition-all duration-500 ${
+            className={`object-cover transition-all duration-500 ${
               hovered && videoUrl && !videoError ? "opacity-0 scale-105" : "opacity-100 scale-100"
             }`}
           />

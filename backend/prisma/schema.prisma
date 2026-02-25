@@ -39,17 +39,20 @@ model NewsPoster {
   isActive  Boolean  @default(true) @map("is_active")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([isActive])
 }
 
 model Contact {
-  id        String   @id @default("default")
-  facebook  String   @default("")
-  whatsapp  String   @default("")
-  instagram String   @default("")
-  email     String   @default("")
-  logoUrl   String?  @map("logo_url")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  id             String   @id @default("default")
+  facebook       String   @default("")
+  whatsapp       String   @default("")
+  instagram      String   @default("")
+  email          String   @default("")
+  logoUrl        String?  @map("logo_url")
+  lobbyVideoUrl  String?  @map("lobby_video_url")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
 }
 
 model Blog {
@@ -60,6 +63,8 @@ model Blog {
   imageUrl  String?  @map("image_url")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([createdAt(sort: Desc)])
 }
 
 model Faq {
@@ -68,6 +73,8 @@ model Faq {
   answer    String   @db.Text
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([createdAt(sort: Desc)])
 }
 
 model Review {
@@ -78,6 +85,8 @@ model Review {
   isFeatured Boolean  @default(true) @map("is_featured")
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@index([isFeatured, createdAt(sort: Desc)])
 }
 
 model PrivacyPolicy {
@@ -172,4 +181,7 @@ model Game {
   isActive     Boolean  @default(true) @map("is_active")
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@index([isActive, sortOrder])
+  @@index([isActive, id])
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { contentApi, type SiteContent } from "@/lib/content-api";
+import { PublicNavbar } from "@/components/PublicNavbar";
 
 export default function BlogsPage() {
   const [content, setContent] = useState<SiteContent | null>(null);
@@ -42,7 +43,9 @@ export default function BlogsPage() {
   const listBlogs = blogs.filter((blog) => blog.id !== selectedBlog?.id);
 
   return (
-    <div className="blog-radiant-page min-h-screen px-4 py-10 text-white">
+    <div className="blog-radiant-page min-h-screen text-white">
+      <PublicNavbar />
+      <div className="px-4 py-10">
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="blog-radiant-orb blog-radiant-orb-left" />
         <div className="blog-radiant-orb blog-radiant-orb-right" />
@@ -145,6 +148,7 @@ export default function BlogsPage() {
             </div>
           </section>
         )}
+      </div>
       </div>
     </div>
   );

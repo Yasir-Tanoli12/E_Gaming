@@ -1,7 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Inject } from '@nestjs/common';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
+import type { Cache } from 'cache-manager';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { PrismaService } from '../prisma/prisma.service';
+
+const CONTENT_PUBLIC_CACHE_KEY = 'content:public';
+const CACHE_TTL_MS = 60 * 1000;
 import { PolicyDocumentKey } from '@prisma/client';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { CreateFaqDto } from './dto/create-faq.dto';
@@ -16,7 +21,10 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 
 @Injectable()
 export class ContentService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    @Inject(CACHE_MANAGER) private cache: Cache,
+  ) {}
   private static readonly ABOUT_US_BLOG_ID = 'about-us-page';
   private static readonly AGE_WARNING_BLOG_ID = 'age-warning-config';
   private static readonly ABOUT_US_DEFAULT_CONTENT =
@@ -219,6 +227,8 @@ export class ContentService {
   }
 
   async getPublicContent() {
+    const cached = await this.cache.get<Awaited<ReturnType<typeof this.getPublicContent>>>(CONTENT_PUBLIC_CACHE_KEY);
+    if (cached) return cached;
     await this.bootstrapFromLegacyFile();
     const contacts = await this.prisma.withPoolRetry(() =>
       this.prisma.contact.findUnique({ where: { id: 'default' } }),
@@ -234,6 +244,15 @@ export class ContentService {
           },
         },
         orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          title: true,
+          excerpt: true,
+          content: true,
+          imageUrl: true,
+          createdAt: true,
+          updatedAt: true,
+        },
       }),
     );
     const faqs = await this.prisma.withPoolRetry(() =>
@@ -243,10 +262,20 @@ export class ContentService {
       this.prisma.review.findMany({
         where: { isFeatured: true },
         orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          reviewer: true,
+          message: true,
+          rating: true,
+          createdAt: true,
+        },
       }),
     );
     const privacyPolicy = await this.prisma.withPoolRetry(() =>
-      this.prisma.privacyPolicy.findUnique({ where: { id: 'default' } }),
+      this.prisma.privacyPolicy.findUnique({
+        where: { id: 'default' },
+        select: { content: true },
+      }),
     );
     const aboutUsBlog = await this.prisma.withPoolRetry(() =>
       this.prisma.blog.findUnique({
@@ -261,13 +290,14 @@ export class ContentService {
       }),
     );
 
-    return {
+    const result = {
       contacts: contacts ?? {
         facebook: '',
         whatsapp: '',
         instagram: '',
         email: '',
         logoUrl: null,
+        lobbyVideoUrl: null,
       },
       blogs,
       faqs,
@@ -280,6 +310,8 @@ export class ContentService {
       privacyPolicyPdfUrl: null,
       socialResponsibilityPdfUrl: null,
     };
+    await this.cache.set(CONTENT_PUBLIC_CACHE_KEY, result, CACHE_TTL_MS);
+    return result;
   }
 
   async getAdminContent() {
@@ -307,7 +339,10 @@ export class ContentService {
       this.prisma.review.findMany({ orderBy: { createdAt: 'desc' } }),
     );
     const privacyPolicy = await this.prisma.withPoolRetry(() =>
-      this.prisma.privacyPolicy.findUnique({ where: { id: 'default' } }),
+      this.prisma.privacyPolicy.findUnique({
+        where: { id: 'default' },
+        select: { content: true },
+      }),
     );
     const aboutUsBlog = await this.prisma.withPoolRetry(() =>
       this.prisma.blog.findUnique({
@@ -329,6 +364,7 @@ export class ContentService {
         instagram: '',
         email: '',
         logoUrl: null,
+        lobbyVideoUrl: null,
       },
       blogs,
       faqs,
@@ -343,12 +379,18 @@ export class ContentService {
     };
   }
 
+  private async invalidatePublicCache() {
+    await this.cache.del(CONTENT_PUBLIC_CACHE_KEY);
+  }
+
   async updateContacts(dto: UpdateContactsDto) {
     await this.bootstrapFromLegacyFile();
-    return this.prisma.contact.update({
+    const result = await this.prisma.contact.update({
       where: { id: 'default' },
       data: dto,
     });
+    await this.invalidatePublicCache();
+    return result;
   }
 
   async updateLogo(logoUrl: string) {
@@ -358,12 +400,24 @@ export class ContentService {
       data: { logoUrl },
       select: { logoUrl: true, updatedAt: true },
     });
+    await this.invalidatePublicCache();
+    return contact;
+  }
+
+  async updateLobbyVideo(videoUrl: string) {
+    await this.bootstrapFromLegacyFile();
+    const contact = await this.prisma.contact.update({
+      where: { id: 'default' },
+      data: { lobbyVideoUrl: videoUrl },
+      select: { lobbyVideoUrl: true, updatedAt: true },
+    });
+    await this.invalidatePublicCache();
     return contact;
   }
 
   async createBlog(dto: CreateBlogDto) {
     await this.bootstrapFromLegacyFile();
-    return this.prisma.blog.create({
+    const result = await this.prisma.blog.create({
       data: {
         title: dto.title,
         excerpt: dto.excerpt ?? null,
@@ -371,11 +425,13 @@ export class ContentService {
         imageUrl: dto.imageUrl ?? null,
       },
     });
+    await this.invalidatePublicCache();
+    return result;
   }
 
   async updateBlog(id: string, dto: UpdateBlogDto) {
     await this.bootstrapFromLegacyFile();
-    return this.prisma.blog.update({
+    const result = await this.prisma.blog.update({
       where: { id },
       data: {
         title: dto.title,
@@ -384,44 +440,52 @@ export class ContentService {
         imageUrl: dto.imageUrl,
       },
     });
+    await this.invalidatePublicCache();
+    return result;
   }
 
   async removeBlog(id: string) {
     await this.bootstrapFromLegacyFile();
     await this.prisma.blog.delete({ where: { id } });
+    await this.invalidatePublicCache();
     return { removed: true };
   }
 
   async createFaq(dto: CreateFaqDto) {
     await this.bootstrapFromLegacyFile();
-    return this.prisma.faq.create({
+    const result = await this.prisma.faq.create({
       data: {
         question: dto.question,
         answer: dto.answer,
       },
     });
+    await this.invalidatePublicCache();
+    return result;
   }
 
   async updateFaq(id: string, dto: UpdateFaqDto) {
     await this.bootstrapFromLegacyFile();
-    return this.prisma.faq.update({
+    const result = await this.prisma.faq.update({
       where: { id },
       data: {
         question: dto.question,
         answer: dto.answer,
       },
     });
+    await this.invalidatePublicCache();
+    return result;
   }
 
   async removeFaq(id: string) {
     await this.bootstrapFromLegacyFile();
     await this.prisma.faq.delete({ where: { id } });
+    await this.invalidatePublicCache();
     return { removed: true };
   }
 
   async createReview(dto: CreateReviewDto) {
     await this.bootstrapFromLegacyFile();
-    return this.prisma.review.create({
+    const result = await this.prisma.review.create({
       data: {
         reviewer: dto.reviewer,
         message: dto.message,
@@ -429,11 +493,13 @@ export class ContentService {
         isFeatured: dto.isFeatured ?? true,
       },
     });
+    await this.invalidatePublicCache();
+    return result;
   }
 
   async updateReview(id: string, dto: UpdateReviewDto) {
     await this.bootstrapFromLegacyFile();
-    return this.prisma.review.update({
+    const result = await this.prisma.review.update({
       where: { id },
       data: {
         reviewer: dto.reviewer,
@@ -442,29 +508,34 @@ export class ContentService {
         isFeatured: dto.isFeatured,
       },
     });
+    await this.invalidatePublicCache();
+    return result;
   }
 
   async removeReview(id: string) {
     await this.bootstrapFromLegacyFile();
     await this.prisma.review.delete({ where: { id } });
+    await this.invalidatePublicCache();
     return { removed: true };
   }
 
   async updatePrivacyPolicy(dto: UpdatePrivacyPolicyDto, updatedBy?: string) {
     await this.bootstrapFromLegacyFile();
-    return this.prisma.privacyPolicy.update({
+    const result = await this.prisma.privacyPolicy.update({
       where: { id: 'default' },
       data: {
         content: dto.content,
         updatedBy: updatedBy ?? null,
       },
     });
+    await this.invalidatePublicCache();
+    return result;
   }
 
   async updateAboutUs(dto: UpdateAboutUsDto, updatedBy?: string) {
     await this.bootstrapFromLegacyFile();
     const clean = dto.content?.trim() || ContentService.ABOUT_US_DEFAULT_CONTENT;
-    return this.prisma.blog.upsert({
+    const result = await this.prisma.blog.upsert({
       where: { id: ContentService.ABOUT_US_BLOG_ID },
       update: {
         title: 'About Us',
@@ -484,6 +555,8 @@ export class ContentService {
         updatedAt: true,
       },
     });
+    await this.invalidatePublicCache();
+    return result;
   }
 
   async updateAgeWarning(dto: UpdateAgeWarningDto) {
@@ -501,7 +574,7 @@ export class ContentService {
       exitButtonLabel: dto.exitButtonLabel?.trim() || parsed.exitButtonLabel,
       exitUrl: dto.exitUrl?.trim() || parsed.exitUrl,
     };
-    return this.prisma.blog.upsert({
+    const result = await this.prisma.blog.upsert({
       where: { id: ContentService.AGE_WARNING_BLOG_ID },
       update: {
         title: 'Age Warning',
@@ -520,6 +593,8 @@ export class ContentService {
         updatedAt: true,
       },
     });
+    await this.invalidatePublicCache();
+    return result;
   }
 
   private parseAgeWarningContent(raw: string | null | undefined) {
@@ -555,7 +630,7 @@ export class ContentService {
   ) {
     await this.bootstrapFromLegacyFile();
     const docKey = this.toPolicyDocumentKey(key);
-    return this.prisma.policyDocument.upsert({
+    const result = await this.prisma.policyDocument.upsert({
       where: { key: docKey },
       update: {
         fileName: file.originalname,
@@ -576,6 +651,8 @@ export class ContentService {
         updatedAt: true,
       },
     });
+    await this.invalidatePublicCache();
+    return result;
   }
 
   async getPolicyDocument(key: string) {

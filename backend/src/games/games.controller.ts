@@ -11,6 +11,7 @@ import {
   UploadedFile,
   BadRequestException,
   Req,
+  Header,
 } from '@nestjs/common';
 import { GamesService } from './games.service';
 import { CreateGameDto } from './dto/create-game.dto';
@@ -32,12 +33,14 @@ export class GamesController {
 
   @Public()
   @Get()
+  @Header('Cache-Control', 'public, max-age=60, s-maxage=120')
   findAll() {
     return this.gamesService.findAll();
   }
 
   @Public()
   @Get('top')
+  @Header('Cache-Control', 'public, max-age=60, s-maxage=120')
   findTopGames() {
     return this.gamesService.findTopGames();
   }

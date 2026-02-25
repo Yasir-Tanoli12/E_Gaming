@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { contentApi } from "@/lib/content-api";
+import { PublicNavbar } from "@/components/PublicNavbar";
 
 const DEFAULT_ABOUT_US =
   "CashlySweeps is built to provide a fast, immersive, and responsible online gaming experience with secure access, live updates, and responsive support for all players.";
@@ -28,7 +29,9 @@ export default function AboutUsPage() {
   }, []);
 
   return (
-    <div className="about-radiant-page min-h-screen px-4 py-10 text-white">
+    <div className="about-radiant-page min-h-screen text-white">
+      <PublicNavbar />
+      <div className="px-4 py-10">
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="about-radiant-orb about-radiant-orb-left" />
         <div className="about-radiant-orb about-radiant-orb-right" />
@@ -78,6 +81,7 @@ export default function AboutUsPage() {
             </div>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

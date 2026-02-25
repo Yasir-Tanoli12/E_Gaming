@@ -3,6 +3,7 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   Param,
   Patch,
   Post,
@@ -23,6 +24,7 @@ export class NewsController {
 
   @Public()
   @Get('current')
+  @Header('Cache-Control', 'public, max-age=60, s-maxage=120')
   getCurrent() {
     return this.newsService.getCurrent();
   }

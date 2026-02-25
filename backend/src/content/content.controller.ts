@@ -4,6 +4,7 @@ import {
   Controller,
   Delete,
   Get,
+  Header,
   Param,
   Patch,
   Post,
@@ -41,6 +42,7 @@ export class ContentController {
 
   @Public()
   @Get('public')
+  @Header('Cache-Control', 'public, max-age=60, s-maxage=120')
   getPublicContent() {
     return this.contentService.getPublicContent();
   }
@@ -111,6 +113,47 @@ export class ContentController {
     const host = req.get('host') ?? 'localhost:3001';
     const logoUrl = `${req.protocol}://${host}/uploads/branding/${file.filename}`;
     return this.contentService.updateLogo(logoUrl);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Post('lobby-video')
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: diskStorage({
+        destination: (_req, _file, cb) => {
+          const dir = join(process.cwd(), 'uploads', 'lobby');
+          if (!existsSync(dir)) {
+            mkdirSync(dir, { recursive: true });
+          }
+          cb(null, dir);
+        },
+        filename: (_req, file, cb) => {
+          const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
+          cb(null, `${unique}${extname(file.originalname)}`);
+        },
+      }),
+      fileFilter: (_req, file, cb) => {
+        const allowed = [
+          'video/mp4',
+          'video/webm',
+          'video/ogg',
+        ];
+        cb(null, allowed.includes(file.mimetype));
+      },
+      limits: { fileSize: 100 * 1024 * 1024 },
+    }),
+  )
+  async uploadLobbyVideo(
+    @UploadedFile() file: { filename: string } | undefined,
+    @Req() req: { protocol: string; get(name: string): string | undefined },
+  ) {
+    if (!file) {
+      throw new BadRequestException('Only video files (MP4, WebM, OGG) are allowed');
+    }
+    const host = req.get('host') ?? 'localhost:3001';
+    const videoUrl = `${req.protocol}://${host}/uploads/lobby/${file.filename}`;
+    return this.contentService.updateLobbyVideo(videoUrl);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
