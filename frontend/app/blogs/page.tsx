@@ -5,6 +5,7 @@ import { contentApi, type SiteContent } from "@/lib/content-api";
 
 export default function BlogsPage() {
   const [content, setContent] = useState<SiteContent | null>(null);
+  const [selectedBlogId, setSelectedBlogId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -24,9 +25,21 @@ export default function BlogsPage() {
 
   const blogs = content?.blogs ?? [];
   const logoUrl = content?.contacts?.logoUrl ?? "";
-  const [featuredBlog, ...otherBlogs] = blogs;
-  const sideBlogs = otherBlogs.slice(0, 3);
-  const remainingBlogs = otherBlogs.slice(3);
+
+  useEffect(() => {
+    if (blogs.length === 0) {
+      setSelectedBlogId(null);
+      return;
+    }
+    const exists = blogs.some((blog) => blog.id === selectedBlogId);
+    if (!selectedBlogId || !exists) {
+      setSelectedBlogId(blogs[0].id);
+    }
+  }, [blogs, selectedBlogId]);
+
+  const selectedBlog =
+    blogs.find((blog) => blog.id === selectedBlogId) ?? blogs[0] ?? null;
+  const listBlogs = blogs.filter((blog) => blog.id !== selectedBlog?.id);
 
   return (
     <div className="blog-radiant-page min-h-screen px-4 py-10 text-white">
@@ -72,89 +85,65 @@ export default function BlogsPage() {
             No blogs published yet.
           </div>
         ) : (
-          <div className="space-y-8">
-            {featuredBlog && (
-              <section className="grid gap-5 lg:grid-cols-[1.45fr_1fr]">
-                <article className="blog-feature-card group">
-                  <div className="relative overflow-hidden rounded-2xl">
-                    {featuredBlog.imageUrl ? (
-                      <img
-                        src={featuredBlog.imageUrl}
-                        alt={featuredBlog.title}
-                        className="blog-feature-image h-[290px] w-full object-cover md:h-[360px]"
-                      />
-                    ) : (
-                      <div className="h-[290px] w-full bg-[radial-gradient(circle_at_20%_20%,rgba(217,70,239,0.35),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(34,211,238,0.35),transparent_38%),linear-gradient(120deg,#0b1331,#121f47)] md:h-[360px]" />
-                    )}
-                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#050814] via-[#050814]/35 to-transparent" />
-                  </div>
-                  <div className="relative z-10 mt-4">
-                    <p className="text-xs uppercase tracking-[0.2em] text-fuchsia-200/90">Featured Story</p>
-                    <h2 className="mt-2 text-2xl font-black md:text-3xl">{featuredBlog.title}</h2>
-                    {featuredBlog.excerpt && (
-                      <p className="mt-2 text-sm text-cyan-100/80">{featuredBlog.excerpt}</p>
-                    )}
-                    {featuredBlog.content && (
-                      <p className="mt-3 line-clamp-4 text-sm text-zinc-300">{featuredBlog.content}</p>
-                    )}
-                  </div>
-                </article>
-
-                <div className="space-y-4">
-                  {sideBlogs.map((blog) => (
-                    <article key={blog.id} className="blog-side-card group">
-                      <div className="flex gap-3">
-                        <div className="h-20 w-24 flex-shrink-0 overflow-hidden rounded-xl">
-                          {blog.imageUrl ? (
-                            <img
-                              src={blog.imageUrl}
-                              alt={blog.title}
-                              className="blog-thumb-image h-full w-full object-cover"
-                            />
-                          ) : (
-                            <div className="h-full w-full bg-[linear-gradient(135deg,#6d28d9,#0891b2)] opacity-70" />
-                          )}
-                        </div>
-                        <div className="min-w-0">
-                          <h3 className="truncate text-base font-bold">{blog.title}</h3>
-                          {blog.excerpt && (
-                            <p className="mt-1 line-clamp-2 text-xs text-cyan-100/75">{blog.excerpt}</p>
-                          )}
-                        </div>
-                      </div>
-                    </article>
-                  ))}
+          <section className="grid gap-5 lg:grid-cols-[1.45fr_1fr]">
+            {selectedBlog && (
+              <article key={selectedBlog.id} className="blog-feature-card group">
+                <div className="relative overflow-hidden rounded-2xl">
+                  {selectedBlog.imageUrl ? (
+                    <img
+                      src={selectedBlog.imageUrl}
+                      alt={selectedBlog.title}
+                      className="blog-feature-image h-[290px] w-full object-cover md:h-[360px]"
+                    />
+                  ) : (
+                    <div className="h-[290px] w-full bg-[radial-gradient(circle_at_20%_20%,rgba(217,70,239,0.35),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(34,211,238,0.35),transparent_38%),linear-gradient(120deg,#0b1331,#121f47)] md:h-[360px]" />
+                  )}
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#050814] via-[#050814]/35 to-transparent" />
                 </div>
-              </section>
+                <div className="relative z-10 mt-4">
+                  <p className="text-xs uppercase tracking-[0.2em] text-fuchsia-200/90">Featured Story</p>
+                  <h2 className="mt-2 text-2xl font-black md:text-3xl">{selectedBlog.title}</h2>
+                  {selectedBlog.excerpt && (
+                    <p className="mt-2 text-sm text-cyan-100/80">{selectedBlog.excerpt}</p>
+                  )}
+                  {selectedBlog.content && (
+                    <p className="mt-3 text-sm text-zinc-300">{selectedBlog.content}</p>
+                  )}
+                </div>
+              </article>
             )}
 
-            {remainingBlogs.length > 0 && (
-              <section className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
-                {remainingBlogs.map((blog) => (
-                  <article key={blog.id} className="blog-grid-card group">
-                    <div className="overflow-hidden rounded-xl">
+            <div className="max-h-[620px] space-y-4 overflow-y-auto pr-1">
+              {listBlogs.map((blog) => (
+                <button
+                  key={blog.id}
+                  type="button"
+                  onClick={() => setSelectedBlogId(blog.id)}
+                  className="blog-side-card group block w-full text-left"
+                >
+                  <div className="flex gap-3">
+                    <div className="h-20 w-24 flex-shrink-0 overflow-hidden rounded-xl">
                       {blog.imageUrl ? (
                         <img
                           src={blog.imageUrl}
                           alt={blog.title}
-                          className="blog-thumb-image h-44 w-full object-cover"
+                          className="blog-thumb-image h-full w-full object-cover"
                         />
                       ) : (
-                        <div className="h-44 w-full bg-[radial-gradient(circle_at_10%_20%,rgba(217,70,239,0.35),transparent_40%),radial-gradient(circle_at_90%_80%,rgba(34,211,238,0.35),transparent_38%),#0f1a3a]" />
+                        <div className="h-full w-full bg-[linear-gradient(135deg,#6d28d9,#0891b2)] opacity-70" />
                       )}
                     </div>
-                    <h3 className="mt-3 text-lg font-bold">{blog.title}</h3>
-                    {blog.excerpt && (
-                      <p className="mt-1 text-sm text-cyan-100/75">{blog.excerpt}</p>
-                    )}
-                    {blog.content && (
-                      <p className="mt-2 line-clamp-3 text-sm text-zinc-300">{blog.content}</p>
-                    )}
-                  </article>
-                ))}
-              </section>
-            )}
-          </div>
+                    <div className="min-w-0">
+                      <h3 className="truncate text-base font-bold">{blog.title}</h3>
+                      {blog.excerpt && (
+                        <p className="mt-1 line-clamp-2 text-xs text-cyan-100/75">{blog.excerpt}</p>
+                      )}
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </section>
         )}
       </div>
     </div>

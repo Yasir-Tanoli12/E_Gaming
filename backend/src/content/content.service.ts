@@ -220,43 +220,46 @@ export class ContentService {
 
   async getPublicContent() {
     await this.bootstrapFromLegacyFile();
-    const [
-      contacts,
-      blogs,
-      faqs,
-      reviews,
-      privacyPolicy,
-      aboutUsBlog,
-      ageWarningBlog,
-    ] =
-      await this.prisma.$transaction([
-        this.prisma.contact.findUnique({ where: { id: 'default' } }),
-        this.prisma.blog.findMany({
-          where: {
-            id: {
-              notIn: [
-                ContentService.ABOUT_US_BLOG_ID,
-                ContentService.AGE_WARNING_BLOG_ID,
-              ],
-            },
+    const contacts = await this.prisma.withPoolRetry(() =>
+      this.prisma.contact.findUnique({ where: { id: 'default' } }),
+    );
+    const blogs = await this.prisma.withPoolRetry(() =>
+      this.prisma.blog.findMany({
+        where: {
+          id: {
+            notIn: [
+              ContentService.ABOUT_US_BLOG_ID,
+              ContentService.AGE_WARNING_BLOG_ID,
+            ],
           },
-          orderBy: { createdAt: 'desc' },
-        }),
-        this.prisma.faq.findMany({ orderBy: { createdAt: 'desc' } }),
-        this.prisma.review.findMany({
-          where: { isFeatured: true },
-          orderBy: { createdAt: 'desc' },
-        }),
-        this.prisma.privacyPolicy.findUnique({ where: { id: 'default' } }),
-        this.prisma.blog.findUnique({
-          where: { id: ContentService.ABOUT_US_BLOG_ID },
-          select: { content: true },
-        }),
-        this.prisma.blog.findUnique({
-          where: { id: ContentService.AGE_WARNING_BLOG_ID },
-          select: { content: true },
-        }),
-      ]);
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+    );
+    const faqs = await this.prisma.withPoolRetry(() =>
+      this.prisma.faq.findMany({ orderBy: { createdAt: 'desc' } }),
+    );
+    const reviews = await this.prisma.withPoolRetry(() =>
+      this.prisma.review.findMany({
+        where: { isFeatured: true },
+        orderBy: { createdAt: 'desc' },
+      }),
+    );
+    const privacyPolicy = await this.prisma.withPoolRetry(() =>
+      this.prisma.privacyPolicy.findUnique({ where: { id: 'default' } }),
+    );
+    const aboutUsBlog = await this.prisma.withPoolRetry(() =>
+      this.prisma.blog.findUnique({
+        where: { id: ContentService.ABOUT_US_BLOG_ID },
+        select: { content: true },
+      }),
+    );
+    const ageWarningBlog = await this.prisma.withPoolRetry(() =>
+      this.prisma.blog.findUnique({
+        where: { id: ContentService.AGE_WARNING_BLOG_ID },
+        select: { content: true },
+      }),
+    );
 
     return {
       contacts: contacts ?? {
@@ -281,40 +284,43 @@ export class ContentService {
 
   async getAdminContent() {
     await this.bootstrapFromLegacyFile();
-    const [
-      contacts,
-      blogs,
-      faqs,
-      reviews,
-      privacyPolicy,
-      aboutUsBlog,
-      ageWarningBlog,
-    ] =
-      await this.prisma.$transaction([
-        this.prisma.contact.findUnique({ where: { id: 'default' } }),
-        this.prisma.blog.findMany({
-          where: {
-            id: {
-              notIn: [
-                ContentService.ABOUT_US_BLOG_ID,
-                ContentService.AGE_WARNING_BLOG_ID,
-              ],
-            },
+    const contacts = await this.prisma.withPoolRetry(() =>
+      this.prisma.contact.findUnique({ where: { id: 'default' } }),
+    );
+    const blogs = await this.prisma.withPoolRetry(() =>
+      this.prisma.blog.findMany({
+        where: {
+          id: {
+            notIn: [
+              ContentService.ABOUT_US_BLOG_ID,
+              ContentService.AGE_WARNING_BLOG_ID,
+            ],
           },
-          orderBy: { createdAt: 'desc' },
-        }),
-        this.prisma.faq.findMany({ orderBy: { createdAt: 'desc' } }),
-        this.prisma.review.findMany({ orderBy: { createdAt: 'desc' } }),
-        this.prisma.privacyPolicy.findUnique({ where: { id: 'default' } }),
-        this.prisma.blog.findUnique({
-          where: { id: ContentService.ABOUT_US_BLOG_ID },
-          select: { content: true },
-        }),
-        this.prisma.blog.findUnique({
-          where: { id: ContentService.AGE_WARNING_BLOG_ID },
-          select: { content: true },
-        }),
-      ]);
+        },
+        orderBy: { createdAt: 'desc' },
+      }),
+    );
+    const faqs = await this.prisma.withPoolRetry(() =>
+      this.prisma.faq.findMany({ orderBy: { createdAt: 'desc' } }),
+    );
+    const reviews = await this.prisma.withPoolRetry(() =>
+      this.prisma.review.findMany({ orderBy: { createdAt: 'desc' } }),
+    );
+    const privacyPolicy = await this.prisma.withPoolRetry(() =>
+      this.prisma.privacyPolicy.findUnique({ where: { id: 'default' } }),
+    );
+    const aboutUsBlog = await this.prisma.withPoolRetry(() =>
+      this.prisma.blog.findUnique({
+        where: { id: ContentService.ABOUT_US_BLOG_ID },
+        select: { content: true },
+      }),
+    );
+    const ageWarningBlog = await this.prisma.withPoolRetry(() =>
+      this.prisma.blog.findUnique({
+        where: { id: ContentService.AGE_WARNING_BLOG_ID },
+        select: { content: true },
+      }),
+    );
 
     return {
       contacts: contacts ?? {

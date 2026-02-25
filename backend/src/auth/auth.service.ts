@@ -448,17 +448,19 @@ export class AuthService {
   }
 
   async validateUser(userId: string) {
-    return this.prisma.user.findUnique({
-      where: { id: userId },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        phone: true,
-        role: true,
-        lastLoginAt: true,
-      },
-    });
+    return this.prisma.withPoolRetry(() =>
+      this.prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          phone: true,
+          role: true,
+          lastLoginAt: true,
+        },
+      }),
+    );
   }
 
   private async logAuth(
@@ -467,13 +469,15 @@ export class AuthService {
     ip?: string,
     userAgent?: string,
   ) {
-    await this.prisma.authLog.create({
-      data: {
-        userId,
-        action,
-        ipAddress: ip ?? null,
-        userAgent: userAgent ?? null,
-      },
-    });
+    await this.prisma.withPoolRetry(() =>
+      this.prisma.authLog.create({
+        data: {
+          userId,
+          action,
+          ipAddress: ip ?? null,
+          userAgent: userAgent ?? null,
+        },
+      }),
+    );
   }
 }

@@ -45,38 +45,42 @@ export class GamesService {
 
   // Public: get active games for landing page
   async findAll() {
-    return this.prisma.game.findMany({
-      where: { isActive: true },
-      orderBy: { sortOrder: 'asc' },
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        thumbnailUrl: true,
-        videoUrl: true,
-        gameLink: true,
-        sortOrder: true,
-      },
-    });
+    return this.prisma.withPoolRetry(() =>
+      this.prisma.game.findMany({
+        where: { isActive: true },
+        orderBy: { sortOrder: 'asc' },
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          thumbnailUrl: true,
+          videoUrl: true,
+          gameLink: true,
+          sortOrder: true,
+        },
+      }),
+    );
   }
 
   async findTopGames() {
     const ids = this.readTopGameIds();
     if (!ids.length) return [];
-    return this.prisma.game.findMany({
-      where: { isActive: true, id: { in: ids } },
-      orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
-      take: 6,
-      select: {
-        id: true,
-        title: true,
-        description: true,
-        thumbnailUrl: true,
-        videoUrl: true,
-        gameLink: true,
-        sortOrder: true,
-      },
-    });
+    return this.prisma.withPoolRetry(() =>
+      this.prisma.game.findMany({
+        where: { isActive: true, id: { in: ids } },
+        orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
+        take: 6,
+        select: {
+          id: true,
+          title: true,
+          description: true,
+          thumbnailUrl: true,
+          videoUrl: true,
+          gameLink: true,
+          sortOrder: true,
+        },
+      }),
+    );
   }
 
   setTopGames(ids: string[]) {

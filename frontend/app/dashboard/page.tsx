@@ -14,7 +14,8 @@ export default function UserDashboardPage() {
   const [content, setContent] = useState<SiteContent | null>(null);
   const [newsPoster, setNewsPoster] = useState<NewsPoster | null>(null);
   const [showNews, setShowNews] = useState(false);
-  const [showAgeWarning, setShowAgeWarning] = useState(true);
+  const [showAgeWarning, setShowAgeWarning] = useState(false);
+  const [ageWarningReady, setAgeWarningReady] = useState(false);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [showCredentialOptions, setShowCredentialOptions] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -23,21 +24,27 @@ export default function UserDashboardPage() {
   useEffect(() => {
     async function load() {
       try {
-        // Keep API calls sequential to avoid saturating low DB pool limits.
+        // Load content first so the first 18+ popup already uses admin text.
+        const publicContent = await contentApi.getPublic();
+        setContent(publicContent);
+        setAgeWarningReady(true);
+        setShowAgeWarning(true);
+
+        // Keep the rest sequential to avoid saturating low DB pool limits.
         const data = await gamesApi.list();
         const top = await gamesApi.listTop();
         const poster = await newsApi.current();
-        const publicContent = await contentApi.getPublic();
         setGames(data);
         setTopGames(top);
         setNewsPoster(poster);
-        setContent(publicContent);
         const seenKey = poster?.id ? `news_seen_${poster.id}` : null;
         if (poster && seenKey && !localStorage.getItem(seenKey)) {
           setShowNews(true);
           localStorage.setItem(seenKey, "1");
         }
       } catch (err) {
+        setAgeWarningReady(true);
+        setShowAgeWarning(true);
         setError(err instanceof Error ? err.message : "Failed to load games");
       } finally {
         setLoading(false);
@@ -224,7 +231,7 @@ export default function UserDashboardPage() {
       </section>
 
       <main id="games" className="relative z-10 mx-auto max-w-7xl px-4 py-12">
-        {showAgeWarning && (
+        {showAgeWarning && ageWarningReady && (
           <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/80 p-4">
             <div className="w-full max-w-xl rounded-2xl border border-amber-400/40 bg-[#120f06] p-6 text-center shadow-[0_0_60px_rgba(251,191,36,0.2)]">
               <p className="text-xs uppercase tracking-[0.2em] text-amber-300">Warning</p>
@@ -475,7 +482,7 @@ export default function UserDashboardPage() {
                 <a href="#games" className="block text-cyan-100/70 transition hover:text-white">Games</a>
                 <Link href="/about-us" className="block text-cyan-100/70 transition hover:text-white">About Us</Link>
                 <Link href="/blogs" className="block text-cyan-100/70 transition hover:text-white">Blogs</Link>
-                <Link href="/privacy-policy" className="block text-cyan-100/70 transition hover:text-white">Privacy Policy</Link>
+                <Link href="/privacy-policy" className="block text-cyan-100/70 transition hover:text-white">Guidelines</Link>
               </div>
             </div>
 
@@ -504,8 +511,7 @@ export default function UserDashboardPage() {
             <div id="support">
               <p className="text-xs uppercase tracking-[0.2em] text-emerald-300">Contact</p>
               <div className="mt-3 space-y-2 text-sm text-cyan-100/70">
-                <p>{contacts?.email || "support@cashlysweeps.com"}</p>
-                <p>{contacts?.whatsapp || "+92 300 0000000"}</p>
+                <p>{contacts?.email || "moeeedahmed07@gmail.com"}</p>
                 <p>24/7 Live Support</p>
                 <div className="mt-1 flex gap-2">
                   {contacts?.facebook && (

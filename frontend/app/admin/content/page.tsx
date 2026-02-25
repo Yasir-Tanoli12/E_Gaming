@@ -194,7 +194,7 @@ export default function AdminContentPage() {
       await contentApi.updatePrivacyPolicy(privacyPolicy);
       await load();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to update privacy policy");
+      setError(err instanceof Error ? err.message : "Failed to update guidelines");
     } finally {
       setSavingPolicy(false);
     }
@@ -257,7 +257,7 @@ export default function AdminContentPage() {
       <div>
         <h1 className="text-3xl font-black">Site Content Manager</h1>
         <p className="mt-1 text-zinc-400">
-          Manage contacts, blogs, reviews, about us, and privacy policy.
+          Manage contacts, blogs, reviews, about us, and guidelines.
         </p>
       </div>
 
@@ -563,9 +563,9 @@ export default function AdminContentPage() {
       </section>
 
       <section className="auth-card space-y-4 rounded-2xl border border-zinc-700/40 bg-zinc-900/60 p-6">
-        <h2 className="text-xl font-bold">Privacy Policy</h2>
+        <h2 className="text-xl font-bold">Guidelines</h2>
         <p className="text-sm text-zinc-400">
-          This content is shown on the public privacy policy page.
+          This content is shown on the public guidelines page.
         </p>
         <textarea
           value={privacyPolicy}
@@ -575,7 +575,7 @@ export default function AdminContentPage() {
         />
         <div>
           <Button onClick={savePrivacyPolicy} loading={savingPolicy}>
-            Save Privacy Policy
+            Save Guidelines
           </Button>
         </div>
       </section>
@@ -588,7 +588,7 @@ export default function AdminContentPage() {
         <div className="grid gap-4 md:grid-cols-2">
           <div>
             <label className="mb-1 block text-sm font-medium text-zinc-300">
-              Privacy Policy PDF
+              Guidelines PDF
             </label>
             <input
               type="file"
