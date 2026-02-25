@@ -31,6 +31,11 @@ export async function apiRequest<T>(
     ...getAuthHeaders(),
     ...(options.headers ?? {}),
   };
-  const res = await fetch(url, { ...options, headers });
+  const method = (options.method ?? "GET").toUpperCase();
+  const res = await fetch(url, {
+    ...options,
+    headers,
+    cache: method === "GET" ? "no-store" : options.cache,
+  });
   return handleResponse<T>(res);
 }

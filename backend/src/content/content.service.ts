@@ -6,6 +6,8 @@ import { PolicyDocumentKey } from '@prisma/client';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { CreateFaqDto } from './dto/create-faq.dto';
 import { CreateReviewDto } from './dto/create-review.dto';
+import { UpdateAboutUsDto } from './dto/update-about-us.dto';
+import { UpdateAgeWarningDto } from './dto/update-age-warning.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import { UpdateContactsDto } from './dto/update-contacts.dto';
 import { UpdateFaqDto } from './dto/update-faq.dto';
@@ -15,6 +17,18 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 @Injectable()
 export class ContentService {
   constructor(private prisma: PrismaService) {}
+  private static readonly ABOUT_US_BLOG_ID = 'about-us-page';
+  private static readonly AGE_WARNING_BLOG_ID = 'age-warning-config';
+  private static readonly ABOUT_US_DEFAULT_CONTENT =
+    'CashlySweeps is built to provide a fast, immersive, and responsible online gaming experience with secure access, live updates, and responsive support for all players.';
+  private static readonly AGE_WARNING_DEFAULT = {
+    title: '18+ Content Notice',
+    message:
+      'This gaming website may include mature themes. Enter only if you are 18 years old or above.',
+    enterButtonLabel: 'I am 18+ Enter',
+    exitButtonLabel: 'Exit',
+    exitUrl: 'https://www.google.com',
+  };
 
   private readonly legacyFilePath = join(
     process.cwd(),
@@ -92,7 +106,16 @@ export class ContentService {
     }
 
     const [blogCount, faqCount, reviewCount] = await this.prisma.$transaction([
-      this.prisma.blog.count(),
+      this.prisma.blog.count({
+        where: {
+          id: {
+            notIn: [
+              ContentService.ABOUT_US_BLOG_ID,
+              ContentService.AGE_WARNING_BLOG_ID,
+            ],
+          },
+        },
+      }),
       this.prisma.faq.count(),
       this.prisma.review.count(),
     ]);
@@ -197,16 +220,42 @@ export class ContentService {
 
   async getPublicContent() {
     await this.bootstrapFromLegacyFile();
-    const [contacts, blogs, faqs, reviews, privacyPolicy] =
+    const [
+      contacts,
+      blogs,
+      faqs,
+      reviews,
+      privacyPolicy,
+      aboutUsBlog,
+      ageWarningBlog,
+    ] =
       await this.prisma.$transaction([
         this.prisma.contact.findUnique({ where: { id: 'default' } }),
-        this.prisma.blog.findMany({ orderBy: { createdAt: 'desc' } }),
+        this.prisma.blog.findMany({
+          where: {
+            id: {
+              notIn: [
+                ContentService.ABOUT_US_BLOG_ID,
+                ContentService.AGE_WARNING_BLOG_ID,
+              ],
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+        }),
         this.prisma.faq.findMany({ orderBy: { createdAt: 'desc' } }),
         this.prisma.review.findMany({
           where: { isFeatured: true },
           orderBy: { createdAt: 'desc' },
         }),
         this.prisma.privacyPolicy.findUnique({ where: { id: 'default' } }),
+        this.prisma.blog.findUnique({
+          where: { id: ContentService.ABOUT_US_BLOG_ID },
+          select: { content: true },
+        }),
+        this.prisma.blog.findUnique({
+          where: { id: ContentService.AGE_WARNING_BLOG_ID },
+          select: { content: true },
+        }),
       ]);
 
     return {
@@ -220,6 +269,10 @@ export class ContentService {
       blogs,
       faqs,
       reviews,
+      aboutUs:
+        aboutUsBlog?.content?.trim() ??
+        ContentService.ABOUT_US_DEFAULT_CONTENT,
+      ageWarning: this.parseAgeWarningContent(ageWarningBlog?.content),
       privacyPolicy: privacyPolicy?.content ?? '',
       privacyPolicyPdfUrl: null,
       socialResponsibilityPdfUrl: null,
@@ -228,13 +281,39 @@ export class ContentService {
 
   async getAdminContent() {
     await this.bootstrapFromLegacyFile();
-    const [contacts, blogs, faqs, reviews, privacyPolicy] =
+    const [
+      contacts,
+      blogs,
+      faqs,
+      reviews,
+      privacyPolicy,
+      aboutUsBlog,
+      ageWarningBlog,
+    ] =
       await this.prisma.$transaction([
         this.prisma.contact.findUnique({ where: { id: 'default' } }),
-        this.prisma.blog.findMany({ orderBy: { createdAt: 'desc' } }),
+        this.prisma.blog.findMany({
+          where: {
+            id: {
+              notIn: [
+                ContentService.ABOUT_US_BLOG_ID,
+                ContentService.AGE_WARNING_BLOG_ID,
+              ],
+            },
+          },
+          orderBy: { createdAt: 'desc' },
+        }),
         this.prisma.faq.findMany({ orderBy: { createdAt: 'desc' } }),
         this.prisma.review.findMany({ orderBy: { createdAt: 'desc' } }),
         this.prisma.privacyPolicy.findUnique({ where: { id: 'default' } }),
+        this.prisma.blog.findUnique({
+          where: { id: ContentService.ABOUT_US_BLOG_ID },
+          select: { content: true },
+        }),
+        this.prisma.blog.findUnique({
+          where: { id: ContentService.AGE_WARNING_BLOG_ID },
+          select: { content: true },
+        }),
       ]);
 
     return {
@@ -248,6 +327,10 @@ export class ContentService {
       blogs,
       faqs,
       reviews,
+      aboutUs:
+        aboutUsBlog?.content?.trim() ??
+        ContentService.ABOUT_US_DEFAULT_CONTENT,
+      ageWarning: this.parseAgeWarningContent(ageWarningBlog?.content),
       privacyPolicy: privacyPolicy?.content ?? '',
       privacyPolicyPdfUrl: null,
       socialResponsibilityPdfUrl: null,
@@ -370,6 +453,86 @@ export class ContentService {
         updatedBy: updatedBy ?? null,
       },
     });
+  }
+
+  async updateAboutUs(dto: UpdateAboutUsDto, updatedBy?: string) {
+    await this.bootstrapFromLegacyFile();
+    const clean = dto.content?.trim() || ContentService.ABOUT_US_DEFAULT_CONTENT;
+    return this.prisma.blog.upsert({
+      where: { id: ContentService.ABOUT_US_BLOG_ID },
+      update: {
+        title: 'About Us',
+        excerpt: 'About CashlySweeps',
+        content: clean,
+      },
+      create: {
+        id: ContentService.ABOUT_US_BLOG_ID,
+        title: 'About Us',
+        excerpt: `Updated by ${updatedBy ?? 'admin'}`,
+        content: clean,
+      },
+      select: {
+        id: true,
+        title: true,
+        content: true,
+        updatedAt: true,
+      },
+    });
+  }
+
+  async updateAgeWarning(dto: UpdateAgeWarningDto) {
+    await this.bootstrapFromLegacyFile();
+    const current = await this.prisma.blog.findUnique({
+      where: { id: ContentService.AGE_WARNING_BLOG_ID },
+      select: { content: true },
+    });
+    const parsed = this.parseAgeWarningContent(current?.content);
+    const next = {
+      title: dto.title?.trim() || parsed.title,
+      message: dto.message?.trim() || parsed.message,
+      enterButtonLabel:
+        dto.enterButtonLabel?.trim() || parsed.enterButtonLabel,
+      exitButtonLabel: dto.exitButtonLabel?.trim() || parsed.exitButtonLabel,
+      exitUrl: dto.exitUrl?.trim() || parsed.exitUrl,
+    };
+    return this.prisma.blog.upsert({
+      where: { id: ContentService.AGE_WARNING_BLOG_ID },
+      update: {
+        title: 'Age Warning',
+        excerpt: '18+ popup content',
+        content: JSON.stringify(next),
+      },
+      create: {
+        id: ContentService.AGE_WARNING_BLOG_ID,
+        title: 'Age Warning',
+        excerpt: '18+ popup content',
+        content: JSON.stringify(next),
+      },
+      select: {
+        id: true,
+        content: true,
+        updatedAt: true,
+      },
+    });
+  }
+
+  private parseAgeWarningContent(raw: string | null | undefined) {
+    const fallback = ContentService.AGE_WARNING_DEFAULT;
+    if (!raw) return fallback;
+    try {
+      const parsed = JSON.parse(raw) as Partial<typeof fallback>;
+      return {
+        title: parsed.title?.trim() || fallback.title,
+        message: parsed.message?.trim() || fallback.message,
+        enterButtonLabel:
+          parsed.enterButtonLabel?.trim() || fallback.enterButtonLabel,
+        exitButtonLabel:
+          parsed.exitButtonLabel?.trim() || fallback.exitButtonLabel,
+        exitUrl: parsed.exitUrl?.trim() || fallback.exitUrl,
+      };
+    } catch {
+      return fallback;
+    }
   }
 
   private toPolicyDocumentKey(key: string): PolicyDocumentKey {

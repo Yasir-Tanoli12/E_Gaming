@@ -27,6 +27,8 @@ import { ContentService } from './content.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { CreateFaqDto } from './dto/create-faq.dto';
 import { CreateReviewDto } from './dto/create-review.dto';
+import { UpdateAboutUsDto } from './dto/update-about-us.dto';
+import { UpdateAgeWarningDto } from './dto/update-age-warning.dto';
 import { UpdateBlogDto } from './dto/update-blog.dto';
 import { UpdateContactsDto } from './dto/update-contacts.dto';
 import { UpdateFaqDto } from './dto/update-faq.dto';
@@ -204,6 +206,23 @@ export class ContentController {
       throw new BadRequestException('Only PDF files are allowed');
     }
     return this.contentService.upsertPolicyDocument(key, file);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Patch('age-warning')
+  updateAgeWarning(@Body() dto: UpdateAgeWarningDto) {
+    return this.contentService.updateAgeWarning(dto);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @Patch('about-us')
+  updateAboutUs(
+    @Body() dto: UpdateAboutUsDto,
+    @Req() req: { user?: { email?: string } },
+  ) {
+    return this.contentService.updateAboutUs(dto, req.user?.email);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

@@ -41,6 +41,14 @@ export interface SiteContent {
   blogs: BlogItem[];
   faqs: FaqItem[];
   reviews: ReviewItem[];
+  aboutUs: string;
+  ageWarning: {
+    title: string;
+    message: string;
+    enterButtonLabel: string;
+    exitButtonLabel: string;
+    exitUrl: string;
+  };
   privacyPolicy: string;
   privacyPolicyPdfUrl?: string | null;
   socialResponsibilityPdfUrl?: string | null;
@@ -157,6 +165,24 @@ export const contentApi = {
       {
         method: "PATCH",
         body: JSON.stringify({ content }),
+      }
+    );
+  },
+  updateAboutUs(content: string) {
+    return apiRequest<{ id: string; title: string; content: string; updatedAt: string }>(
+      "/content/about-us",
+      {
+        method: "PATCH",
+        body: JSON.stringify({ content }),
+      }
+    );
+  },
+  updateAgeWarning(body: Partial<SiteContent["ageWarning"]>) {
+    return apiRequest<{ id: string; content: string; updatedAt: string }>(
+      "/content/age-warning",
+      {
+        method: "PATCH",
+        body: JSON.stringify(body),
       }
     );
   },

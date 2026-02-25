@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { contentApi } from "@/lib/content-api";
 
@@ -46,12 +45,6 @@ export default function PrivacyPolicyPage() {
             <h1 className="mt-2 text-4xl font-black">Privacy Policy</h1>
             </div>
           </div>
-          <Link
-            href="/dashboard"
-            className="rounded-full border border-cyan-300/40 bg-cyan-500/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:bg-cyan-500/20"
-          >
-            Back to Dashboard
-          </Link>
         </div>
 
         {loading ? (

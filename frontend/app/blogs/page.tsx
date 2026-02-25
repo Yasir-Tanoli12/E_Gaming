@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { contentApi, type SiteContent } from "@/lib/content-api";
 
 export default function BlogsPage() {
@@ -58,12 +57,6 @@ export default function BlogsPage() {
             </p>
             </div>
           </div>
-          <Link
-            href="/dashboard"
-            className="rounded-full border border-cyan-300/40 bg-cyan-500/10 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:-translate-y-0.5 hover:bg-cyan-500/25 hover:shadow-[0_0_24px_rgba(34,211,238,0.35)]"
-          >
-            Back to Dashboard
-          </Link>
         </div>
 
         {loading ? (

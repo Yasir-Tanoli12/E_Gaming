@@ -68,6 +68,14 @@ export default function UserDashboardPage() {
   const heroVideo = orderedGames.find((game) => game.videoUrl)?.videoUrl ?? null;
   const reviewItems = content?.reviews ?? [];
   const movingReviewItems = reviewItems.length > 0 ? [...reviewItems, ...reviewItems] : [];
+  const ageWarning = content?.ageWarning ?? {
+    title: "18+ Content Notice",
+    message:
+      "This gaming website may include mature themes. Enter only if you are 18 years old or above.",
+    enterButtonLabel: "I am 18+ Enter",
+    exitButtonLabel: "Exit",
+    exitUrl: "https://www.google.com",
+  };
 
   return (
     <div className="min-h-screen bg-[#050814] text-white">
@@ -100,7 +108,7 @@ export default function UserDashboardPage() {
             {[
               { label: "HOME", href: "#home", active: true },
               { label: "GAMES", href: "#games" },
-              { label: "ABOUT US", href: "#about-us" },
+              { label: "ABOUT US", href: "/about-us" },
               { label: "CONTACT US", href: "#support" },
             ].map((item) => (
               <Link
@@ -220,18 +228,19 @@ export default function UserDashboardPage() {
           <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/80 p-4">
             <div className="w-full max-w-xl rounded-2xl border border-amber-400/40 bg-[#120f06] p-6 text-center shadow-[0_0_60px_rgba(251,191,36,0.2)]">
               <p className="text-xs uppercase tracking-[0.2em] text-amber-300">Warning</p>
-              <h3 className="mt-2 text-2xl font-black text-amber-100">18+ Content Notice</h3>
+              <h3 className="mt-2 text-2xl font-black text-amber-100">{ageWarning.title}</h3>
               <p className="mt-3 text-sm text-amber-100/80">
-                This gaming website may include mature themes. Enter only if you
-                are 18 years old or above.
+                {ageWarning.message}
               </p>
               <div className="mt-5 flex items-center justify-center gap-3">
-                <Button onClick={() => setShowAgeWarning(false)}>I am 18+ Enter</Button>
+                <Button onClick={() => setShowAgeWarning(false)}>
+                  {ageWarning.enterButtonLabel}
+                </Button>
                 <a
-                  href="https://www.google.com"
+                  href={ageWarning.exitUrl || "https://www.google.com"}
                   className="inline-flex items-center justify-center rounded-lg border border-zinc-600 px-4 py-2.5 text-sm text-zinc-300 transition hover:bg-zinc-800"
                 >
-                  Exit
+                  {ageWarning.exitButtonLabel}
                 </a>
               </div>
             </div>
@@ -429,17 +438,6 @@ export default function UserDashboardPage() {
               )}
             </section>
 
-            <section
-              id="about-us"
-              className="rounded-2xl border border-cyan-300/20 bg-[#0a1432]/60 p-6"
-            >
-              <h2 className="text-2xl font-black">About Us</h2>
-              <p className="mt-3 max-w-4xl text-sm text-cyan-100/75">
-                CashlySweeps is built to provide a fast, immersive, and responsible
-                online gaming experience with secure access, live updates, and
-                responsive support for all players.
-              </p>
-            </section>
           </div>
         )}
       </main>
@@ -475,10 +473,9 @@ export default function UserDashboardPage() {
               <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">Quick Links</p>
               <div className="mt-3 space-y-2 text-sm">
                 <a href="#games" className="block text-cyan-100/70 transition hover:text-white">Games</a>
+                <Link href="/about-us" className="block text-cyan-100/70 transition hover:text-white">About Us</Link>
                 <Link href="/blogs" className="block text-cyan-100/70 transition hover:text-white">Blogs</Link>
                 <Link href="/privacy-policy" className="block text-cyan-100/70 transition hover:text-white">Privacy Policy</Link>
-                <a href="#leaderboard" className="block text-cyan-100/70 transition hover:text-white">Leaderboard</a>
-                <a href="#rewards" className="block text-cyan-100/70 transition hover:text-white">Rewards</a>
               </div>
             </div>
 

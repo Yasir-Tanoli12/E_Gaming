@@ -16,6 +16,8 @@ export default function AdminContentPage() {
   const [savingContacts, setSavingContacts] = useState(false);
   const [savingBlog, setSavingBlog] = useState(false);
   const [savingReview, setSavingReview] = useState(false);
+  const [savingAboutUs, setSavingAboutUs] = useState(false);
+  const [savingAgeWarning, setSavingAgeWarning] = useState(false);
   const [savingPolicy, setSavingPolicy] = useState(false);
   const [uploadingBlogImage, setUploadingBlogImage] = useState(false);
   const [uploadingLogo, setUploadingLogo] = useState(false);
@@ -32,6 +34,15 @@ export default function AdminContentPage() {
   });
   const [blogs, setBlogs] = useState<BlogItem[]>([]);
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
+  const [aboutUs, setAboutUs] = useState("");
+  const [ageWarning, setAgeWarning] = useState({
+    title: "18+ Content Notice",
+    message:
+      "This gaming website may include mature themes. Enter only if you are 18 years old or above.",
+    enterButtonLabel: "I am 18+ Enter",
+    exitButtonLabel: "Exit",
+    exitUrl: "https://www.google.com",
+  });
   const [privacyPolicy, setPrivacyPolicy] = useState("");
 
   const [blogForm, setBlogForm] = useState({
@@ -55,6 +66,10 @@ export default function AdminContentPage() {
       setContacts(data.contacts);
       setBlogs(data.blogs);
       setReviews(data.reviews);
+      setAboutUs(data.aboutUs || "");
+      if (data.ageWarning) {
+        setAgeWarning(data.ageWarning);
+      }
       setPrivacyPolicy(data.privacyPolicy || "");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load content");
@@ -185,6 +200,32 @@ export default function AdminContentPage() {
     }
   }
 
+  async function saveAboutUs() {
+    setSavingAboutUs(true);
+    setError("");
+    try {
+      await contentApi.updateAboutUs(aboutUs);
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update about us");
+    } finally {
+      setSavingAboutUs(false);
+    }
+  }
+
+  async function saveAgeWarning() {
+    setSavingAgeWarning(true);
+    setError("");
+    try {
+      await contentApi.updateAgeWarning(ageWarning);
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update age warning");
+    } finally {
+      setSavingAgeWarning(false);
+    }
+  }
+
   async function uploadLegalPdf(
     key: "privacy-policy" | "social-responsibility",
     file: File | null
@@ -216,7 +257,7 @@ export default function AdminContentPage() {
       <div>
         <h1 className="text-3xl font-black">Site Content Manager</h1>
         <p className="mt-1 text-zinc-400">
-          Manage contacts, blogs, reviews, and privacy policy.
+          Manage contacts, blogs, reviews, about us, and privacy policy.
         </p>
       </div>
 
@@ -444,6 +485,80 @@ export default function AdminContentPage() {
               </div>
             ))
           )}
+        </div>
+      </section>
+
+      <section className="auth-card space-y-4 rounded-2xl border border-zinc-700/40 bg-zinc-900/60 p-6">
+        <h2 className="text-xl font-bold">About Us Page</h2>
+        <p className="text-sm text-zinc-400">
+          This content is shown on the public About Us page.
+        </p>
+        <textarea
+          value={aboutUs}
+          onChange={(e) => setAboutUs(e.target.value)}
+          rows={8}
+          className="w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-zinc-100"
+        />
+        <div>
+          <Button onClick={saveAboutUs} loading={savingAboutUs}>
+            Save About Us
+          </Button>
+        </div>
+      </section>
+
+      <section className="auth-card space-y-4 rounded-2xl border border-zinc-700/40 bg-zinc-900/60 p-6">
+        <h2 className="text-xl font-bold">18+ Popup Content</h2>
+        <p className="text-sm text-zinc-400">
+          Customize the initial age warning popup shown on landing page.
+        </p>
+        <div className="grid gap-4 md:grid-cols-2">
+          <Input
+            label="Popup Title"
+            value={ageWarning.title}
+            onChange={(e) =>
+              setAgeWarning((p) => ({ ...p, title: e.target.value }))
+            }
+          />
+          <Input
+            label="Exit URL"
+            value={ageWarning.exitUrl}
+            onChange={(e) =>
+              setAgeWarning((p) => ({ ...p, exitUrl: e.target.value }))
+            }
+            placeholder="https://example.com"
+          />
+          <Input
+            label="Enter Button Label"
+            value={ageWarning.enterButtonLabel}
+            onChange={(e) =>
+              setAgeWarning((p) => ({ ...p, enterButtonLabel: e.target.value }))
+            }
+          />
+          <Input
+            label="Exit Button Label"
+            value={ageWarning.exitButtonLabel}
+            onChange={(e) =>
+              setAgeWarning((p) => ({ ...p, exitButtonLabel: e.target.value }))
+            }
+          />
+        </div>
+        <div>
+          <label className="mb-1 block text-sm font-medium text-zinc-300">
+            Popup Message
+          </label>
+          <textarea
+            value={ageWarning.message}
+            onChange={(e) =>
+              setAgeWarning((p) => ({ ...p, message: e.target.value }))
+            }
+            rows={4}
+            className="w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-zinc-100"
+          />
+        </div>
+        <div>
+          <Button onClick={saveAgeWarning} loading={savingAgeWarning}>
+            Save 18+ Popup
+          </Button>
         </div>
       </section>
 
