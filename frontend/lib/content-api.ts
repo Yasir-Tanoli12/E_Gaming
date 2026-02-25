@@ -1,10 +1,11 @@
-import { apiRequest } from "./api";
+import { apiRequest, getAuthHeaders } from "./api";
 
 export interface SiteContacts {
   facebook: string;
   whatsapp: string;
   instagram: string;
   email: string;
+  logoUrl?: string | null;
 }
 
 export interface BlogItem {
@@ -41,9 +42,52 @@ export interface SiteContent {
   faqs: FaqItem[];
   reviews: ReviewItem[];
   privacyPolicy: string;
+  privacyPolicyPdfUrl?: string | null;
+  socialResponsibilityPdfUrl?: string | null;
 }
 
 export const contentApi = {
+  async uploadLogo(file: File): Promise<{ logoUrl: string | null; updatedAt: string }> {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch(`${baseUrl}/content/logo`, {
+      method: "POST",
+      headers: {
+        ...getAuthHeaders(),
+      },
+      body: formData,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const message =
+        typeof data.message === "string" ? data.message : "Logo upload failed";
+      throw new Error(message);
+    }
+    return data as { logoUrl: string | null; updatedAt: string };
+  },
+  async uploadPolicyDocument(
+    key: "privacy-policy" | "social-responsibility",
+    file: File
+  ): Promise<{ id: string; key: string; fileName: string; mimeType: string; updatedAt: string }> {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch(`${baseUrl}/content/documents/${key}`, {
+      method: "POST",
+      headers: {
+        ...getAuthHeaders(),
+      },
+      body: formData,
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const message =
+        typeof data.message === "string" ? data.message : "Upload failed";
+      throw new Error(message);
+    }
+    return data as { id: string; key: string; fileName: string; mimeType: string; updatedAt: string };
+  },
   getPublic() {
     return apiRequest<SiteContent>("/content/public");
   },

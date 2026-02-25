@@ -1,4 +1,4 @@
-# E-Gaming Security Guide
+# CashlySweeps Security Guide
 
 ## Implemented Security Features
 
@@ -41,8 +41,8 @@ SMTP_PORT=587
 SMTP_SECURE=false
 SMTP_USER=your-email@domain.com
 SMTP_PASS=your-app-password
-MAIL_FROM="E-Gaming <noreply@yourdomain.com>"
-APP_NAME=E-Gaming
+MAIL_FROM="CashlySweeps <noreply@yourdomain.com>"
+APP_NAME=CashlySweeps
 ```
 
 ### Popular SMTP providers

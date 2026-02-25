@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { PrismaService } from '../prisma/prisma.service';
+import { PolicyDocumentKey } from '@prisma/client';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { CreateFaqDto } from './dto/create-faq.dto';
 import { CreateReviewDto } from './dto/create-review.dto';
@@ -38,6 +39,8 @@ export class ContentService {
         create: {
           id: 'default',
           content: 'Privacy policy will be added soon.',
+          privacyPolicyPdfUrl: null,
+          socialResponsibilityPdfUrl: null,
         },
       }),
     ]);
@@ -50,6 +53,7 @@ export class ContentService {
         whatsapp?: string;
         instagram?: string;
         email?: string;
+        logoUrl?: string;
       };
       blogs?: Array<{
         id?: string;
@@ -98,7 +102,8 @@ export class ContentService {
       !contact.facebook &&
       !contact.whatsapp &&
       !contact.instagram &&
-      !contact.email
+      !contact.email &&
+      !contact.logoUrl
     ) {
       await this.prisma.contact.update({
         where: { id: 'default' },
@@ -107,6 +112,7 @@ export class ContentService {
           whatsapp: legacy.contacts.whatsapp ?? '',
           instagram: legacy.contacts.instagram ?? '',
           email: legacy.contacts.email ?? '',
+          logoUrl: legacy.contacts.logoUrl ?? null,
         },
       });
     }
@@ -209,11 +215,14 @@ export class ContentService {
         whatsapp: '',
         instagram: '',
         email: '',
+        logoUrl: null,
       },
       blogs,
       faqs,
       reviews,
       privacyPolicy: privacyPolicy?.content ?? '',
+      privacyPolicyPdfUrl: null,
+      socialResponsibilityPdfUrl: null,
     };
   }
 
@@ -234,11 +243,14 @@ export class ContentService {
         whatsapp: '',
         instagram: '',
         email: '',
+        logoUrl: null,
       },
       blogs,
       faqs,
       reviews,
       privacyPolicy: privacyPolicy?.content ?? '',
+      privacyPolicyPdfUrl: null,
+      socialResponsibilityPdfUrl: null,
     };
   }
 
@@ -248,6 +260,16 @@ export class ContentService {
       where: { id: 'default' },
       data: dto,
     });
+  }
+
+  async updateLogo(logoUrl: string) {
+    await this.bootstrapFromLegacyFile();
+    const contact = await this.prisma.contact.update({
+      where: { id: 'default' },
+      data: { logoUrl },
+      select: { logoUrl: true, updatedAt: true },
+    });
+    return contact;
   }
 
   async createBlog(dto: CreateBlogDto) {
@@ -346,6 +368,56 @@ export class ContentService {
       data: {
         content: dto.content,
         updatedBy: updatedBy ?? null,
+      },
+    });
+  }
+
+  private toPolicyDocumentKey(key: string): PolicyDocumentKey {
+    const normalized = key.trim().toLowerCase().replace(/\s+/g, '-');
+    if (normalized === 'privacy-policy') return 'PRIVACY_POLICY';
+    if (normalized === 'social-responsibility')
+      return 'SOCIAL_RESPONSIBILITY';
+    throw new Error('Invalid legal document key');
+  }
+
+  async upsertPolicyDocument(
+    key: string,
+    file: { originalname: string; mimetype: string; buffer: Buffer },
+  ) {
+    await this.bootstrapFromLegacyFile();
+    const docKey = this.toPolicyDocumentKey(key);
+    return this.prisma.policyDocument.upsert({
+      where: { key: docKey },
+      update: {
+        fileName: file.originalname,
+        mimeType: file.mimetype,
+        data: file.buffer,
+      },
+      create: {
+        key: docKey,
+        fileName: file.originalname,
+        mimeType: file.mimetype,
+        data: file.buffer,
+      },
+      select: {
+        id: true,
+        key: true,
+        fileName: true,
+        mimeType: true,
+        updatedAt: true,
+      },
+    });
+  }
+
+  async getPolicyDocument(key: string) {
+    await this.bootstrapFromLegacyFile();
+    const docKey = this.toPolicyDocumentKey(key);
+    return this.prisma.policyDocument.findUnique({
+      where: { key: docKey },
+      select: {
+        fileName: true,
+        mimeType: true,
+        data: true,
       },
     });
   }

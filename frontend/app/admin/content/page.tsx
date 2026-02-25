@@ -18,6 +18,9 @@ export default function AdminContentPage() {
   const [savingReview, setSavingReview] = useState(false);
   const [savingPolicy, setSavingPolicy] = useState(false);
   const [uploadingBlogImage, setUploadingBlogImage] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingPrivacyPdf, setUploadingPrivacyPdf] = useState(false);
+  const [uploadingSocialPdf, setUploadingSocialPdf] = useState(false);
   const [error, setError] = useState("");
 
   const [contacts, setContacts] = useState<SiteContacts>({
@@ -25,6 +28,7 @@ export default function AdminContentPage() {
     whatsapp: "",
     instagram: "",
     email: "",
+    logoUrl: "",
   });
   const [blogs, setBlogs] = useState<BlogItem[]>([]);
   const [reviews, setReviews] = useState<ReviewItem[]>([]);
@@ -120,6 +124,24 @@ export default function AdminContentPage() {
     }
   }
 
+  async function uploadLogo(file: File | null) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setError("Only image files are allowed for logo.");
+      return;
+    }
+    setUploadingLogo(true);
+    setError("");
+    try {
+      const res = await contentApi.uploadLogo(file);
+      setContacts((p) => ({ ...p, logoUrl: res.logoUrl ?? "" }));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to upload logo");
+    } finally {
+      setUploadingLogo(false);
+    }
+  }
+
   async function addReview() {
     if (!reviewForm.reviewer.trim() || !reviewForm.message.trim()) return;
     setSavingReview(true);
@@ -163,6 +185,28 @@ export default function AdminContentPage() {
     }
   }
 
+  async function uploadLegalPdf(
+    key: "privacy-policy" | "social-responsibility",
+    file: File | null
+  ) {
+    if (!file) return;
+    if (file.type !== "application/pdf") {
+      setError("Only PDF files are allowed.");
+      return;
+    }
+    if (key === "privacy-policy") setUploadingPrivacyPdf(true);
+    if (key === "social-responsibility") setUploadingSocialPdf(true);
+    setError("");
+    try {
+      await contentApi.uploadPolicyDocument(key, file);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to upload PDF");
+    } finally {
+      if (key === "privacy-policy") setUploadingPrivacyPdf(false);
+      if (key === "social-responsibility") setUploadingSocialPdf(false);
+    }
+  }
+
   if (loading) {
     return <div className="text-zinc-400">Loading content...</div>;
   }
@@ -184,6 +228,30 @@ export default function AdminContentPage() {
 
       <section className="auth-card space-y-4 rounded-2xl border border-zinc-700/40 bg-zinc-900/60 p-6">
         <h2 className="text-xl font-bold">Contacts</h2>
+        <div>
+          <label className="mb-1 block text-sm font-medium text-zinc-300">
+            Brand logo
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => uploadLogo(e.target.files?.[0] ?? null)}
+            className="rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-sm text-zinc-200"
+          />
+          {uploadingLogo && (
+            <p className="mt-1 text-xs text-cyan-300">Uploading logo...</p>
+          )}
+          {contacts.logoUrl && (
+            <div className="mt-3 inline-flex items-center gap-3 rounded-xl border border-cyan-300/30 bg-cyan-500/10 px-3 py-2">
+              <img
+                src={contacts.logoUrl}
+                alt="Site logo"
+                className="h-10 w-10 rounded-lg object-cover ring-1 ring-cyan-300/40"
+              />
+              <p className="text-xs text-cyan-100/80">Logo is active site-wide</p>
+            </div>
+          )}
+        </div>
         <div className="grid gap-4 md:grid-cols-2">
           <Input
             label="Facebook URL"
@@ -394,6 +462,47 @@ export default function AdminContentPage() {
           <Button onClick={savePrivacyPolicy} loading={savingPolicy}>
             Save Privacy Policy
           </Button>
+        </div>
+      </section>
+
+      <section className="auth-card space-y-4 rounded-2xl border border-zinc-700/40 bg-zinc-900/60 p-6">
+        <h2 className="text-xl font-bold">Legal PDFs (Stored in DB)</h2>
+        <p className="text-sm text-zinc-400">
+          Upload PDFs for footer links. Files are stored directly in database.
+        </p>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div>
+            <label className="mb-1 block text-sm font-medium text-zinc-300">
+              Privacy Policy PDF
+            </label>
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={(e) =>
+                uploadLegalPdf("privacy-policy", e.target.files?.[0] ?? null)
+              }
+              className="rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-sm text-zinc-200"
+            />
+            {uploadingPrivacyPdf && (
+              <p className="mt-1 text-xs text-cyan-300">Uploading...</p>
+            )}
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-zinc-300">
+              Social Responsibility Rules PDF
+            </label>
+            <input
+              type="file"
+              accept="application/pdf"
+              onChange={(e) =>
+                uploadLegalPdf("social-responsibility", e.target.files?.[0] ?? null)
+              }
+              className="rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-sm text-zinc-200"
+            />
+            {uploadingSocialPdf && (
+              <p className="mt-1 text-xs text-cyan-300">Uploading...</p>
+            )}
+          </div>
         </div>
       </section>
     </div>

@@ -14,8 +14,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "E-Gaming",
-  description: "E-Gaming platform",
+  title: "CashlySweeps",
+  description: "CashlySweeps platform",
 };
 
 export default function RootLayout({

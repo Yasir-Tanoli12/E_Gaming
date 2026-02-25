@@ -16,4 +16,8 @@ export class UpdateContactsDto {
   @IsOptional()
   @IsString()
   email?: string;
+
+  @IsOptional()
+  @IsString()
+  logoUrl?: string;
 }

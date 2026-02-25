@@ -43,7 +43,7 @@ const SAMPLE_GAMES = [
 
 async function main() {
   // Create admin user
-  const adminEmail = process.env.ADMIN_EMAIL ?? 'admin@egaming.com';
+  const adminEmail = process.env.ADMIN_EMAIL ?? 'admin@cashlysweeps.com';
   const adminPassword = process.env.ADMIN_PASSWORD ?? 'Admin@123';
 
   const existingUser = await prisma.user.findUnique({

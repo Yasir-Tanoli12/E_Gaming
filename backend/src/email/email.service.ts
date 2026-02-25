@@ -17,8 +17,8 @@ export class EmailService {
     }
 
     const from =
-      this.config.get<string>('MAIL_FROM') ?? 'E-Gaming <noreply@egaming.com>';
-    const appName = this.config.get<string>('APP_NAME') ?? 'E-Gaming';
+      this.config.get<string>('MAIL_FROM') ?? 'CashlySweeps <noreply@cashlysweeps.com>';
+    const appName = this.config.get<string>('APP_NAME') ?? 'CashlySweeps';
 
     const subject =
       type === 'EMAIL_VERIFY'

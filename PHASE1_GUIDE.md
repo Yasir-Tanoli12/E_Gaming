@@ -1,6 +1,6 @@
 # Phase 1: Database & Core Backend — Step-by-Step Guide
 
-This guide walks you through Phase 1 of the E-Gaming project.
+This guide walks you through Phase 1 of the CashlySweeps project.
 
 ---
 
@@ -23,7 +23,7 @@ You need a PostgreSQL database. Options:
 | **Supabase** | 500MB | [supabase.com](https://supabase.com) → New Project → Settings → Database → Connection string |
 | **Neon** | 512MB | [neon.tech](https://neon.tech) → Create project → Connection string |
 | **Railway** | $5 credit | [railway.app](https://railway.app) → New → PostgreSQL |
-| **Local** | — | Install PostgreSQL, use `postgresql://user:pass@localhost:5432/egaming` |
+| **Local** | — | Install PostgreSQL, use `postgresql://user:pass@localhost:5432/cashlysweeps` |
 
 Copy the **connection string** (looks like `postgresql://user:password@host:5432/database`).
 
@@ -80,7 +80,7 @@ npm run prisma:seed
 
 This creates the first admin user:
 
-- **Email:** `admin@egaming.com`
+- **Email:** `admin@cashlysweeps.com`
 - **Password:** `Admin@123`
 
 To customize:
@@ -158,7 +158,7 @@ curl -X POST http://localhost:3001/auth/register ^
 ```bash
 curl -X POST http://localhost:3001/auth/login ^
   -H "Content-Type: application/json" ^
-  -d "{\"email\":\"admin@egaming.com\",\"password\":\"Admin@123\"}"
+  -d "{\"email\":\"admin@cashlysweeps.com\",\"password\":\"Admin@123\"}"
 ```
 
 Use the `accessToken` from the response for protected routes.

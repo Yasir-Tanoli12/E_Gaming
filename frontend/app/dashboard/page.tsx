@@ -23,12 +23,11 @@ export default function UserDashboardPage() {
   useEffect(() => {
     async function load() {
       try {
-        const [data, top, poster, publicContent] = await Promise.all([
-          gamesApi.list(),
-          gamesApi.listTop(),
-          newsApi.current(),
-          contentApi.getPublic(),
-        ]);
+        // Keep API calls sequential to avoid saturating low DB pool limits.
+        const data = await gamesApi.list();
+        const top = await gamesApi.listTop();
+        const poster = await newsApi.current();
+        const publicContent = await contentApi.getPublic();
         setGames(data);
         setTopGames(top);
         setNewsPoster(poster);
@@ -55,6 +54,12 @@ export default function UserDashboardPage() {
     return (a.sortOrder ?? 0) - (b.sortOrder ?? 0);
   });
   const contacts = content?.contacts;
+  const logoUrl = contacts?.logoUrl ?? "";
+  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+  const privacyPolicyPdfUrl =
+    `${apiBaseUrl}/content/documents/privacy-policy`;
+  const socialResponsibilityPdfUrl =
+    `${apiBaseUrl}/content/documents/social-responsibility`;
   const whatsappLink = contacts?.whatsapp
     ? contacts.whatsapp.startsWith("http")
       ? contacts.whatsapp
@@ -74,20 +79,29 @@ export default function UserDashboardPage() {
       <header className="sticky top-0 z-50 border-b border-cyan-300/20 bg-[#0a1330]/80 backdrop-blur-xl">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-fuchsia-400/80 to-transparent" />
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4">
-          <Link href="/dashboard" className="group relative text-xl font-black tracking-wide text-white">
+          <Link href="/dashboard" className="group relative flex items-center gap-3 text-xl font-black tracking-wide text-white">
             <span className="absolute -inset-2 -z-10 rounded-xl bg-gradient-to-r from-fuchsia-500/30 to-cyan-400/30 opacity-0 blur-xl transition duration-500 group-hover:opacity-100" />
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt="CashlySweeps logo"
+                className="h-10 w-10 rounded-xl object-cover ring-1 ring-cyan-300/50 shadow-[0_0_24px_rgba(34,211,238,0.35)] transition-transform duration-300 group-hover:scale-105"
+              />
+            ) : (
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500 to-cyan-400 text-sm font-black shadow-[0_0_24px_rgba(34,211,238,0.35)]">
+                CS
+              </span>
+            )}
             <span className="inline-block transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-105">
-              E-Gaming
+              CashlySweeps
             </span>
           </Link>
           <nav className="hidden items-center gap-2 lg:flex">
             {[
-              { label: "Lobby", href: "/dashboard", active: true },
-              { label: "Games", href: "#games" },
-              { label: "Blogs", href: "/blogs" },
-              { label: "Reviews", href: "#reviews" },
-              { label: "Privacy", href: "/privacy-policy" },
-              { label: "Support", href: "#support" },
+              { label: "HOME", href: "#home", active: true },
+              { label: "GAMES", href: "#games" },
+              { label: "ABOUT US", href: "#about-us" },
+              { label: "CONTACT US", href: "#support" },
             ].map((item) => (
               <Link
                 key={item.label}
@@ -114,9 +128,13 @@ export default function UserDashboardPage() {
                 href={contacts.facebook}
                 target="_blank"
                 rel="noreferrer"
-                className="hidden rounded-full border border-fuchsia-300/30 bg-fuchsia-500/10 px-3 py-1 text-xs text-fuchsia-200 transition hover:bg-fuchsia-500/20 md:inline-block"
+                aria-label="Facebook"
+                title="Facebook"
+                className="hidden h-9 w-9 items-center justify-center rounded-full border border-fuchsia-300/40 bg-fuchsia-500/15 text-fuchsia-100 shadow-[0_0_18px_rgba(217,70,239,0.35)] transition hover:-translate-y-0.5 hover:bg-fuchsia-500/25 md:inline-flex"
               >
-                Facebook
+                <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
+                  <path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.5-3.88 3.79-3.88 1.1 0 2.24.2 2.24.2v2.47h-1.27c-1.26 0-1.65.78-1.65 1.58V12h2.8l-.45 2.89h-2.35v6.99A10 10 0 0 0 22 12z" />
+                </svg>
               </a>
             )}
             {contacts?.whatsapp && (
@@ -124,9 +142,13 @@ export default function UserDashboardPage() {
                 href={contacts.whatsapp.startsWith("http") ? contacts.whatsapp : `https://wa.me/${contacts.whatsapp.replace(/\D/g, "")}`}
                 target="_blank"
                 rel="noreferrer"
-                className="hidden rounded-full border border-emerald-300/30 bg-emerald-500/10 px-3 py-1 text-xs text-emerald-200 transition hover:bg-emerald-500/20 md:inline-block"
+                aria-label="WhatsApp"
+                title="WhatsApp"
+                className="hidden h-9 w-9 items-center justify-center rounded-full border border-emerald-300/40 bg-emerald-500/15 text-emerald-100 shadow-[0_0_18px_rgba(16,185,129,0.35)] transition hover:-translate-y-0.5 hover:bg-emerald-500/25 md:inline-flex"
               >
-                WhatsApp
+                <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
+                  <path d="M20.52 3.48A11.86 11.86 0 0 0 12.07 0C5.54 0 .2 5.34.2 11.86c0 2.09.55 4.14 1.59 5.95L0 24l6.37-1.67a11.86 11.86 0 0 0 5.7 1.46h.01c6.53 0 11.87-5.33 11.87-11.86 0-3.17-1.23-6.15-3.43-8.45zM12.08 21.8h-.01a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.78.99 1.01-3.68-.23-.38a9.86 9.86 0 0 1-1.51-5.27c0-5.45 4.44-9.88 9.91-9.88a9.8 9.8 0 0 1 7.02 2.91 9.79 9.79 0 0 1 2.9 6.98c0 5.45-4.44 9.89-9.91 9.89zm5.43-7.42c-.3-.15-1.77-.87-2.05-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.95 1.16-.17.2-.35.22-.65.08-.3-.15-1.27-.47-2.42-1.5-.9-.8-1.5-1.8-1.68-2.1-.18-.3-.02-.46.13-.6.14-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.67-1.62-.92-2.22-.24-.58-.48-.5-.67-.51h-.57c-.2 0-.53.08-.8.38-.27.3-1.03 1-1.03 2.45 0 1.45 1.05 2.85 1.2 3.05.15.2 2.07 3.16 5.01 4.43.7.3 1.25.48 1.68.62.7.22 1.33.2 1.83.12.56-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.08-.12-.27-.2-.57-.35z" />
+                </svg>
               </a>
             )}
             <Link href="/login">
@@ -136,7 +158,10 @@ export default function UserDashboardPage() {
         </div>
       </header>
 
-      <section className="relative flex min-h-[calc(100vh-82px)] items-center overflow-hidden border-b border-cyan-300/20 bg-gradient-to-r from-fuchsia-600/20 via-purple-600/20 to-cyan-500/20 px-4 py-10">
+      <section
+        id="home"
+        className="relative flex min-h-[calc(100vh-82px)] items-center overflow-hidden border-b border-cyan-300/20 bg-gradient-to-r from-fuchsia-600/20 via-purple-600/20 to-cyan-500/20 px-4 py-10"
+      >
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-8 top-8 h-40 w-40 rounded-full bg-fuchsia-500/20 blur-3xl" />
           <div className="absolute bottom-10 right-10 h-52 w-52 animate-pulse rounded-full bg-cyan-400/20 blur-3xl" />
@@ -297,25 +322,33 @@ export default function UserDashboardPage() {
                       href={contacts?.facebook || "#"}
                       target="_blank"
                       rel="noreferrer"
-                      className={`inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition ${
+                      aria-label="Messenger"
+                      title="Messenger"
+                      className={`inline-flex h-11 w-11 items-center justify-center rounded-xl transition ${
                         contacts?.facebook
-                          ? "border border-fuchsia-300/50 bg-fuchsia-500/20 text-fuchsia-100 shadow-[0_0_20px_rgba(217,70,239,0.28)] hover:-translate-y-0.5 hover:bg-fuchsia-500/30"
+                          ? "border border-fuchsia-300/50 bg-fuchsia-500/20 text-fuchsia-100 shadow-[0_0_22px_rgba(217,70,239,0.35)] hover:-translate-y-0.5 hover:bg-fuchsia-500/30"
                           : "pointer-events-none border border-zinc-700 bg-zinc-800 text-zinc-500"
                       }`}
                     >
-                      Messenger
+                      <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
+                        <path d="M12 2C6.48 2 2 6.15 2 11.27c0 2.92 1.46 5.52 3.74 7.22V22l3.35-1.84c.9.25 1.88.38 2.91.38 5.52 0 10-4.15 10-9.27S17.52 2 12 2zm.99 12.5-2.55-2.72-4.9 2.72 5.39-5.73 2.63 2.72 4.82-2.72-5.39 5.73z" />
+                      </svg>
                     </a>
                     <a
                       href={whatsappLink || "#"}
                       target="_blank"
                       rel="noreferrer"
-                      className={`inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition ${
+                      aria-label="WhatsApp"
+                      title="WhatsApp"
+                      className={`inline-flex h-11 w-11 items-center justify-center rounded-xl transition ${
                         whatsappLink
-                          ? "border border-emerald-300/50 bg-emerald-500/20 text-emerald-100 shadow-[0_0_20px_rgba(16,185,129,0.28)] hover:-translate-y-0.5 hover:bg-emerald-500/30"
+                          ? "border border-emerald-300/50 bg-emerald-500/20 text-emerald-100 shadow-[0_0_22px_rgba(16,185,129,0.35)] hover:-translate-y-0.5 hover:bg-emerald-500/30"
                           : "pointer-events-none border border-zinc-700 bg-zinc-800 text-zinc-500"
                       }`}
                     >
-                      WhatsApp
+                      <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
+                        <path d="M20.52 3.48A11.86 11.86 0 0 0 12.07 0C5.54 0 .2 5.34.2 11.86c0 2.09.55 4.14 1.59 5.95L0 24l6.37-1.67a11.86 11.86 0 0 0 5.7 1.46h.01c6.53 0 11.87-5.33 11.87-11.86 0-3.17-1.23-6.15-3.43-8.45zM12.08 21.8h-.01a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.78.99 1.01-3.68-.23-.38a9.86 9.86 0 0 1-1.51-5.27c0-5.45 4.44-9.88 9.91-9.88a9.8 9.8 0 0 1 7.02 2.91 9.79 9.79 0 0 1 2.9 6.98c0 5.45-4.44 9.89-9.91 9.89zm5.43-7.42c-.3-.15-1.77-.87-2.05-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.95 1.16-.17.2-.35.22-.65.08-.3-.15-1.27-.47-2.42-1.5-.9-.8-1.5-1.8-1.68-2.1-.18-.3-.02-.46.13-.6.14-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.67-1.62-.92-2.22-.24-.58-.48-.5-.67-.51h-.57c-.2 0-.53.08-.8.38-.27.3-1.03 1-1.03 2.45 0 1.45 1.05 2.85 1.2 3.05.15.2 2.07 3.16 5.01 4.43.7.3 1.25.48 1.68.62.7.22 1.33.2 1.83.12.56-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.08-.12-.27-.2-.57-.35z" />
+                      </svg>
                     </a>
                     <Button
                       variant="secondary"
@@ -395,6 +428,18 @@ export default function UserDashboardPage() {
                 </div>
               )}
             </section>
+
+            <section
+              id="about-us"
+              className="rounded-2xl border border-cyan-300/20 bg-[#0a1432]/60 p-6"
+            >
+              <h2 className="text-2xl font-black">About Us</h2>
+              <p className="mt-3 max-w-4xl text-sm text-cyan-100/75">
+                CashlySweeps is built to provide a fast, immersive, and responsible
+                online gaming experience with secure access, live updates, and
+                responsive support for all players.
+              </p>
+            </section>
           </div>
         )}
       </main>
@@ -407,7 +452,20 @@ export default function UserDashboardPage() {
         <div className="relative mx-auto max-w-7xl px-4 py-12">
           <div className="grid gap-8 md:grid-cols-4">
             <div>
-              <h3 className="text-xl font-black text-white">E-Gaming</h3>
+              <div className="flex items-center gap-3">
+                {logoUrl ? (
+                  <img
+                    src={logoUrl}
+                    alt="CashlySweeps logo"
+                    className="h-11 w-11 rounded-xl object-cover ring-1 ring-cyan-300/50 shadow-[0_0_24px_rgba(34,211,238,0.3)]"
+                  />
+                ) : (
+                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500 to-cyan-400 text-sm font-black text-white shadow-[0_0_20px_rgba(217,70,239,0.35)]">
+                    CS
+                  </span>
+                )}
+                <h3 className="text-xl font-black text-white">CashlySweeps</h3>
+              </div>
               <p className="mt-3 text-sm text-cyan-100/70">
                 Play trending games with a neon arcade experience and smooth media previews.
               </p>
@@ -427,22 +485,44 @@ export default function UserDashboardPage() {
             <div>
               <p className="text-xs uppercase tracking-[0.2em] text-fuchsia-300">Resources</p>
               <div className="mt-3 space-y-2 text-sm">
-                <a href="#" className="block text-cyan-100/70 transition hover:text-white">Help Center</a>
-                <a href="#" className="block text-cyan-100/70 transition hover:text-white">Terms</a>
-                <a href="#" className="block text-cyan-100/70 transition hover:text-white">Privacy</a>
+                <a
+                  href={privacyPolicyPdfUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block text-cyan-100/70 transition hover:text-white"
+                >
+                  Privacy Policy
+                </a>
+                <a
+                  href={socialResponsibilityPdfUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block text-cyan-100/70 transition hover:text-white"
+                >
+                  Social Responsibility Rules
+                </a>
               </div>
             </div>
 
             <div id="support">
               <p className="text-xs uppercase tracking-[0.2em] text-emerald-300">Contact</p>
               <div className="mt-3 space-y-2 text-sm text-cyan-100/70">
-                <p>{contacts?.email || "support@egaming.com"}</p>
+                <p>{contacts?.email || "support@cashlysweeps.com"}</p>
                 <p>{contacts?.whatsapp || "+92 300 0000000"}</p>
                 <p>24/7 Live Support</p>
                 <div className="mt-1 flex gap-2">
                   {contacts?.facebook && (
-                    <a href={contacts.facebook} target="_blank" rel="noreferrer" className="text-fuchsia-300 hover:text-fuchsia-200">
-                      Facebook
+                    <a
+                      href={contacts.facebook}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label="Facebook"
+                      title="Facebook"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-fuchsia-300/40 bg-fuchsia-500/15 text-fuchsia-200 shadow-[0_0_16px_rgba(217,70,239,0.32)] transition hover:-translate-y-0.5 hover:bg-fuchsia-500/25"
+                    >
+                      <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
+                        <path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.5-3.88 3.79-3.88 1.1 0 2.24.2 2.24.2v2.47h-1.27c-1.26 0-1.65.78-1.65 1.58V12h2.8l-.45 2.89h-2.35v6.99A10 10 0 0 0 22 12z" />
+                      </svg>
                     </a>
                   )}
                   {contacts?.whatsapp && (
@@ -450,9 +530,13 @@ export default function UserDashboardPage() {
                       href={contacts.whatsapp.startsWith("http") ? contacts.whatsapp : `https://wa.me/${contacts.whatsapp.replace(/\D/g, "")}`}
                       target="_blank"
                       rel="noreferrer"
-                      className="text-emerald-300 hover:text-emerald-200"
+                      aria-label="WhatsApp"
+                      title="WhatsApp"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-emerald-300/40 bg-emerald-500/15 text-emerald-200 shadow-[0_0_16px_rgba(16,185,129,0.32)] transition hover:-translate-y-0.5 hover:bg-emerald-500/25"
                     >
-                      WhatsApp
+                      <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
+                        <path d="M20.52 3.48A11.86 11.86 0 0 0 12.07 0C5.54 0 .2 5.34.2 11.86c0 2.09.55 4.14 1.59 5.95L0 24l6.37-1.67a11.86 11.86 0 0 0 5.7 1.46h.01c6.53 0 11.87-5.33 11.87-11.86 0-3.17-1.23-6.15-3.43-8.45zM12.08 21.8h-.01a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.78.99 1.01-3.68-.23-.38a9.86 9.86 0 0 1-1.51-5.27c0-5.45 4.44-9.88 9.91-9.88a9.8 9.8 0 0 1 7.02 2.91 9.79 9.79 0 0 1 2.9 6.98c0 5.45-4.44 9.89-9.91 9.89zm5.43-7.42c-.3-.15-1.77-.87-2.05-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.95 1.16-.17.2-.35.22-.65.08-.3-.15-1.27-.47-2.42-1.5-.9-.8-1.5-1.8-1.68-2.1-.18-.3-.02-.46.13-.6.14-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.67-1.62-.92-2.22-.24-.58-.48-.5-.67-.51h-.57c-.2 0-.53.08-.8.38-.27.3-1.03 1-1.03 2.45 0 1.45 1.05 2.85 1.2 3.05.15.2 2.07 3.16 5.01 4.43.7.3 1.25.48 1.68.62.7.22 1.33.2 1.83.12.56-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.08-.12-.27-.2-.57-.35z" />
+                      </svg>
                     </a>
                   )}
                 </div>
@@ -461,8 +545,8 @@ export default function UserDashboardPage() {
           </div>
 
           <div className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-cyan-300/20 pt-4 text-xs text-cyan-100/60 md:flex-row">
-            <p>© {new Date().getFullYear()} E-Gaming. All rights reserved.</p>
-            <p>Built for immersive gaming UX.</p>
+            <p>© {new Date().getFullYear()} CashlySweeps. All rights reserved.</p>
+            <p>Built for immersive sweepstakes UX.</p>
           </div>
         </div>
       </footer>

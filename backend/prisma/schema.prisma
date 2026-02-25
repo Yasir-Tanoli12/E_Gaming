@@ -1,4 +1,4 @@
-// E-Gaming Database Schema - Phase 1
+// CashlySweeps Database Schema - Phase 1
 // https://pris.ly/d/prisma-schema
 
 generator client {
@@ -47,6 +47,7 @@ model Contact {
   whatsapp  String   @default("")
   instagram String   @default("")
   email     String   @default("")
+  logoUrl   String?  @map("logo_url")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 }
@@ -82,9 +83,21 @@ model Review {
 model PrivacyPolicy {
   id        String   @id @default("default")
   content   String   @db.Text
+  privacyPolicyPdfUrl      String? @map("privacy_policy_pdf_url")
+  socialResponsibilityPdfUrl String? @map("social_responsibility_pdf_url")
   updatedBy String?  @map("updated_by")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model PolicyDocument {
+  id        String            @id @default(cuid())
+  key       PolicyDocumentKey @unique
+  fileName  String            @map("file_name")
+  mimeType  String            @map("mime_type")
+  data      Bytes
+  createdAt DateTime          @default(now()) @map("created_at")
+  updatedAt DateTime          @updatedAt @map("updated_at")
 }
 
 // Email verification codes (signup, login 2FA, password reset)
@@ -139,6 +152,11 @@ model AuthLog {
 enum AuthAction {
   SIGNUP
   SIGNIN
+}
+
+enum PolicyDocumentKey {
+  PRIVACY_POLICY
+  SOCIAL_RESPONSIBILITY
 }
 
 // Games displayed on landing page

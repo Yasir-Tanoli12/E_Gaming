@@ -24,6 +24,7 @@ export default function BlogsPage() {
   }, []);
 
   const blogs = content?.blogs ?? [];
+  const logoUrl = content?.contacts?.logoUrl ?? "";
   const [featuredBlog, ...otherBlogs] = blogs;
   const sideBlogs = otherBlogs.slice(0, 3);
   const remainingBlogs = otherBlogs.slice(3);
@@ -37,12 +38,25 @@ export default function BlogsPage() {
 
       <div className="relative mx-auto max-w-7xl">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
-          <div>
+          <div className="flex items-center gap-3">
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt="CashlySweeps logo"
+                className="h-12 w-12 rounded-xl object-cover ring-1 ring-cyan-300/50 shadow-[0_0_24px_rgba(34,211,238,0.35)]"
+              />
+            ) : (
+              <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500 to-cyan-400 text-sm font-black text-white shadow-[0_0_24px_rgba(217,70,239,0.35)]">
+                CS
+              </span>
+            )}
+            <div>
             <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">Neon Editorial</p>
             <h1 className="mt-2 text-4xl font-black md:text-5xl">Blogs</h1>
             <p className="mt-2 max-w-2xl text-sm text-cyan-100/70">
-              Fresh posts, updates, and stories with a glowing E-Gaming vibe.
+              Fresh posts, updates, and stories with a glowing CashlySweeps vibe.
             </p>
+            </div>
           </div>
           <Link
             href="/dashboard"
