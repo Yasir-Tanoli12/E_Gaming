@@ -55,10 +55,16 @@ export const authApi = {
     });
   },
 
-  refresh(refreshToken: string) {
+  refresh() {
     return apiRequest<AuthTokens>(`${AUTH}/refresh`, {
       method: "POST",
-      body: JSON.stringify({ refreshToken }),
+      body: JSON.stringify({}),
+    });
+  },
+
+  logout() {
+    return apiRequest<{ message: string }>(`${AUTH}/logout`, {
+      method: "POST",
     });
   },
 

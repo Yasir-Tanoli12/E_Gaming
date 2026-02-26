@@ -5,8 +5,10 @@ import {
   MinLength,
   Matches,
 } from 'class-validator';
+import { Trim } from '../../common/sanitize.decorator';
 
 export class RegisterDto {
+  @Trim()
   @IsEmail()
   email: string;
 

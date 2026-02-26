@@ -1,10 +1,12 @@
 const getBaseUrl = () =>
   process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
+/**
+ * Auth uses httpOnly cookies - no client-side token storage.
+ * credentials: 'include' sends cookies automatically.
+ */
 export function getAuthHeaders(): HeadersInit {
-  if (typeof window === "undefined") return {};
-  const token = localStorage.getItem("eg_access_token");
-  return token ? { Authorization: `Bearer ${token}` } : {};
+  return {};
 }
 
 async function handleResponse<T>(res: Response): Promise<T> {
@@ -28,13 +30,13 @@ export async function apiRequest<T>(
   const url = `${getBaseUrl()}${path}`;
   const headers: HeadersInit = {
     "Content-Type": "application/json",
-    ...getAuthHeaders(),
     ...(options.headers ?? {}),
   };
   const method = (options.method ?? "GET").toUpperCase();
   const res = await fetch(url, {
     ...options,
     headers,
+    credentials: "include",
     cache: method === "GET" ? "no-store" : options.cache,
   });
   return handleResponse<T>(res);

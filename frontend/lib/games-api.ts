@@ -1,4 +1,4 @@
-import { apiRequest, getAuthHeaders } from "./api";
+import { apiRequest } from "./api";
 
 export interface Game {
   id: string;
@@ -50,9 +50,7 @@ export const gamesApi = {
 
     const res = await fetch(`${getBaseUrl()}/games/upload-media`, {
       method: "POST",
-      headers: {
-        ...getAuthHeaders(),
-      },
+      credentials: "include",
       body: formData,
     });
 

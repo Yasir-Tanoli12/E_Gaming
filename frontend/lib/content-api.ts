@@ -1,4 +1,4 @@
-import { apiRequest, getAuthHeaders } from "./api";
+import { apiRequest } from "./api";
 
 export interface SiteContacts {
   facebook: string;
@@ -62,9 +62,7 @@ export const contentApi = {
     formData.append("file", file);
     const res = await fetch(`${baseUrl}/content/lobby-video`, {
       method: "POST",
-      headers: {
-        ...getAuthHeaders(),
-      },
+      credentials: "include",
       body: formData,
     });
     const data = await res.json().catch(() => ({}));
@@ -81,9 +79,7 @@ export const contentApi = {
     formData.append("file", file);
     const res = await fetch(`${baseUrl}/content/logo`, {
       method: "POST",
-      headers: {
-        ...getAuthHeaders(),
-      },
+      credentials: "include",
       body: formData,
     });
     const data = await res.json().catch(() => ({}));
@@ -103,9 +99,7 @@ export const contentApi = {
     formData.append("file", file);
     const res = await fetch(`${baseUrl}/content/documents/${key}`, {
       method: "POST",
-      headers: {
-        ...getAuthHeaders(),
-      },
+      credentials: "include",
       body: formData,
     });
     const data = await res.json().catch(() => ({}));

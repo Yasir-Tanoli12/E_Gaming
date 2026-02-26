@@ -8,7 +8,6 @@ import React, {
   useState,
 } from "react";
 import { authApi } from "@/lib/auth-api";
-import { authStorage } from "@/lib/auth-storage";
 import type {
   User,
   RegisterInput,
@@ -33,7 +32,7 @@ interface AuthContextValue extends AuthState {
   register: (input: RegisterInput) => Promise<{ requiresVerification: boolean; code?: string }>;
   verifyEmail: (input: VerifyCodeInput) => Promise<User>;
   verifyLogin: (input: VerifyCodeInput) => Promise<User>;
-  logout: () => void;
+  logout: () => void | Promise<void>;
   requestPasswordReset: (email: string) => Promise<void>;
   resetPassword: (input: ResetPasswordInput) => Promise<void>;
   setUser: (user: User | null) => void;
@@ -48,37 +47,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const setUser = useCallback((u: User | null) => setUserState(u), []);
 
-  const persistTokens = useCallback(
-    (accessToken: string, refreshToken: string) => {
-      authStorage.setTokens(accessToken, refreshToken);
-    },
-    []
-  );
-
   const loadUser = useCallback(async () => {
-    const access = authStorage.getAccessToken();
-    if (!access) {
-      setUserState(null);
-      setIsInitialized(true);
-      return;
-    }
     try {
       const me = await authApi.me();
       setUserState(me ?? null);
     } catch {
-      const refresh = authStorage.getRefreshToken();
-      if (!refresh) {
-        authStorage.clear();
-        setUserState(null);
-        setIsInitialized(true);
-        return;
-      }
       try {
-        const tokens = await authApi.refresh(refresh);
-        authStorage.setTokens(tokens.accessToken, tokens.refreshToken);
+        const tokens = await authApi.refresh();
         setUserState(tokens.user);
       } catch {
-        authStorage.clear();
+        await authApi.logout().catch(() => {});
         setUserState(null);
       }
     } finally {
@@ -98,15 +76,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if ("requiresVerification" in res && res.requiresVerification) {
           return { requiresVerification: true, email: res.email, code: res.code };
         }
-        const tokens = res as { accessToken: string; refreshToken: string; user: User };
-        persistTokens(tokens.accessToken, tokens.refreshToken);
-        setUserState(tokens.user);
-        return { user: tokens.user };
+        const data = res as { user: User };
+        setUserState(data.user);
+        return { user: data.user };
       } finally {
         setIsLoading(false);
       }
     },
-    [persistTokens]
+    []
   );
 
   const register = useCallback(async (input: RegisterInput) => {
@@ -119,38 +96,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const verifyEmail = useCallback(
-    async (input: VerifyCodeInput) => {
-      setIsLoading(true);
-      try {
-        const tokens = await authApi.verifyEmail(input);
-        persistTokens(tokens.accessToken, tokens.refreshToken);
-        setUserState(tokens.user);
-        return tokens.user;
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [persistTokens]
-  );
+  const verifyEmail = useCallback(async (input: VerifyCodeInput) => {
+    setIsLoading(true);
+    try {
+      const tokens = await authApi.verifyEmail(input);
+      setUserState(tokens.user);
+      return tokens.user;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-  const verifyLogin = useCallback(
-    async (input: VerifyCodeInput) => {
-      setIsLoading(true);
-      try {
-        const tokens = await authApi.verifyLogin(input);
-        persistTokens(tokens.accessToken, tokens.refreshToken);
-        setUserState(tokens.user);
-        return tokens.user;
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    [persistTokens]
-  );
+  const verifyLogin = useCallback(async (input: VerifyCodeInput) => {
+    setIsLoading(true);
+    try {
+      const tokens = await authApi.verifyLogin(input);
+      setUserState(tokens.user);
+      return tokens.user;
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
-  const logout = useCallback(() => {
-    authStorage.clear();
+  const logout = useCallback(async () => {
+    await authApi.logout().catch(() => {});
     setUserState(null);
   }, []);
 

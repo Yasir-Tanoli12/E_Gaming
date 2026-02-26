@@ -1,12 +1,28 @@
-import { Controller, Post, Get, Body, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  Req,
+  Res,
+  UseGuards,
+  UseInterceptors,
+  BadRequestException,
+} from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
+import * as express from 'express';
 import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { VerifyEmailDto } from './dto/verify-email.dto';
 import { RequestResetDto, ResetPasswordDto } from './dto/reset-password.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 import { JwtAuthGuard } from './jwt-auth.guard';
 import { Public } from './public.decorator';
+import {
+  AuthCookiesInterceptor,
+  clearAuthCookies,
+} from './auth-cookies.interceptor';
 
 @Throttle({ default: { limit: 10, ttl: 60000 } })
 @Controller('auth')
@@ -25,6 +41,7 @@ export class AuthController {
   }
 
   @Public()
+  @UseInterceptors(AuthCookiesInterceptor)
   @Post('verify-email')
   async verifyEmail(
     @Body() dto: VerifyEmailDto,
@@ -36,6 +53,7 @@ export class AuthController {
   }
 
   @Public()
+  @UseInterceptors(AuthCookiesInterceptor)
   @Post('login')
   async login(
     @Body() dto: LoginDto,
@@ -47,6 +65,7 @@ export class AuthController {
   }
 
   @Public()
+  @UseInterceptors(AuthCookiesInterceptor)
   @Post('verify-login')
   async verifyLogin(
     @Body() dto: VerifyEmailDto,
@@ -70,9 +89,25 @@ export class AuthController {
   }
 
   @Public()
+  @UseInterceptors(AuthCookiesInterceptor)
   @Post('refresh')
-  async refresh(@Body('refreshToken') refreshToken: string) {
+  async refresh(
+    @Body() dto: RefreshTokenDto,
+    @Req() req: { cookies?: { eg_refresh_token?: string } },
+  ) {
+    const refreshToken =
+      req.cookies?.eg_refresh_token ?? dto.refreshToken ?? '';
+    if (!refreshToken || typeof refreshToken !== 'string') {
+      throw new BadRequestException('Refresh token required');
+    }
     return this.authService.refreshTokens(refreshToken);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('logout')
+  logout(@Res() res: express.Response) {
+    clearAuthCookies(res);
+    return res.status(200).json({ message: 'Logged out' });
   }
 
   @UseGuards(JwtAuthGuard)
