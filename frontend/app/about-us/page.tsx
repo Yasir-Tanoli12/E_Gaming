@@ -44,15 +44,15 @@ export default function AboutUsPage() {
               <img
                 src={logoUrl}
                 alt="CashlySweeps logo"
-                className="h-12 w-12 rounded-xl object-cover ring-1 ring-cyan-300/50 shadow-[0_0_24px_rgba(34,211,238,0.35)]"
+                className="h-12 w-12 rounded-xl object-cover ring-1 ring-[#EDC537]/50 shadow-[0_0_24px_rgba(237,197,55,0.35)]"
               />
             ) : (
-              <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500 to-cyan-400 text-sm font-black text-white shadow-[0_0_24px_rgba(217,70,239,0.35)]">
+              <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#990808] to-[#EDC537] text-sm font-black text-white shadow-[0_0_24px_rgba(237,197,55,0.35)]">
                 CS
               </span>
             )}
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">
+              <p className="text-xs uppercase tracking-[0.2em] text-[#EDC537]">
                 Company
               </p>
               <h1 className="mt-2 text-4xl font-black md:text-5xl">About Us</h1>
@@ -62,7 +62,7 @@ export default function AboutUsPage() {
 
         {loading ? (
           <div className="flex justify-center py-24">
-            <div className="h-12 w-12 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+            <div className="h-12 w-12 animate-spin rounded-full border-2 border-[#EDC537] border-t-transparent" />
           </div>
         ) : error ? (
           <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-6 py-4 text-red-400">
@@ -73,7 +73,7 @@ export default function AboutUsPage() {
             <div className="about-credits-track">
               {[0, 1].map((index) => (
                 <div key={index} className="about-credits-card">
-                  <p className="whitespace-pre-wrap text-center text-base leading-8 text-cyan-100/90 md:text-lg">
+                  <p className="whitespace-pre-wrap text-center text-base leading-8 text-[#fef3c7]/95 md:text-lg">
                     {aboutUs || DEFAULT_ABOUT_US}
                   </p>
                 </div>

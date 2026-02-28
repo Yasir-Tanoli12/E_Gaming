@@ -58,17 +58,17 @@ export default function BlogsPage() {
               <img
                 src={logoUrl}
                 alt="CashlySweeps logo"
-                className="h-12 w-12 rounded-xl object-cover ring-1 ring-cyan-300/50 shadow-[0_0_24px_rgba(34,211,238,0.35)]"
+                className="h-12 w-12 rounded-xl object-cover ring-1 ring-[#EDC537]/50 shadow-[0_0_24px_rgba(237,197,55,0.35)]"
               />
             ) : (
-              <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500 to-cyan-400 text-sm font-black text-white shadow-[0_0_24px_rgba(217,70,239,0.35)]">
+              <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#990808] to-[#EDC537] text-sm font-black text-white shadow-[0_0_24px_rgba(237,197,55,0.35)]">
                 CS
               </span>
             )}
             <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">Neon Editorial</p>
+            <p className="text-xs uppercase tracking-[0.2em] text-[#EDC537]">Neon Editorial</p>
             <h1 className="mt-2 text-4xl font-black md:text-5xl">Blogs</h1>
-            <p className="mt-2 max-w-2xl text-sm text-cyan-100/70">
+            <p className="mt-2 max-w-2xl text-sm text-[#fef3c7]/80">
               Fresh posts, updates, and stories with a glowing CashlySweeps vibe.
             </p>
             </div>
@@ -77,7 +77,7 @@ export default function BlogsPage() {
 
         {loading ? (
           <div className="flex justify-center py-24">
-            <div className="h-12 w-12 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+            <div className="h-12 w-12 animate-spin rounded-full border-2 border-[#EDC537] border-t-transparent" />
           </div>
         ) : error ? (
           <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-6 py-4 text-red-400">
@@ -99,15 +99,15 @@ export default function BlogsPage() {
                       className="blog-feature-image h-[290px] w-full object-cover md:h-[360px]"
                     />
                   ) : (
-                    <div className="h-[290px] w-full bg-[radial-gradient(circle_at_20%_20%,rgba(217,70,239,0.35),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(34,211,238,0.35),transparent_38%),linear-gradient(120deg,#0b1331,#121f47)] md:h-[360px]" />
+                    <div className="h-[290px] w-full bg-[radial-gradient(circle_at_20%_20%,rgba(153,8,8,0.35),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(237,197,55,0.3),transparent_38%),linear-gradient(120deg,#0f0808,#1a0c08)] md:h-[360px]" />
                   )}
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#050814] via-[#050814]/35 to-transparent" />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0a0808] via-[#0a0808]/40 to-transparent" />
                 </div>
                 <div className="relative z-10 mt-4">
-                  <p className="text-xs uppercase tracking-[0.2em] text-fuchsia-200/90">Featured Story</p>
+                  <p className="text-xs uppercase tracking-[0.2em] text-[#EDC537]">Featured Story</p>
                   <h2 className="mt-2 text-2xl font-black md:text-3xl">{selectedBlog.title}</h2>
                   {selectedBlog.excerpt && (
-                    <p className="mt-2 text-sm text-cyan-100/80">{selectedBlog.excerpt}</p>
+                    <p className="mt-2 text-sm text-[#fef3c7]/85">{selectedBlog.excerpt}</p>
                   )}
                   {selectedBlog.content && (
                     <p className="mt-3 text-sm text-zinc-300">{selectedBlog.content}</p>
@@ -133,13 +133,13 @@ export default function BlogsPage() {
                           className="blog-thumb-image h-full w-full object-cover"
                         />
                       ) : (
-                        <div className="h-full w-full bg-[linear-gradient(135deg,#6d28d9,#0891b2)] opacity-70" />
+                        <div className="h-full w-full bg-[linear-gradient(135deg,#990808,#EDC537)] opacity-70" />
                       )}
                     </div>
                     <div className="min-w-0">
                       <h3 className="truncate text-base font-bold">{blog.title}</h3>
                       {blog.excerpt && (
-                        <p className="mt-1 line-clamp-2 text-xs text-cyan-100/75">{blog.excerpt}</p>
+                        <p className="mt-1 line-clamp-2 text-xs text-[#fef3c7]/80">{blog.excerpt}</p>
                       )}
                     </div>
                   </div>

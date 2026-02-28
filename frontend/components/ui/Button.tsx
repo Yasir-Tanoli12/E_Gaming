@@ -24,7 +24,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       "inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:pointer-events-none disabled:opacity-60";
     const variants = {
       primary:
-        "bg-emerald-600 text-white hover:bg-emerald-700 focus:ring-emerald-500",
+        "bg-[#990808] text-white hover:bg-[#c41e1e] focus:ring-[#EDC537]",
       secondary:
         "border border-zinc-300 bg-white text-zinc-700 hover:bg-zinc-50 focus:ring-zinc-400 dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-200 dark:hover:bg-zinc-700",
       ghost:

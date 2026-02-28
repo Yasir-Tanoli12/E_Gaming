@@ -89,43 +89,43 @@ export default function UserDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#050814] text-white">
+    <div className="min-h-screen bg-[#0a0808] text-white">
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -left-24 top-20 h-80 w-80 animate-float rounded-full bg-fuchsia-500/20 blur-[100px]" />
-        <div className="absolute right-0 top-40 h-96 w-96 animate-float-delayed rounded-full bg-cyan-400/20 blur-[110px]" />
+        <div className="absolute -left-24 top-20 h-80 w-80 animate-float rounded-full bg-[#990808]/25 blur-[100px]" />
+        <div className="absolute right-0 top-40 h-96 w-96 animate-float-delayed rounded-full bg-[#EDC537]/20 blur-[110px]" />
       </div>
 
       <PublicNavbar />
 
       <section
         id="home"
-        className="relative flex min-h-[calc(100vh-82px)] items-center overflow-hidden border-b border-cyan-300/20 bg-gradient-to-r from-fuchsia-600/20 via-purple-600/20 to-cyan-500/20 px-4 py-10"
+        className="relative flex min-h-[calc(100vh-82px)] items-center overflow-hidden border-b border-[#EDC537]/20 bg-gradient-to-r from-[#990808]/25 via-[#E85D04]/20 to-[#EDC537]/25 px-4 py-10"
       >
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-8 top-8 h-40 w-40 rounded-full bg-fuchsia-500/20 blur-3xl" />
-          <div className="absolute bottom-10 right-10 h-52 w-52 animate-pulse rounded-full bg-cyan-400/20 blur-3xl" />
+          <div className="absolute left-8 top-8 h-40 w-40 rounded-full bg-[#990808]/25 blur-3xl" />
+          <div className="absolute bottom-10 right-10 h-52 w-52 animate-pulse rounded-full bg-[#EDC537]/20 blur-3xl" />
         </div>
         <div className="mx-auto grid w-full max-w-7xl items-center gap-10 md:grid-cols-2">
           <div className="animate-fade-in">
             <h1 className="text-5xl font-black leading-[0.95] md:text-7xl">
               PLAY. WIN. DOMINATE.
             </h1>
-            <p className="mt-6 max-w-xl text-lg text-cyan-100/80">
+            <p className="mt-6 max-w-xl text-lg text-[#fef3c7]/90">
               Browse our curated games. Play instantly with your credentials or
               get access from our support team. Click any game card to play or buy credentials.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-3 text-xs">
-              <span className="rounded-full border border-cyan-300/40 bg-cyan-500/10 px-3 py-1 text-cyan-200">
+              <span className="rounded-full border border-[#EDC537]/50 bg-[#EDC537]/15 px-3 py-1 text-[#fef3c7]">
                 Game previews
               </span>
-              <span className="rounded-full border border-fuchsia-300/40 bg-fuchsia-500/10 px-3 py-1 text-fuchsia-200">
+              <span className="rounded-full border border-[#990808]/60 bg-[#990808]/25 px-3 py-1 text-[#fef3c7]">
                 Get credentials
               </span>
             </div>
           </div>
-          <div className="relative h-[420px] animate-fade-in animation-delay-200 rounded-3xl border border-fuchsia-300/40 bg-gradient-to-br from-fuchsia-500/20 to-cyan-500/20 p-3 shadow-[0_0_45px_rgba(217,70,239,0.35)] md:h-[500px]">
-            <div className="absolute -inset-[1px] -z-10 rounded-3xl bg-[conic-gradient(from_0deg,rgba(34,211,238,0.45),rgba(217,70,239,0.45),rgba(34,211,238,0.45))] blur-sm" />
-            <div className="group relative h-full w-full overflow-hidden rounded-2xl border border-cyan-300/30 bg-[#061028]/80">
+          <div className="relative h-[420px] animate-fade-in animation-delay-200 rounded-3xl border border-[#EDC537]/40 bg-gradient-to-br from-[#990808]/25 to-[#EDC537]/20 p-3 shadow-[0_0_45px_rgba(237,197,55,0.3)] md:h-[500px]">
+            <div className="absolute -inset-[1px] -z-10 rounded-3xl bg-[conic-gradient(from_0deg,rgba(237,197,55,0.4),rgba(153,8,8,0.45),rgba(237,197,55,0.4))] blur-sm" />
+            <div className="group relative h-full w-full overflow-hidden rounded-2xl border border-[#EDC537]/30 bg-[#0f0808]/90">
               {heroVideo ? (
                 <video
                   src={heroVideo}
@@ -136,18 +136,18 @@ export default function UserDashboardPage() {
                   className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
                 />
               ) : (
-                <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_20%_20%,rgba(217,70,239,0.35),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(34,211,238,0.35),transparent_40%),linear-gradient(120deg,#0a1230,#131a46)]">
-                  <p className="text-sm text-cyan-100/75">Game preview will appear here</p>
+                <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_20%_20%,rgba(153,8,8,0.35),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(237,197,55,0.3),transparent_40%),linear-gradient(120deg,#0f0808,#1a0c08)]">
+                  <p className="text-sm text-[#fef3c7]/80">Game preview will appear here</p>
                 </div>
               )}
               <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(transparent_48%,rgba(5,8,20,0.25)_50%,transparent_52%)] bg-[length:100%_6px] opacity-30" />
-              <div className="pointer-events-none absolute left-4 top-4 flex items-center gap-2 rounded-full border border-emerald-300/40 bg-emerald-500/15 px-3 py-1 text-xs text-emerald-200">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-emerald-300" />
+              <div className="pointer-events-none absolute left-4 top-4 flex items-center gap-2 rounded-full border border-[#EDC537]/50 bg-[#EDC537]/20 px-3 py-1 text-xs text-[#fef3c7]">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-[#EDC537]" />
                 LIVE LOBBY
               </div>
               <div className="pointer-events-none absolute bottom-4 left-4 rounded-lg bg-black/45 px-4 py-2 backdrop-blur">
-                <p className="text-xs uppercase tracking-[0.22em] text-cyan-300">Game Arena</p>
-                <p className="mt-1 text-sm text-cyan-100/85">Browse games, get credentials, or play now</p>
+                <p className="text-xs uppercase tracking-[0.22em] text-[#EDC537]">Game Arena</p>
+                <p className="mt-1 text-sm text-[#fef3c7]/90">Browse games, get credentials, or play now</p>
               </div>
             </div>
           </div>
@@ -180,7 +180,7 @@ export default function UserDashboardPage() {
 
         {showNews && newsPoster && (
           <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 p-4">
-            <div className="w-full max-w-3xl overflow-hidden rounded-2xl border border-fuchsia-400/40 bg-[#0c1230] shadow-[0_0_60px_rgba(217,70,239,0.3)]">
+            <div className="w-full max-w-3xl overflow-hidden rounded-2xl border border-[#EDC537]/40 bg-[#140808] shadow-[0_0_60px_rgba(237,197,55,0.25)]">
               <div className="flex items-center justify-between border-b border-zinc-700 px-4 py-3">
                 <h3 className="font-semibold text-white">{newsPoster.title ?? "Latest News"}</h3>
                 <button
@@ -198,10 +198,10 @@ export default function UserDashboardPage() {
 
         {selectedGame && (
           <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/80 p-4 backdrop-blur-[2px]">
-            <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-amber-300/40 bg-[#0b0904]/95 p-6 shadow-[0_0_70px_rgba(251,191,36,0.2)] md:p-8">
-              <div className="pointer-events-none absolute -left-16 top-4 h-48 w-48 rounded-full bg-fuchsia-500/20 blur-[80px]" />
-              <div className="pointer-events-none absolute -right-12 bottom-2 h-56 w-56 rounded-full bg-cyan-400/20 blur-[90px]" />
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(251,191,36,0.16),transparent_45%)]" />
+            <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-[#EDC537]/40 bg-[#0f0808]/95 p-6 shadow-[0_0_70px_rgba(237,197,55,0.2)] md:p-8">
+              <div className="pointer-events-none absolute -left-16 top-4 h-48 w-48 rounded-full bg-[#990808]/25 blur-[80px]" />
+              <div className="pointer-events-none absolute -right-12 bottom-2 h-56 w-56 rounded-full bg-[#EDC537]/20 blur-[90px]" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(237,197,55,0.12),transparent_45%)]" />
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-xs uppercase tracking-[0.24em] text-amber-300">
@@ -266,7 +266,7 @@ export default function UserDashboardPage() {
                       title="Messenger"
                       className={`inline-flex h-11 w-11 items-center justify-center rounded-xl transition ${
                         contacts?.facebook
-                          ? "border border-fuchsia-300/50 bg-fuchsia-500/20 text-fuchsia-100 shadow-[0_0_22px_rgba(217,70,239,0.35)] hover:-translate-y-0.5 hover:bg-fuchsia-500/30"
+                          ? "border border-[#EDC537]/50 bg-[#990808]/25 text-[#fef3c7] shadow-[0_0_22px_rgba(237,197,55,0.3)] hover:-translate-y-0.5 hover:bg-[#990808]/35"
                           : "pointer-events-none border border-zinc-700 bg-zinc-800 text-zinc-500"
                       }`}
                     >
@@ -282,7 +282,7 @@ export default function UserDashboardPage() {
                       title="WhatsApp"
                       className={`inline-flex h-11 w-11 items-center justify-center rounded-xl transition ${
                         whatsappLink
-                          ? "border border-emerald-300/50 bg-emerald-500/20 text-emerald-100 shadow-[0_0_22px_rgba(16,185,129,0.35)] hover:-translate-y-0.5 hover:bg-emerald-500/30"
+                          ? "border border-[#EDC537]/50 bg-[#EDC537]/20 text-[#1a0a0a] shadow-[0_0_22px_rgba(237,197,55,0.35)] hover:-translate-y-0.5 hover:bg-[#EDC537]/30"
                           : "pointer-events-none border border-zinc-700 bg-zinc-800 text-zinc-500"
                       }`}
                     >
@@ -305,16 +305,16 @@ export default function UserDashboardPage() {
 
         {loading ? (
           <div className="flex justify-center py-24">
-            <div className="h-12 w-12 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
+            <div className="h-12 w-12 animate-spin rounded-full border-2 border-[#EDC537] border-t-transparent" />
           </div>
         ) : error ? (
           <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-6 py-4 text-red-400">
             {error}
           </div>
         ) : games.length === 0 ? (
-          <div className="rounded-2xl border border-cyan-300/20 bg-[#0a1432]/60 p-16 text-center">
-            <p className="text-cyan-200/80">No games available yet.</p>
-            <p className="mt-2 text-sm text-cyan-100/60">
+          <div className="rounded-2xl border border-[#EDC537]/20 bg-[#140808]/70 p-16 text-center">
+            <p className="text-[#fef3c7]/90">No games available yet.</p>
+            <p className="mt-2 text-sm text-[#fef3c7]/70">
               Admins can add games from the admin dashboard.
             </p>
           </div>
@@ -342,7 +342,7 @@ export default function UserDashboardPage() {
             <section id="reviews">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-2xl font-black">Reviews</h2>
-                <span className="text-xs text-cyan-200/70">What players are saying</span>
+                <span className="text-xs text-[#fef3c7]/80">What players are saying</span>
               </div>
               {reviewItems.length === 0 ? (
                 <div className="rounded-xl border border-zinc-700/50 bg-zinc-900/30 p-5 text-sm text-zinc-400">
@@ -360,8 +360,8 @@ export default function UserDashboardPage() {
                         <p className="text-sm font-bold tracking-wide text-white">
                           {item.reviewer}
                         </p>
-                        <p className="mt-2 text-sm italic text-cyan-100/85">{item.message}</p>
-                        <p className="mt-2 text-xs text-amber-300/90">Rating: {item.rating}/5</p>
+                        <p className="mt-2 text-sm italic text-[#fef3c7]/90">{item.message}</p>
+                        <p className="mt-2 text-xs text-[#EDC537]/95">Rating: {item.rating}/5</p>
                       </article>
                     ))}
                   </div>
@@ -373,10 +373,10 @@ export default function UserDashboardPage() {
         )}
       </main>
 
-      <footer className="relative mt-8 border-t border-cyan-300/20 bg-[#070d22]">
+      <footer className="relative mt-8 border-t border-[#EDC537]/20 bg-[#0f0808]">
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute left-1/4 top-0 h-40 w-40 animate-orbit rounded-full bg-fuchsia-500/20 blur-3xl" />
-          <div className="absolute right-1/4 bottom-0 h-44 w-44 animate-orbit-reverse rounded-full bg-cyan-400/20 blur-3xl" />
+          <div className="absolute left-1/4 top-0 h-40 w-40 animate-orbit rounded-full bg-[#990808]/25 blur-3xl" />
+          <div className="absolute right-1/4 bottom-0 h-44 w-44 animate-orbit-reverse rounded-full bg-[#EDC537]/20 blur-3xl" />
         </div>
         <div className="relative mx-auto max-w-7xl px-4 py-12">
           <div className="grid gap-8 md:grid-cols-4">
@@ -386,38 +386,38 @@ export default function UserDashboardPage() {
                   <img
                     src={logoUrl}
                     alt="CashlySweeps logo"
-                    className="h-11 w-11 rounded-xl object-cover ring-1 ring-cyan-300/50 shadow-[0_0_24px_rgba(34,211,238,0.3)]"
+                    className="h-11 w-11 rounded-xl object-cover ring-1 ring-[#EDC537]/50 shadow-[0_0_24px_rgba(237,197,55,0.3)]"
                   />
                 ) : (
-                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-fuchsia-500 to-cyan-400 text-sm font-black text-white shadow-[0_0_20px_rgba(217,70,239,0.35)]">
+                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#990808] to-[#EDC537] text-sm font-black text-white shadow-[0_0_20px_rgba(237,197,55,0.35)]">
                     CS
                   </span>
                 )}
                 <h3 className="text-xl font-black text-white">CashlySweeps</h3>
               </div>
-              <p className="mt-3 text-sm text-cyan-100/70">
+              <p className="mt-3 text-sm text-[#fef3c7]/80">
                 Play trending games with credentials. Get access from our support team or jump in straight away.
               </p>
             </div>
 
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-cyan-300">Quick Links</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-[#EDC537]">Quick Links</p>
               <div className="mt-3 space-y-2 text-sm">
-                <a href="#games" className="block text-cyan-100/70 transition hover:text-white">Games</a>
-                <Link href="/about-us" className="block text-cyan-100/70 transition hover:text-white">About Us</Link>
-                <Link href="/blogs" className="block text-cyan-100/70 transition hover:text-white">Blogs</Link>
-                <Link href="/privacy-policy" className="block text-cyan-100/70 transition hover:text-white">Guidelines</Link>
+                <a href="#games" className="block text-[#fef3c7]/80 transition hover:text-white">Games</a>
+                <Link href="/about-us" className="block text-[#fef3c7]/80 transition hover:text-white">About Us</Link>
+                <Link href="/blogs" className="block text-[#fef3c7]/80 transition hover:text-white">Blogs</Link>
+                <Link href="/privacy-policy" className="block text-[#fef3c7]/80 transition hover:text-white">Guidelines</Link>
               </div>
             </div>
 
             <div>
-              <p className="text-xs uppercase tracking-[0.2em] text-fuchsia-300">Resources</p>
+              <p className="text-xs uppercase tracking-[0.2em] text-[#EDC537]">Resources</p>
               <div className="mt-3 space-y-2 text-sm">
                 <a
                   href={privacyPolicyPdfUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="block text-cyan-100/70 transition hover:text-white"
+                  className="block text-[#fef3c7]/80 transition hover:text-white"
                 >
                   Privacy Policy
                 </a>
@@ -425,7 +425,7 @@ export default function UserDashboardPage() {
                   href={socialResponsibilityPdfUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="block text-cyan-100/70 transition hover:text-white"
+                  className="block text-[#fef3c7]/80 transition hover:text-white"
                 >
                   Social Responsibility Rules
                 </a>
@@ -433,8 +433,8 @@ export default function UserDashboardPage() {
             </div>
 
             <div id="support">
-              <p className="text-xs uppercase tracking-[0.2em] text-emerald-300">Contact</p>
-              <div className="mt-3 space-y-2 text-sm text-cyan-100/70">
+              <p className="text-xs uppercase tracking-[0.2em] text-[#EDC537]">Contact</p>
+              <div className="mt-3 space-y-2 text-sm text-[#fef3c7]/80">
                 <p>{contacts?.email || "moeeedahmed07@gmail.com"}</p>
                 <p>24/7 Live Support</p>
                 <div className="mt-1 flex gap-2">
@@ -445,7 +445,7 @@ export default function UserDashboardPage() {
                       rel="noreferrer"
                       aria-label="Facebook"
                       title="Facebook"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-fuchsia-300/40 bg-fuchsia-500/15 text-fuchsia-200 shadow-[0_0_16px_rgba(217,70,239,0.32)] transition hover:-translate-y-0.5 hover:bg-fuchsia-500/25"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#EDC537]/40 bg-[#990808]/20 text-[#fef3c7] shadow-[0_0_16px_rgba(237,197,55,0.3)] transition hover:-translate-y-0.5 hover:bg-[#990808]/30"
                     >
                       <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
                         <path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.5-3.88 3.79-3.88 1.1 0 2.24.2 2.24.2v2.47h-1.27c-1.26 0-1.65.78-1.65 1.58V12h2.8l-.45 2.89h-2.35v6.99A10 10 0 0 0 22 12z" />
@@ -459,7 +459,7 @@ export default function UserDashboardPage() {
                       rel="noreferrer"
                       aria-label="WhatsApp"
                       title="WhatsApp"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-emerald-300/40 bg-emerald-500/15 text-emerald-200 shadow-[0_0_16px_rgba(16,185,129,0.32)] transition hover:-translate-y-0.5 hover:bg-emerald-500/25"
+                      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#EDC537]/40 bg-[#EDC537]/20 text-[#1a0a0a] shadow-[0_0_16px_rgba(237,197,55,0.3)] transition hover:-translate-y-0.5 hover:bg-[#EDC537]/30"
                     >
                       <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
                         <path d="M20.52 3.48A11.86 11.86 0 0 0 12.07 0C5.54 0 .2 5.34.2 11.86c0 2.09.55 4.14 1.59 5.95L0 24l6.37-1.67a11.86 11.86 0 0 0 5.7 1.46h.01c6.53 0 11.87-5.33 11.87-11.86 0-3.17-1.23-6.15-3.43-8.45zM12.08 21.8h-.01a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.78.99 1.01-3.68-.23-.38a9.86 9.86 0 0 1-1.51-5.27c0-5.45 4.44-9.88 9.91-9.88a9.8 9.8 0 0 1 7.02 2.91 9.79 9.79 0 0 1 2.9 6.98c0 5.45-4.44 9.89-9.91 9.89zm5.43-7.42c-.3-.15-1.77-.87-2.05-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.95 1.16-.17.2-.35.22-.65.08-.3-.15-1.27-.47-2.42-1.5-.9-.8-1.5-1.8-1.68-2.1-.18-.3-.02-.46.13-.6.14-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.67-1.62-.92-2.22-.24-.58-.48-.5-.67-.51h-.57c-.2 0-.53.08-.8.38-.27.3-1.03 1-1.03 2.45 0 1.45 1.05 2.85 1.2 3.05.15.2 2.07 3.16 5.01 4.43.7.3 1.25.48 1.68.62.7.22 1.33.2 1.83.12.56-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.08-.12-.27-.2-.57-.35z" />
@@ -471,7 +471,7 @@ export default function UserDashboardPage() {
             </div>
           </div>
 
-          <div className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-cyan-300/20 pt-4 text-xs text-cyan-100/60 md:flex-row">
+          <div className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-[#EDC537]/20 pt-4 text-xs text-[#fef3c7]/70 md:flex-row">
             <p>© {new Date().getFullYear()} CashlySweeps. All rights reserved.</p>
             <p>Built for players who love to play.</p>
           </div>
