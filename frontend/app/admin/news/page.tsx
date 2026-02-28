@@ -86,7 +86,7 @@ export default function AdminNewsPage() {
 
   return (
     <div className="text-white">
-      <h1 className="text-3xl font-black">News Poster</h1>
+      <h1 className="text-2xl font-black sm:text-3xl">News Poster</h1>
       <p className="mt-1 text-zinc-400">
         This poster appears when the website loads for users.
       </p>

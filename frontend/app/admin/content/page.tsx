@@ -282,8 +282,8 @@ export default function AdminContentPage() {
   return (
     <div className="space-y-8 text-white">
       <div>
-        <h1 className="text-3xl font-black">Site Content Manager</h1>
-        <p className="mt-1 text-zinc-400">
+        <h1 className="text-2xl font-black sm:text-3xl">Site Content Manager</h1>
+        <p className="mt-1 text-sm text-zinc-400">
           Manage contacts, blogs, reviews, about us, and guidelines.
         </p>
       </div>

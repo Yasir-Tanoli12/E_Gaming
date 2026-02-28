@@ -151,14 +151,14 @@ export default function AdminGamesPage() {
 
   return (
     <div className="text-white">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-black tracking-wide text-white">Game Card Studio</h1>
-          <p className="mt-1 text-cyan-100/70">
+          <h1 className="text-2xl font-black tracking-wide text-white sm:text-3xl">Game Card Studio</h1>
+          <p className="mt-1 text-sm text-zinc-400">
             Build an attractive game lobby with image/video cards and local uploads.
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Link href="/admin/dashboard">
             <Button variant="ghost">← Users</Button>
           </Link>
@@ -259,27 +259,27 @@ export default function AdminGamesPage() {
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
         </div>
       ) : games.length === 0 ? (
-        <div className="rounded-xl border border-cyan-300/20 bg-[#0a1330]/70 p-12 text-center text-cyan-100/70">
+        <div className="rounded-xl border border-zinc-700 bg-zinc-900/50 p-8 text-center text-zinc-400 sm:p-12">
           No games yet. Click &quot;Add game&quot; to create one.
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-cyan-300/20 bg-[#091129]/75">
-          <table className="w-full">
+        <div className="overflow-x-auto rounded-xl border border-zinc-700 bg-zinc-900/50">
+          <table className="w-full min-w-[640px]">
             <thead>
-              <tr className="border-b border-cyan-300/15 text-left">
-                <th className="px-4 py-3 text-sm font-medium text-cyan-100/70">
+              <tr className="border-b border-zinc-700 text-left">
+                <th className="px-4 py-3 text-sm font-medium text-zinc-400">
                   Preview
                 </th>
-                <th className="px-4 py-3 text-sm font-medium text-cyan-100/70">
+                <th className="px-4 py-3 text-sm font-medium text-zinc-400">
                   Title
                 </th>
-                <th className="px-4 py-3 text-sm font-medium text-cyan-100/70">
+                <th className="px-4 py-3 text-sm font-medium text-zinc-400">
                   Top
                 </th>
-                <th className="px-4 py-3 text-sm font-medium text-cyan-100/70">
+                <th className="px-4 py-3 text-sm font-medium text-zinc-400">
                   Game link
                 </th>
-                <th className="px-4 py-3 text-sm font-medium text-cyan-100/70">
+                <th className="px-4 py-3 text-sm font-medium text-zinc-400">
                   Actions
                 </th>
               </tr>
@@ -288,7 +288,7 @@ export default function AdminGamesPage() {
               {games.map((g) => (
                 <tr
                   key={g.id}
-                  className="border-b border-cyan-300/10 last:border-0"
+                  className="border-b border-zinc-800 last:border-0"
                 >
                   <td className="px-4 py-3">
                     {g.thumbnailUrl ? (
@@ -324,7 +324,7 @@ export default function AdminGamesPage() {
                     </a>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       <Button
                         variant="secondary"
                         onClick={() => openEdit(g)}

@@ -101,14 +101,14 @@ export default function AdminDashboardPage() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold text-white">User management</h1>
-          <p className="mt-1 text-zinc-400">
+          <p className="mt-1 text-sm text-zinc-400">
             Promote users to admin or demote admins to user.
           </p>
         </div>
-        <Link href="/admin/games">
+        <Link href="/admin/games" className="self-start">
           <Button variant="secondary">Manage games →</Button>
         </Link>
       </div>
@@ -124,8 +124,8 @@ export default function AdminDashboardPage() {
         <p className="mt-1 text-sm text-zinc-400">
           Add an email here to allow that person to create an admin account from the register page.
         </p>
-        <form onSubmit={addAllowedAdminEmail} className="mt-4 flex flex-wrap items-end gap-3">
-          <div className="min-w-[280px] flex-1">
+        <form onSubmit={addAllowedAdminEmail} className="mt-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
+          <div className="min-w-0 flex-1 sm:min-w-[200px]">
             <Input
               label="Allowed admin email"
               type="email"
@@ -171,8 +171,8 @@ export default function AdminDashboardPage() {
           <div className="h-8 w-8 animate-spin rounded-full border-2 border-emerald-500 border-t-transparent" />
         </div>
       ) : (
-        <div className="mt-6 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50">
-          <table className="w-full">
+        <div className="mt-6 overflow-x-auto rounded-xl border border-zinc-800 bg-zinc-900/50">
+          <table className="w-full min-w-[640px]">
             <thead>
               <tr className="border-b border-zinc-800 text-left">
                 <th className="px-4 py-3 text-sm font-medium text-zinc-400">Email</th>
