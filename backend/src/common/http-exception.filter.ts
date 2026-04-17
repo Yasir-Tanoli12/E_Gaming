@@ -12,6 +12,22 @@ import { Request, Response } from 'express';
 export class HttpExceptionFilter implements ExceptionFilter {
   private readonly logger = new Logger(HttpExceptionFilter.name);
 
+  private isDatabaseUnavailableError(exception: unknown): boolean {
+    if (!(exception instanceof Error)) return false;
+    const code =
+      typeof exception === 'object' && exception !== null && 'code' in exception
+        ? String((exception as { code?: string }).code ?? '')
+        : '';
+    if (code === 'P1001' || code === 'P1017' || code === 'P2024') {
+      return true;
+    }
+    return (
+      exception.message.includes("Can't reach database server") ||
+      exception.message.includes('Server has closed the connection') ||
+      exception.message.includes('Connection terminated unexpectedly')
+    );
+  }
+
   catch(exception: unknown, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const res = ctx.getResponse<Response>();
@@ -38,6 +54,11 @@ export class HttpExceptionFilter implements ExceptionFilter {
       } else {
         message = String(exceptionResponse);
       }
+    } else if (this.isDatabaseUnavailableError(exception)) {
+      status = HttpStatus.SERVICE_UNAVAILABLE;
+      error = 'Service Unavailable';
+      message = 'Database temporarily unavailable. Please try again shortly.';
+      this.logger.error('Database unavailable while handling request.');
     } else if (exception instanceof Error) {
       message = isProd ? 'Internal server error' : exception.message;
       this.logger.error(

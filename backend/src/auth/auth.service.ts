@@ -53,12 +53,9 @@ export class AuthService {
     const userCount = await this.prisma.user.count();
     const normalizedEmail = dto.email.toLowerCase();
 
-    if (
-      userCount > 0 &&
-      !this.usersService.isEmailAllowedForAdminSignup(normalizedEmail)
-    ) {
+    if (userCount > 0) {
       throw new ForbiddenException(
-        'Signup not allowed for this email. Ask an admin to allowlist your email first.',
+        'Admin registration is closed. Contact an existing admin for access.',
       );
     }
 

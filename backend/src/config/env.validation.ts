@@ -28,6 +28,11 @@ export const envSchema = Joi.object({
   APP_NAME: Joi.string().optional(),
   ADMIN_EMAIL: Joi.string().email().optional(),
   ADMIN_PASSWORD: Joi.string().optional(),
+  PRISMA_MAX_RETRIES: Joi.number().integer().min(0).max(10).default(2),
+  PRISMA_RETRY_BASE_DELAY_MS: Joi.number().integer().min(50).default(250),
+  PRISMA_RETRY_MAX_DELAY_MS: Joi.number().integer().min(100).default(2500),
+  PRISMA_LOG_QUERIES: Joi.boolean().default(false),
+  PRISMA_FAIL_FAST_ON_STARTUP: Joi.boolean().default(true),
 })
   .unknown(true);
 

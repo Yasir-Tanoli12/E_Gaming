@@ -14,27 +14,11 @@ export class NewsService {
     'news-posters.json',
   );
   private bootstrapDone = false;
-  private async withPoolRetry<T>(fn: () => Promise<T>, retries = 2): Promise<T> {
-    try {
-      return await fn();
-    } catch (error) {
-      const code =
-        typeof error === 'object' && error && 'code' in error
-          ? String((error as { code?: string }).code)
-          : '';
-      if (code === 'P2024' && retries > 0) {
-        await new Promise((resolve) => setTimeout(resolve, 800));
-        return this.withPoolRetry(fn, retries - 1);
-      }
-      throw error;
-    }
-  }
-
   private async bootstrapFromLegacyFile() {
     if (this.bootstrapDone) return;
     this.bootstrapDone = true;
 
-    const count = await this.withPoolRetry(() => this.prisma.newsPoster.count());
+    const count = await this.prisma.withPoolRetry(() => this.prisma.newsPoster.count());
     if (count > 0 || !existsSync(this.legacyNewsPath)) return;
 
     try {
@@ -51,7 +35,7 @@ export class NewsService {
 
       if (!Array.isArray(legacyItems) || legacyItems.length === 0) return;
 
-      await this.withPoolRetry(() =>
+      await this.prisma.withPoolRetry(() =>
         this.prisma.newsPoster.createMany({
           data: legacyItems
             .filter((item) => !!item.imageUrl)
@@ -73,7 +57,7 @@ export class NewsService {
 
   async getCurrent() {
     await this.bootstrapFromLegacyFile();
-    return this.withPoolRetry(() =>
+    return this.prisma.withPoolRetry(() =>
       this.prisma.newsPoster.findFirst({
         where: { isActive: true },
         orderBy: { createdAt: 'desc' },
@@ -83,14 +67,14 @@ export class NewsService {
 
   async findAll() {
     await this.bootstrapFromLegacyFile();
-    return this.withPoolRetry(() =>
+    return this.prisma.withPoolRetry(() =>
       this.prisma.newsPoster.findMany({ orderBy: { createdAt: 'desc' } }),
     );
   }
 
   async create(dto: CreateNewsDto) {
     await this.bootstrapFromLegacyFile();
-    return this.withPoolRetry(() =>
+    return this.prisma.withPoolRetry(() =>
       this.prisma.newsPoster.create({
         data: {
           title: dto.title ?? null,
@@ -103,11 +87,11 @@ export class NewsService {
 
   async update(id: string, dto: UpdateNewsDto) {
     await this.bootstrapFromLegacyFile();
-    const existing = await this.withPoolRetry(() =>
+    const existing = await this.prisma.withPoolRetry(() =>
       this.prisma.newsPoster.findUnique({ where: { id } }),
     );
     if (!existing) throw new NotFoundException('News poster not found');
-    return this.withPoolRetry(() =>
+    return this.prisma.withPoolRetry(() =>
       this.prisma.newsPoster.update({
         where: { id },
         data: {
@@ -121,10 +105,12 @@ export class NewsService {
 
   async remove(id: string) {
     await this.bootstrapFromLegacyFile();
-    const existing = await this.withPoolRetry(() =>
+    const existing = await this.prisma.withPoolRetry(() =>
       this.prisma.newsPoster.findUnique({ where: { id } }),
     );
     if (!existing) throw new NotFoundException('News poster not found');
-    return this.withPoolRetry(() => this.prisma.newsPoster.delete({ where: { id } }));
+    return this.prisma.withPoolRetry(() =>
+      this.prisma.newsPoster.delete({ where: { id } }),
+    );
   }
 }

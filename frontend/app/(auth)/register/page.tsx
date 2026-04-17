@@ -43,7 +43,7 @@ export default function RegisterPage() {
     <div className="auth-card rounded-2xl border border-zinc-700/50 bg-zinc-800/80 p-8 shadow-xl backdrop-blur">
       <h1 className="text-2xl font-bold text-white">Admin account registration</h1>
       <p className="mt-1 text-zinc-400">
-        Your email must be allowlisted by an existing admin before signup.
+        Only the first admin can register. If admins exist, contact one for access.
       </p>
       <form onSubmit={handleSubmit} className="mt-6 space-y-4">
         <Input

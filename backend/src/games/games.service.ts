@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Inject } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject, Logger } from '@nestjs/common';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import type { Cache } from 'cache-manager';
 import { PrismaService } from '../prisma/prisma.service';
@@ -13,12 +13,31 @@ const CACHE_TTL_MS = 60 * 1000;
 
 @Injectable()
 export class GamesService {
+  private readonly logger = new Logger(GamesService.name);
+
   constructor(
     private prisma: PrismaService,
     @Inject(CACHE_MANAGER) private cache: Cache,
   ) {}
 
   private configPath = join(process.cwd(), 'data', 'site-config.json');
+
+  private isDatabaseUnavailableError(error: unknown): boolean {
+    const code =
+      typeof error === 'object' && error !== null && 'code' in error
+        ? String((error as { code?: string }).code ?? '')
+        : '';
+    if (code === 'P1001' || code === 'P1017' || code === 'P2024') {
+      return true;
+    }
+    const message =
+      error instanceof Error ? error.message : String(error ?? '').toString();
+    return (
+      message.includes("Can't reach database server") ||
+      message.includes('Server has closed the connection') ||
+      message.includes('Connection terminated unexpectedly')
+    );
+  }
 
   private readTopGameIds(): string[] {
     try {
@@ -56,23 +75,31 @@ export class GamesService {
   async findAll() {
     const cached = await this.cache.get<Awaited<ReturnType<typeof this.findAll>>>(GAMES_CACHE_KEY);
     if (cached) return cached;
-    const result = await this.prisma.withPoolRetry(() =>
-      this.prisma.game.findMany({
-        where: { isActive: true },
-        orderBy: { sortOrder: 'asc' },
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          thumbnailUrl: true,
-          videoUrl: true,
-          gameLink: true,
-          sortOrder: true,
-        },
-      }),
-    );
-    await this.cache.set(GAMES_CACHE_KEY, result, CACHE_TTL_MS);
-    return result;
+    try {
+      const result = await this.prisma.withPoolRetry(() =>
+        this.prisma.game.findMany({
+          where: { isActive: true },
+          orderBy: { sortOrder: 'asc' },
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            thumbnailUrl: true,
+            videoUrl: true,
+            gameLink: true,
+            sortOrder: true,
+          },
+        }),
+      );
+      await this.cache.set(GAMES_CACHE_KEY, result, CACHE_TTL_MS);
+      return result;
+    } catch (error) {
+      if (this.isDatabaseUnavailableError(error)) {
+        this.logger.warn('Database unavailable in games.findAll; returning empty list.');
+        return [];
+      }
+      throw error;
+    }
   }
 
   async findTopGames() {
@@ -81,24 +108,34 @@ export class GamesService {
     const cacheKey = `${TOP_GAMES_CACHE_KEY}:${ids.join(',')}`;
     const cached = await this.cache.get<Awaited<ReturnType<typeof this.findTopGames>>>(cacheKey);
     if (cached) return cached;
-    const result = await this.prisma.withPoolRetry(() =>
-      this.prisma.game.findMany({
-        where: { isActive: true, id: { in: ids } },
-        orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
-        take: 6,
-        select: {
-          id: true,
-          title: true,
-          description: true,
-          thumbnailUrl: true,
-          videoUrl: true,
-          gameLink: true,
-          sortOrder: true,
-        },
-      }),
-    );
-    await this.cache.set(cacheKey, result, CACHE_TTL_MS);
-    return result;
+    try {
+      const result = await this.prisma.withPoolRetry(() =>
+        this.prisma.game.findMany({
+          where: { isActive: true, id: { in: ids } },
+          orderBy: [{ sortOrder: 'asc' }, { createdAt: 'desc' }],
+          take: 6,
+          select: {
+            id: true,
+            title: true,
+            description: true,
+            thumbnailUrl: true,
+            videoUrl: true,
+            gameLink: true,
+            sortOrder: true,
+          },
+        }),
+      );
+      await this.cache.set(cacheKey, result, CACHE_TTL_MS);
+      return result;
+    } catch (error) {
+      if (this.isDatabaseUnavailableError(error)) {
+        this.logger.warn(
+          'Database unavailable in games.findTopGames; returning empty list.',
+        );
+        return [];
+      }
+      throw error;
+    }
   }
 
   async setTopGames(ids: string[]) {

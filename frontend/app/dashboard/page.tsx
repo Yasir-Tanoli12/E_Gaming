@@ -89,10 +89,10 @@ export default function UserDashboardPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0808] text-white">
+    <div className="min-h-screen bg-[#FFFBF5] text-[#1a1a1a]">
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -left-24 top-20 h-80 w-80 animate-float rounded-full bg-[#990808]/25 blur-[100px]" />
-        <div className="absolute right-0 top-40 h-96 w-96 animate-float-delayed rounded-full bg-[#EDC537]/20 blur-[110px]" />
+        <div className="absolute -left-24 top-20 h-80 w-80 animate-float rounded-full bg-[#990808]/12 blur-[100px]" />
+        <div className="absolute right-0 top-40 h-96 w-96 animate-float-delayed rounded-full bg-[#EDC537]/25 blur-[110px]" />
       </div>
 
       <PublicNavbar />
@@ -110,22 +110,22 @@ export default function UserDashboardPage() {
             <h1 className="text-5xl font-black leading-[0.95] md:text-7xl">
               PLAY. WIN. DOMINATE.
             </h1>
-            <p className="mt-6 max-w-xl text-lg text-[#fef3c7]/90">
+            <p className="mt-6 max-w-xl text-lg text-zinc-600">
               Browse our curated games. Play instantly with your credentials or
               get access from our support team. Click any game card to play or buy credentials.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-3 text-xs">
-              <span className="rounded-full border border-[#EDC537]/50 bg-[#EDC537]/15 px-3 py-1 text-[#fef3c7]">
+              <span className="rounded-full border border-[#EDC537]/50 bg-[#EDC537]/25 px-3 py-1 text-zinc-800">
                 Game previews
               </span>
-              <span className="rounded-full border border-[#990808]/60 bg-[#990808]/25 px-3 py-1 text-[#fef3c7]">
+              <span className="rounded-full border border-[#990808]/50 bg-[#990808]/20 px-3 py-1 text-zinc-800">
                 Get credentials
               </span>
             </div>
           </div>
           <div className="relative h-[420px] animate-fade-in animation-delay-200 rounded-3xl border border-[#EDC537]/40 bg-gradient-to-br from-[#990808]/25 to-[#EDC537]/20 p-3 shadow-[0_0_45px_rgba(237,197,55,0.3)] md:h-[500px]">
             <div className="absolute -inset-[1px] -z-10 rounded-3xl bg-[conic-gradient(from_0deg,rgba(237,197,55,0.4),rgba(153,8,8,0.45),rgba(237,197,55,0.4))] blur-sm" />
-            <div className="group relative h-full w-full overflow-hidden rounded-2xl border border-[#EDC537]/30 bg-[#0f0808]/90">
+            <div className="group relative h-full w-full overflow-hidden rounded-2xl border border-[#EDC537]/40 bg-white/95 shadow-lg">
               {heroVideo ? (
                 <video
                   src={heroVideo}
@@ -136,18 +136,18 @@ export default function UserDashboardPage() {
                   className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
                 />
               ) : (
-                <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_20%_20%,rgba(153,8,8,0.35),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(237,197,55,0.3),transparent_40%),linear-gradient(120deg,#0f0808,#1a0c08)]">
-                  <p className="text-sm text-[#fef3c7]/80">Game preview will appear here</p>
+                <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_20%_20%,rgba(153,8,8,0.15),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(237,197,55,0.25),transparent_40%),linear-gradient(120deg,#FFF8E7,#FFFBF5)]">
+                  <p className="text-sm text-zinc-500">Game preview will appear here</p>
                 </div>
               )}
               <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(transparent_48%,rgba(5,8,20,0.25)_50%,transparent_52%)] bg-[length:100%_6px] opacity-30" />
-              <div className="pointer-events-none absolute left-4 top-4 flex items-center gap-2 rounded-full border border-[#EDC537]/50 bg-[#EDC537]/20 px-3 py-1 text-xs text-[#fef3c7]">
+              <div className="pointer-events-none absolute left-4 top-4 flex items-center gap-2 rounded-full border border-[#EDC537]/50 bg-[#EDC537]/30 px-3 py-1 text-xs text-zinc-800">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-[#EDC537]" />
                 LIVE LOBBY
               </div>
-              <div className="pointer-events-none absolute bottom-4 left-4 rounded-lg bg-black/45 px-4 py-2 backdrop-blur">
+              <div className="pointer-events-none absolute bottom-4 left-4 rounded-lg bg-white/90 px-4 py-2 shadow-lg backdrop-blur">
                 <p className="text-xs uppercase tracking-[0.22em] text-[#EDC537]">Game Arena</p>
-                <p className="mt-1 text-sm text-[#fef3c7]/90">Browse games, get credentials, or play now</p>
+                <p className="mt-1 text-sm text-zinc-600">Browse games, get credentials, or play now</p>
               </div>
             </div>
           </div>
@@ -156,11 +156,11 @@ export default function UserDashboardPage() {
 
       <main id="games" className="relative z-10 mx-auto max-w-7xl px-4 py-12">
         {showAgeWarning && ageWarningReady && (
-          <div className="fixed inset-0 z-[90] flex items-center justify-center bg-black/80 p-4">
-            <div className="w-full max-w-xl rounded-2xl border border-amber-400/40 bg-[#120f06] p-6 text-center shadow-[0_0_60px_rgba(251,191,36,0.2)]">
-              <p className="text-xs uppercase tracking-[0.2em] text-amber-300">Warning</p>
-              <h3 className="mt-2 text-2xl font-black text-amber-100">{ageWarning.title}</h3>
-              <p className="mt-3 text-sm text-amber-100/80">
+          <div className="fixed inset-0 z-[90] flex items-center justify-center bg-white/90 backdrop-blur-sm p-4">
+            <div className="w-full max-w-xl rounded-2xl border border-amber-400/50 bg-white p-6 text-center shadow-[0_0_60px_rgba(251,191,36,0.25)]">
+              <p className="text-xs uppercase tracking-[0.2em] text-amber-600">Warning</p>
+              <h3 className="mt-2 text-2xl font-black text-zinc-800">{ageWarning.title}</h3>
+              <p className="mt-3 text-sm text-zinc-600">
                 {ageWarning.message}
               </p>
               <div className="mt-5 flex items-center justify-center gap-3">
@@ -169,7 +169,7 @@ export default function UserDashboardPage() {
                 </Button>
                 <a
                   href={ageWarning.exitUrl || "https://www.google.com"}
-                  className="inline-flex items-center justify-center rounded-lg border border-zinc-600 px-4 py-2.5 text-sm text-zinc-300 transition hover:bg-zinc-800"
+                  className="inline-flex items-center justify-center rounded-lg border border-amber-300 px-4 py-2.5 text-sm text-zinc-700 transition hover:bg-amber-50"
                 >
                   {ageWarning.exitButtonLabel}
                 </a>
@@ -179,13 +179,13 @@ export default function UserDashboardPage() {
         )}
 
         {showNews && newsPoster && (
-          <div className="fixed inset-0 z-[70] flex items-center justify-center bg-black/70 p-4">
-            <div className="w-full max-w-3xl overflow-hidden rounded-2xl border border-[#EDC537]/40 bg-[#140808] shadow-[0_0_60px_rgba(237,197,55,0.25)]">
-              <div className="flex items-center justify-between border-b border-zinc-700 px-4 py-3">
-                <h3 className="font-semibold text-white">{newsPoster.title ?? "Latest News"}</h3>
+          <div className="fixed inset-0 z-[70] flex items-center justify-center bg-white/90 backdrop-blur-sm p-4">
+            <div className="w-full max-w-3xl overflow-hidden rounded-2xl border border-[#EDC537]/50 bg-white shadow-[0_0_60px_rgba(237,197,55,0.2)]">
+              <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-3">
+                <h3 className="font-semibold text-zinc-800">{newsPoster.title ?? "Latest News"}</h3>
                 <button
                   type="button"
-                  className="rounded px-2 py-1 text-zinc-300 hover:bg-zinc-700"
+                  className="rounded px-2 py-1 text-zinc-600 hover:bg-amber-50"
                   onClick={() => setShowNews(false)}
                 >
                   ✕
@@ -197,8 +197,8 @@ export default function UserDashboardPage() {
         )}
 
         {selectedGame && (
-          <div className="fixed inset-0 z-[80] flex items-center justify-center bg-black/80 p-4 backdrop-blur-[2px]">
-            <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-[#EDC537]/40 bg-[#0f0808]/95 p-6 shadow-[0_0_70px_rgba(237,197,55,0.2)] md:p-8">
+          <div className="fixed inset-0 z-[80] flex items-center justify-center bg-white/95 p-4 backdrop-blur-sm">
+            <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-[#EDC537]/50 bg-white p-6 shadow-[0_0_70px_rgba(237,197,55,0.2)] md:p-8">
               <div className="pointer-events-none absolute -left-16 top-4 h-48 w-48 rounded-full bg-[#990808]/25 blur-[80px]" />
               <div className="pointer-events-none absolute -right-12 bottom-2 h-56 w-56 rounded-full bg-[#EDC537]/20 blur-[90px]" />
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(237,197,55,0.12),transparent_45%)]" />
@@ -207,7 +207,7 @@ export default function UserDashboardPage() {
                   <p className="text-xs uppercase tracking-[0.24em] text-amber-300">
                     Game Access
                   </p>
-                  <h3 className="mt-2 text-2xl font-black text-white">
+                  <h3 className="mt-2 text-2xl font-black text-zinc-800">
                     {selectedGame.title}
                   </h3>
                 </div>
@@ -217,7 +217,7 @@ export default function UserDashboardPage() {
                     setSelectedGame(null);
                     setShowCredentialOptions(false);
                   }}
-                  className="rounded px-2 py-1 text-zinc-300 transition hover:bg-white/10"
+                  className="rounded px-2 py-1 text-zinc-600 transition hover:bg-zinc-100"
                 >
                   ✕
                 </button>
@@ -342,7 +342,7 @@ export default function UserDashboardPage() {
             <section id="reviews">
               <div className="mb-4 flex items-center justify-between">
                 <h2 className="text-2xl font-black">Reviews</h2>
-                <span className="text-xs text-[#fef3c7]/80">What players are saying</span>
+                <span className="text-xs text-[#7a5a16]">What players are saying</span>
               </div>
               {reviewItems.length === 0 ? (
                 <div className="rounded-xl border border-zinc-700/50 bg-zinc-900/30 p-5 text-sm text-zinc-400">
@@ -355,13 +355,13 @@ export default function UserDashboardPage() {
                     {movingReviewItems.map((item, index) => (
                       <article
                         key={`${item.id}-${index}`}
-                        className="qa-marquee-card"
+                        className="qa-marquee-card border border-[#EDC537]/40 bg-[linear-gradient(145deg,#ffffff,#fff8df_55%,#fff3c4)] shadow-[inset_0_0_0_1px_rgba(237,197,55,0.35),0_10px_24px_rgba(153,8,8,0.08)]"
                       >
-                        <p className="text-sm font-bold tracking-wide text-white">
+                        <p className="text-sm font-bold tracking-wide text-[#7a0b0b]">
                           {item.reviewer}
                         </p>
-                        <p className="mt-2 text-sm italic text-[#fef3c7]/90">{item.message}</p>
-                        <p className="mt-2 text-xs text-[#EDC537]/95">Rating: {item.rating}/5</p>
+                        <p className="mt-2 text-sm italic text-[#3d2a0f]">{item.message}</p>
+                        <p className="mt-2 text-xs font-semibold text-[#9a7000]">Rating: {item.rating}/5</p>
                       </article>
                     ))}
                   </div>

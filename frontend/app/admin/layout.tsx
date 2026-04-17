@@ -12,7 +12,11 @@ const ADMIN_NAV = [
   { label: "Dashboard", href: "/admin/dashboard" },
   { label: "Games", href: "/admin/games" },
   { label: "News", href: "/admin/news" },
-  { label: "Content", href: "/admin/content" },
+  { label: "Contacts", href: "/admin/contacts" },
+  { label: "Blogs", href: "/admin/blogs" },
+  { label: "Reviews", href: "/admin/reviews" },
+  { label: "Site", href: "/admin/site" },
+  { label: "Guidelines", href: "/admin/guidelines" },
 ];
 
 export default function AdminLayout({

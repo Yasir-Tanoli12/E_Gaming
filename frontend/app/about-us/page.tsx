@@ -29,7 +29,7 @@ export default function AboutUsPage() {
   }, []);
 
   return (
-    <div className="about-radiant-page min-h-screen text-white">
+    <div className="about-radiant-page min-h-screen text-[#1f140a]">
       <PublicNavbar />
       <div className="px-4 py-10">
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
@@ -55,7 +55,9 @@ export default function AboutUsPage() {
               <p className="text-xs uppercase tracking-[0.2em] text-[#EDC537]">
                 Company
               </p>
-              <h1 className="mt-2 text-4xl font-black md:text-5xl">About Us</h1>
+              <h1 className="mt-2 text-4xl font-black text-[#7a0b0b] md:text-5xl">
+                About Us
+              </h1>
             </div>
           </div>
         </div>
@@ -73,7 +75,7 @@ export default function AboutUsPage() {
             <div className="about-credits-track">
               {[0, 1].map((index) => (
                 <div key={index} className="about-credits-card">
-                  <p className="whitespace-pre-wrap text-center text-base leading-8 text-[#fef3c7]/95 md:text-lg">
+                  <p className="whitespace-pre-wrap text-center text-base leading-8 text-[#2b1a0a] md:text-lg">
                     {aboutUs || DEFAULT_ABOUT_US}
                   </p>
                 </div>
