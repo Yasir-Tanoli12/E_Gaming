@@ -1,4 +1,4 @@
-import { apiRequest } from "./api";
+import { apiFormRequest, apiRequest } from "./api";
 
 export interface Game {
   id: string;
@@ -20,9 +20,6 @@ export interface CreateGameInput {
   sortOrder?: number;
   isActive?: boolean;
 }
-
-const getBaseUrl = () =>
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
 export const gamesApi = {
   list() {
@@ -47,20 +44,7 @@ export const gamesApi = {
   async uploadMedia(file: File): Promise<{ url: string }> {
     const formData = new FormData();
     formData.append("file", file);
-
-    const res = await fetch(`${getBaseUrl()}/games/upload-media`, {
-      method: "POST",
-      credentials: "include",
-      body: formData,
-    });
-
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      const message =
-        typeof data.message === "string" ? data.message : "Upload failed";
-      throw new Error(message);
-    }
-    return data as { url: string };
+    return apiFormRequest<{ url: string }>("/games/upload-media", "POST", formData);
   },
 
   create(body: CreateGameInput) {

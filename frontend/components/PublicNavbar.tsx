@@ -18,9 +18,26 @@ export function PublicNavbar() {
   const pathname = usePathname();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [contacts, setContacts] = useState<SiteContacts | null>(null);
+  const [contactsError, setContactsError] = useState("");
 
   useEffect(() => {
-    contentApi.getPublic().then((d) => setContacts(d.contacts)).catch(() => {});
+    let active = true;
+    async function loadContacts() {
+      try {
+        const data = await contentApi.getPublic();
+        if (!active) return;
+        setContacts(data.contacts ?? null);
+        setContactsError("");
+      } catch (error) {
+        if (!active) return;
+        setContacts(null);
+        setContactsError(error instanceof Error ? error.message : "Failed to load contacts");
+      }
+    }
+    loadContacts();
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -79,6 +96,11 @@ export function PublicNavbar() {
           </nav>
 
           <div className="hidden items-center gap-2 lg:flex">
+            {contactsError && (
+              <span className="max-w-[180px] truncate text-xs text-red-300/80">
+                {contactsError}
+              </span>
+            )}
             {contacts?.facebook && (
               <a href={contacts.facebook} target="_blank" rel="noreferrer" aria-label="Facebook" title="Facebook" className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#EDC537]/40 bg-[#990808]/20 text-[#fef3c7] shadow-[0_0_18px_rgba(237,197,55,0.3)] transition hover:-translate-y-0.5 hover:bg-[#990808]/30">
                 <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true"><path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.5-3.88 3.79-3.88 1.1 0 2.24.2 2.24.2v2.47h-1.27c-1.26 0-1.65.78-1.65 1.58V12h2.8l-.45 2.89h-2.35v6.99A10 10 0 0 0 22 12z" /></svg>

@@ -1,12 +1,10 @@
 "use client";
 
 import Image from "next/image";
-
-const getBaseUrl = () =>
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+import { getApiBaseUrl } from "@/lib/api";
 
 function isUploadUrl(src: string): boolean {
-  const base = getBaseUrl();
+  const base = getApiBaseUrl();
   return src.startsWith(base) && src.includes("/uploads/");
 }
 

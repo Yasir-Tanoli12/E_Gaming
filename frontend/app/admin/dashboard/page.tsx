@@ -1,15 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { usersApi, type ApiUser } from "@/lib/users-api";
 import { Button } from "@/components/ui/Button";
 
 export default function AdminDashboardPage() {
+  const PAGE_SIZE = 10;
   const [users, setUsers] = useState<ApiUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
 
   async function loadUsers() {
     setLoading(true);
@@ -17,6 +19,7 @@ export default function AdminDashboardPage() {
     try {
       const data = await usersApi.list();
       setUsers(data);
+      setPage(1);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load users");
     } finally {
@@ -44,6 +47,15 @@ export default function AdminDashboardPage() {
       setUpdatingId(null);
     }
   }
+
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil(users.length / PAGE_SIZE)),
+    [users.length]
+  );
+  const pagedUsers = useMemo(() => {
+    const start = (page - 1) * PAGE_SIZE;
+    return users.slice(start, start + PAGE_SIZE);
+  }, [users, page]);
 
   return (
     <div>
@@ -82,7 +94,7 @@ export default function AdminDashboardPage() {
               </tr>
             </thead>
             <tbody>
-              {users.map((u) => (
+              {pagedUsers.map((u) => (
                 <tr
                   key={u.id}
                   className="border-b border-zinc-800/80 last:border-0"
@@ -117,6 +129,33 @@ export default function AdminDashboardPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      )}
+      {!loading && users.length > PAGE_SIZE && (
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-zinc-400">
+          <p>
+            Showing {(page - 1) * PAGE_SIZE + 1}-
+            {Math.min(page * PAGE_SIZE, users.length)} of {users.length} users
+          </p>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="secondary"
+              disabled={page <= 1}
+              onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+            >
+              Previous
+            </Button>
+            <span>
+              Page {page} / {totalPages}
+            </span>
+            <Button
+              variant="secondary"
+              disabled={page >= totalPages}
+              onClick={() => setPage((prev) => Math.min(totalPages, prev + 1))}
+            >
+              Next
+            </Button>
+          </div>
         </div>
       )}
     </div>

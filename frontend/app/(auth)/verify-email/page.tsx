@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,11 +18,6 @@ function VerifyEmailForm() {
   const [email, setEmail] = useState(emailParam);
   const [code, setCode] = useState(codeParam);
   const [error, setError] = useState("");
-
-  useEffect(() => {
-    setEmail((prev) => (emailParam || prev));
-    setCode((prev) => (codeParam || prev));
-  }, [emailParam, codeParam]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

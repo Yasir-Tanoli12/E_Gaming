@@ -1,7 +1,24 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
-export function middleware(_request: NextRequest) {
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const hasAccessCookie = Boolean(request.cookies.get("eg_access_token")?.value);
+
+  if (pathname.startsWith("/admin") && !hasAccessCookie) {
+    const loginUrl = request.nextUrl.clone();
+    loginUrl.pathname = "/login";
+    return NextResponse.redirect(loginUrl);
+  }
+
+  if (
+    (pathname === "/login" || pathname === "/register" || pathname === "/verify-email") &&
+    hasAccessCookie
+  ) {
+    const dashboardUrl = request.nextUrl.clone();
+    dashboardUrl.pathname = "/admin/dashboard";
+    return NextResponse.redirect(dashboardUrl);
+  }
+
   const res = NextResponse.next();
 
   const securityHeaders: Record<string, string> = {

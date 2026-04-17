@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { contentApi, type SiteContent } from "@/lib/content-api";
 import { PublicNavbar } from "@/components/PublicNavbar";
 
@@ -24,7 +24,7 @@ export default function BlogsPage() {
     load();
   }, []);
 
-  const blogs = content?.blogs ?? [];
+  const blogs = useMemo(() => content?.blogs ?? [], [content?.blogs]);
   const logoUrl = content?.contacts?.logoUrl ?? "";
 
   useEffect(() => {
@@ -43,7 +43,7 @@ export default function BlogsPage() {
   const listBlogs = blogs.filter((blog) => blog.id !== selectedBlog?.id);
 
   return (
-    <div className="blog-radiant-page min-h-screen text-white">
+    <div className="blog-radiant-page min-h-screen text-[#2a1808]">
       <PublicNavbar />
       <div className="px-4 py-10">
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
@@ -66,9 +66,9 @@ export default function BlogsPage() {
               </span>
             )}
             <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-[#EDC537]">Neon Editorial</p>
-            <h1 className="mt-2 text-4xl font-black md:text-5xl">Blogs</h1>
-            <p className="mt-2 max-w-2xl text-sm text-[#fef3c7]/80">
+            <p className="text-xs uppercase tracking-[0.2em] text-[#9a7000]">Neon Editorial</p>
+            <h1 className="mt-2 text-4xl font-black text-[#7a0b0b] md:text-5xl">Blogs</h1>
+            <p className="mt-2 max-w-2xl text-sm text-[#5b3b18]">
               Fresh posts, updates, and stories with a glowing CashlySweeps vibe.
             </p>
             </div>
@@ -101,16 +101,16 @@ export default function BlogsPage() {
                   ) : (
                     <div className="h-[290px] w-full bg-[radial-gradient(circle_at_20%_20%,rgba(153,8,8,0.35),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(237,197,55,0.3),transparent_38%),linear-gradient(120deg,#0f0808,#1a0c08)] md:h-[360px]" />
                   )}
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0a0808] via-[#0a0808]/40 to-transparent" />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0a0808]/55 via-[#0a0808]/20 to-transparent" />
                 </div>
                 <div className="relative z-10 mt-4">
-                  <p className="text-xs uppercase tracking-[0.2em] text-[#EDC537]">Featured Story</p>
-                  <h2 className="mt-2 text-2xl font-black md:text-3xl">{selectedBlog.title}</h2>
+                  <p className="text-xs uppercase tracking-[0.2em] text-[#9a7000]">Featured Story</p>
+                  <h2 className="mt-2 text-2xl font-black text-[#7a0b0b] md:text-3xl">{selectedBlog.title}</h2>
                   {selectedBlog.excerpt && (
-                    <p className="mt-2 text-sm text-[#fef3c7]/85">{selectedBlog.excerpt}</p>
+                    <p className="mt-2 text-sm text-[#5b3b18]">{selectedBlog.excerpt}</p>
                   )}
                   {selectedBlog.content && (
-                    <p className="mt-3 text-sm text-zinc-300">{selectedBlog.content}</p>
+                    <p className="mt-3 text-sm text-[#2f210f]">{selectedBlog.content}</p>
                   )}
                 </div>
               </article>
@@ -137,9 +137,9 @@ export default function BlogsPage() {
                       )}
                     </div>
                     <div className="min-w-0">
-                      <h3 className="truncate text-base font-bold">{blog.title}</h3>
+                      <h3 className="truncate text-base font-bold text-[#7a0b0b]">{blog.title}</h3>
                       {blog.excerpt && (
-                        <p className="mt-1 line-clamp-2 text-xs text-[#fef3c7]/80">{blog.excerpt}</p>
+                        <p className="mt-1 line-clamp-2 text-xs text-[#5b3b18]">{blog.excerpt}</p>
                       )}
                     </div>
                   </div>

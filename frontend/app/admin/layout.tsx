@@ -58,10 +58,6 @@ export default function AdminLayout({
   }, []);
 
   useEffect(() => {
-    setMobileNavOpen(false);
-  }, [pathname]);
-
-  useEffect(() => {
     if (mobileNavOpen) document.body.style.overflow = "hidden";
     else document.body.style.overflow = "";
     return () => {
@@ -138,7 +134,7 @@ export default function AdminLayout({
                 User view
               </Link>
               <span className="max-w-[140px] truncate text-sm text-zinc-500 sm:max-w-[200px]">
-                {user.email}
+                {user?.email ?? "N/A"}
               </span>
               <Button variant="secondary" onClick={logout}>
                 Sign out
@@ -230,7 +226,7 @@ export default function AdminLayout({
             </Link>
             <div className="mt-2 rounded-xl bg-zinc-800/50 px-4 py-3">
               <p className="text-xs text-zinc-500">Signed in as</p>
-              <p className="mt-0.5 truncate text-sm text-zinc-300">{user.email}</p>
+              <p className="mt-0.5 truncate text-sm text-zinc-300">{user?.email ?? "N/A"}</p>
             </div>
             <Button
               variant="secondary"

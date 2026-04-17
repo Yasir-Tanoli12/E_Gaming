@@ -8,6 +8,7 @@ import React, {
   useState,
 } from "react";
 import { authApi } from "@/lib/auth-api";
+import { AUTH_EXPIRED_EVENT, ApiError } from "@/lib/api";
 import type {
   User,
   RegisterInput,
@@ -51,7 +52,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const me = await authApi.me();
       setUserState(me ?? null);
-    } catch {
+    } catch (error) {
+      if (error instanceof ApiError && error.status >= 500) {
+        setUserState(null);
+        return;
+      }
       try {
         const tokens = await authApi.refresh();
         setUserState(tokens.user);
@@ -67,6 +72,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     loadUser();
   }, [loadUser]);
+
+  useEffect(() => {
+    function handleAuthExpired() {
+      setUserState(null);
+    }
+    window.addEventListener(AUTH_EXPIRED_EVENT, handleAuthExpired);
+    return () => window.removeEventListener(AUTH_EXPIRED_EVENT, handleAuthExpired);
+  }, []);
 
   const login = useCallback(
     async (input: LoginInput) => {

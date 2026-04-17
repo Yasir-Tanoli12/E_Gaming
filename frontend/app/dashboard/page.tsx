@@ -5,6 +5,7 @@ import Link from "next/link";
 import { gamesApi, type Game } from "@/lib/games-api";
 import { newsApi, type NewsPoster } from "@/lib/news-api";
 import { contentApi, type SiteContent } from "@/lib/content-api";
+import { getApiBaseUrl } from "@/lib/api";
 import { GameCard } from "@/components/GameCard";
 import { Button } from "@/components/ui/Button";
 import { PublicNavbar } from "@/components/PublicNavbar";
@@ -63,7 +64,7 @@ export default function UserDashboardPage() {
   });
   const contacts = content?.contacts;
   const logoUrl = contacts?.logoUrl ?? "";
-  const apiBaseUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+  const apiBaseUrl = getApiBaseUrl();
   const privacyPolicyPdfUrl =
     `${apiBaseUrl}/content/documents/privacy-policy`;
   const socialResponsibilityPdfUrl =
