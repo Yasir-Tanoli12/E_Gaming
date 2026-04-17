@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
@@ -75,8 +74,8 @@ export default function AdminLayout({
 
   if (!isInitialized) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-900">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-[#EDC537] border-t-transparent" />
+      <div className="flex min-h-screen items-center justify-center bg-[#09090b]">
+        <div className="h-9 w-9 animate-spin rounded-full border-2 border-amber-500/30 border-t-amber-400" />
       </div>
     );
   }
@@ -85,39 +84,49 @@ export default function AdminLayout({
     return null;
   }
 
+  const navLinkClass = (active: boolean) =>
+    `rounded-md px-3 py-2 text-sm font-medium transition-colors ${
+      active
+        ? "bg-white/[0.08] text-white shadow-sm ring-1 ring-white/10"
+        : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-200"
+    }`;
+
   return (
-    <div className="min-h-screen bg-zinc-950">
-      <header className="sticky top-0 z-40 border-b border-zinc-800 bg-zinc-900/95 backdrop-blur-sm">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-2 px-4 py-3">
-          <div className="flex min-w-0 items-center gap-2 sm:gap-4">
+    <div className="dark min-h-screen bg-[#09090b] text-zinc-100 antialiased [&_label]:!text-zinc-200">
+      <header className="sticky top-0 z-40 border-b border-white/[0.06] bg-[#09090b]/90 backdrop-blur-md">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
+          <div className="flex min-w-0 flex-1 items-center gap-3">
             <Link
               href="/admin/dashboard"
-              className="flex shrink-0 items-center gap-2 text-base font-semibold text-white sm:gap-3 sm:text-lg"
+              className="flex shrink-0 items-center gap-2.5 rounded-lg outline-none ring-offset-2 ring-offset-[#09090b] focus-visible:ring-2 focus-visible:ring-amber-500/50 sm:gap-3"
             >
               {logoUrl ? (
                 <img
                   src={logoUrl}
-                  alt="CashlySweeps logo"
-                  className="h-9 w-9 shrink-0 rounded-lg object-cover ring-1 ring-[#EDC537]/50"
+                  alt=""
+                  className="h-9 w-9 shrink-0 rounded-lg object-cover ring-1 ring-white/10"
                 />
               ) : (
-                <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#990808] to-[#EDC537] text-xs font-black text-white">
-                  CS
+                <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-zinc-700 to-zinc-900 text-xs font-semibold tracking-tight text-zinc-200 ring-1 ring-white/10">
+                  ST
                 </span>
               )}
-              <span className="hidden truncate sm:inline">CashlySweeps Admin</span>
-              <span className="truncate sm:hidden">Admin</span>
+              <div className="min-w-0 leading-tight">
+                <span className="block truncate text-sm font-semibold text-white sm:text-base">
+                  SWEEPSTOWN
+                </span>
+                <span className="hidden text-[11px] font-medium uppercase tracking-wider text-zinc-500 sm:block">
+                  Admin
+                </span>
+              </div>
             </Link>
-            <nav className="hidden items-center gap-2 lg:flex">
+
+            <nav className="ml-2 hidden min-w-0 flex-1 items-center gap-0.5 overflow-x-auto py-0.5 xl:flex xl:ml-4">
               {ADMIN_NAV.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`rounded-lg px-3 py-2 text-sm transition ${
-                    pathname === item.href
-                      ? "bg-zinc-700 text-white"
-                      : "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-200"
-                  }`}
+                  className={navLinkClass(pathname === item.href)}
                 >
                   {item.label}
                 </Link>
@@ -125,70 +134,29 @@ export default function AdminLayout({
             </nav>
           </div>
 
-          <div className="flex shrink-0 items-center gap-2 sm:gap-4">
-            <nav className="hidden items-center gap-3 lg:flex">
+          <div className="flex shrink-0 items-center gap-2 sm:gap-3">
+            <div className="hidden items-center gap-3 xl:flex">
               <Link
                 href="/dashboard"
-                className="text-sm text-zinc-400 hover:text-zinc-200"
+                className="text-sm text-zinc-500 transition hover:text-zinc-300"
               >
-                User view
+                Public site
               </Link>
-              <span className="max-w-[140px] truncate text-sm text-zinc-500 sm:max-w-[200px]">
-                {user?.email ?? "N/A"}
+              <span
+                className="max-w-[min(220px,28vw)] truncate border-l border-white/10 pl-3 text-xs text-zinc-500"
+                title={user.email ?? undefined}
+              >
+                {user.email}
               </span>
-              <Button variant="secondary" onClick={logout}>
+              <Button variant="secondary" className="!py-2 text-sm" onClick={logout}>
                 Sign out
               </Button>
-            </nav>
+            </div>
             <button
               type="button"
               onClick={() => setMobileNavOpen(true)}
               aria-label="Open menu"
-              className="flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-600 text-zinc-300 transition hover:bg-zinc-800 hover:text-white lg:hidden"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                className="h-6 w-6"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <line x1="3" y1="6" x2="21" y2="6" />
-                <line x1="3" y1="12" x2="21" y2="12" />
-                <line x1="3" y1="18" x2="21" y2="18" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      {/* Mobile slide-out menu */}
-      <div
-        role="dialog"
-        aria-modal="true"
-        aria-label="Admin menu"
-        className={`fixed inset-0 z-50 lg:hidden ${mobileNavOpen ? "visible" : "invisible"}`}
-      >
-        <div
-          className={`absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300 ${
-            mobileNavOpen ? "opacity-100" : "opacity-0"
-          }`}
-          onClick={() => setMobileNavOpen(false)}
-        />
-        <div
-          className={`absolute right-0 top-0 flex h-full w-[min(300px,85vw)] flex-col border-l border-zinc-700 bg-zinc-900 shadow-xl transition-transform duration-300 ease-out ${
-            mobileNavOpen ? "translate-x-0" : "translate-x-full"
-          }`}
-        >
-          <div className="flex items-center justify-between border-b border-zinc-700 px-4 py-4">
-            <span className="font-semibold text-white">Menu</span>
-            <button
-              type="button"
-              onClick={() => setMobileNavOpen(false)}
-              aria-label="Close menu"
-              className="flex h-10 w-10 items-center justify-center rounded-lg border border-zinc-600 text-zinc-300 transition hover:bg-zinc-700"
+              className="flex h-10 w-10 items-center justify-center rounded-lg border border-white/10 bg-white/[0.03] text-zinc-300 transition hover:bg-white/[0.06] hover:text-white xl:hidden"
             >
               <svg
                 viewBox="0 0 24 24"
@@ -196,45 +164,82 @@ export default function AdminLayout({
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
               >
+                <line x1="4" y1="6" x2="20" y2="6" />
+                <line x1="4" y1="12" x2="20" y2="12" />
+                <line x1="4" y1="18" x2="20" y2="18" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Admin navigation"
+        className={`fixed inset-0 z-50 xl:hidden ${mobileNavOpen ? "visible" : "invisible"}`}
+      >
+        <div
+          className={`absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity duration-200 ${
+            mobileNavOpen ? "opacity-100" : "opacity-0"
+          }`}
+          onClick={() => setMobileNavOpen(false)}
+        />
+        <div
+          className={`absolute right-0 top-0 flex h-full w-[min(320px,100%)] flex-col border-l border-white/10 bg-[#0c0c0f] shadow-2xl transition-transform duration-200 ease-out ${
+            mobileNavOpen ? "translate-x-0" : "translate-x-full"
+          }`}
+        >
+          <div className="flex items-center justify-between border-b border-white/10 px-4 py-4">
+            <span className="text-sm font-semibold text-white">Navigation</span>
+            <button
+              type="button"
+              onClick={() => setMobileNavOpen(false)}
+              aria-label="Close menu"
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-white/10 text-zinc-400 hover:bg-white/5 hover:text-white"
+            >
+              <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M18 6L6 18M6 6l12 12" />
               </svg>
             </button>
           </div>
-          <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-4">
+          <nav className="flex flex-1 flex-col gap-0.5 overflow-y-auto p-3">
             {ADMIN_NAV.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileNavOpen(false)}
-                className={`rounded-xl px-4 py-3 text-base font-medium transition ${
+                className={`rounded-lg px-4 py-3 text-[15px] font-medium ${
                   pathname === item.href
-                    ? "bg-zinc-700 text-white"
-                    : "text-zinc-300 hover:bg-zinc-800 hover:text-white"
+                    ? "bg-white/[0.08] text-white"
+                    : "text-zinc-400 hover:bg-white/[0.04] hover:text-zinc-100"
                 }`}
               >
                 {item.label}
               </Link>
             ))}
-            <div className="my-2 border-t border-zinc-700" />
+            <div className="my-3 border-t border-white/10" />
             <Link
               href="/dashboard"
               onClick={() => setMobileNavOpen(false)}
-              className="rounded-xl px-4 py-3 text-base font-medium text-zinc-300 transition hover:bg-zinc-800 hover:text-white"
+              className="rounded-lg px-4 py-3 text-[15px] font-medium text-zinc-400 hover:bg-white/[0.04] hover:text-white"
             >
-              User view
+              View public site
             </Link>
-            <div className="mt-2 rounded-xl bg-zinc-800/50 px-4 py-3">
-              <p className="text-xs text-zinc-500">Signed in as</p>
-              <p className="mt-0.5 truncate text-sm text-zinc-300">{user?.email ?? "N/A"}</p>
+            <div className="mt-2 rounded-lg border border-white/10 bg-white/[0.03] px-4 py-3">
+              <p className="text-[11px] font-medium uppercase tracking-wide text-zinc-500">Signed in</p>
+              <p className="mt-1 break-all text-sm text-zinc-300">{user.email}</p>
             </div>
             <Button
               variant="secondary"
+              className="mt-3 w-full"
               onClick={() => {
                 setMobileNavOpen(false);
                 logout();
               }}
-              className="mt-4 w-full"
             >
               Sign out
             </Button>
@@ -242,7 +247,7 @@ export default function AdminLayout({
         </div>
       </div>
 
-      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-6">{children}</main>
+      <main className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10">{children}</main>
     </div>
   );
 }

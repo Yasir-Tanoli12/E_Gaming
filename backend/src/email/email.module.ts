@@ -24,7 +24,7 @@ import { EmailService } from './email.service';
           defaults: {
             from: config.get<string>(
               'MAIL_FROM',
-              '"CashlySweeps" <noreply@cashlysweeps.com>',
+              '"SWEEPSTOWN" <noreply@sweepstown.com>',
             ),
           },
         };

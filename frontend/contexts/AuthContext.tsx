@@ -9,13 +9,7 @@ import React, {
 } from "react";
 import { authApi } from "@/lib/auth-api";
 import { AUTH_EXPIRED_EVENT, ApiError } from "@/lib/api";
-import type {
-  User,
-  RegisterInput,
-  LoginInput,
-  VerifyCodeInput,
-  ResetPasswordInput,
-} from "@/lib/types/auth";
+import type { User } from "@/lib/types/auth";
 
 interface AuthState {
   user: User | null;
@@ -24,18 +18,10 @@ interface AuthState {
 }
 
 interface AuthContextValue extends AuthState {
-  login: (input: LoginInput) => Promise<{
-    user?: User;
-    requiresVerification?: boolean;
-    email?: string;
-    code?: string;
-  }>;
-  register: (input: RegisterInput) => Promise<{ requiresVerification: boolean; code?: string }>;
-  verifyEmail: (input: VerifyCodeInput) => Promise<User>;
-  verifyLogin: (input: VerifyCodeInput) => Promise<User>;
+  requestAdminOtp: (email: string) => Promise<{ message: string }>;
+  verifyAdminOtp: (input: { email: string; otp: string }) => Promise<User>;
+  promoteAdmin: (email: string) => Promise<{ message: string; email: string }>;
   logout: () => void | Promise<void>;
-  requestPasswordReset: (email: string) => Promise<void>;
-  resetPassword: (input: ResetPasswordInput) => Promise<void>;
   setUser: (user: User | null) => void;
 }
 
@@ -81,38 +67,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener(AUTH_EXPIRED_EVENT, handleAuthExpired);
   }, []);
 
-  const login = useCallback(
-    async (input: LoginInput) => {
-      setIsLoading(true);
-      try {
-        const res = await authApi.login(input);
-        if ("requiresVerification" in res && res.requiresVerification) {
-          return { requiresVerification: true, email: res.email, code: res.code };
-        }
-        const data = res as { user: User };
-        setUserState(data.user);
-        return { user: data.user };
-      } finally {
-        setIsLoading(false);
-      }
-    },
-    []
-  );
-
-  const register = useCallback(async (input: RegisterInput) => {
+  const requestAdminOtp = useCallback(async (email: string) => {
     setIsLoading(true);
     try {
-      const res = await authApi.register(input);
-      return { requiresVerification: true, code: res.code };
+      return await authApi.requestAdminOtp(email);
     } finally {
       setIsLoading(false);
     }
   }, []);
 
-  const verifyEmail = useCallback(async (input: VerifyCodeInput) => {
+  const verifyAdminOtp = useCallback(async (input: { email: string; otp: string }) => {
     setIsLoading(true);
     try {
-      const tokens = await authApi.verifyEmail(input);
+      const tokens = await authApi.verifyAdminOtp(input);
       setUserState(tokens.user);
       return tokens.user;
     } finally {
@@ -120,12 +87,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const verifyLogin = useCallback(async (input: VerifyCodeInput) => {
+  const promoteAdmin = useCallback(async (email: string) => {
     setIsLoading(true);
     try {
-      const tokens = await authApi.verifyLogin(input);
-      setUserState(tokens.user);
-      return tokens.user;
+      return await authApi.promoteAdmin(email);
     } finally {
       setIsLoading(false);
     }
@@ -136,35 +101,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUserState(null);
   }, []);
 
-  const requestPasswordReset = useCallback(async (email: string) => {
-    setIsLoading(true);
-    try {
-      await authApi.requestPasswordReset(email);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
-  const resetPassword = useCallback(async (input: ResetPasswordInput) => {
-    setIsLoading(true);
-    try {
-      await authApi.resetPassword(input);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
-
   const value: AuthContextValue = {
     user,
     isLoading,
     isInitialized,
-    login,
-    register,
-    verifyEmail,
-    verifyLogin,
+    requestAdminOtp,
+    verifyAdminOtp,
+    promoteAdmin,
     logout,
-    requestPasswordReset,
-    resetPassword,
     setUser,
   };
 

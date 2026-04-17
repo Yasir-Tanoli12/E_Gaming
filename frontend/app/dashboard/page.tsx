@@ -205,7 +205,7 @@ export default function UserDashboardPage() {
               <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(237,197,55,0.12),transparent_45%)]" />
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <p className="text-xs uppercase tracking-[0.24em] text-amber-300">
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-800">
                     Game Access
                   </p>
                   <h3 className="mt-2 text-2xl font-black text-zinc-800">
@@ -226,7 +226,7 @@ export default function UserDashboardPage() {
 
               {!showCredentialOptions ? (
                 <>
-                  <p className="mt-3 text-base text-amber-100/85">
+                  <p className="mt-3 text-base text-zinc-700">
                     Where do you want to go?
                   </p>
                   <div className="mt-5 flex flex-wrap gap-3">
@@ -255,7 +255,7 @@ export default function UserDashboardPage() {
                 </>
               ) : (
                 <>
-                  <p className="mt-3 text-base text-amber-100/85">
+                  <p className="mt-3 text-base text-zinc-700">
                     Contact admin for credentials:
                   </p>
                   <div className="mt-5 flex flex-wrap gap-3">
@@ -386,15 +386,15 @@ export default function UserDashboardPage() {
                 {logoUrl ? (
                   <img
                     src={logoUrl}
-                    alt="CashlySweeps logo"
+                    alt="SWEEPSTOWN logo"
                     className="h-11 w-11 rounded-xl object-cover ring-1 ring-[#EDC537]/50 shadow-[0_0_24px_rgba(237,197,55,0.3)]"
                   />
                 ) : (
                   <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#990808] to-[#EDC537] text-sm font-black text-white shadow-[0_0_20px_rgba(237,197,55,0.35)]">
-                    CS
+                    ST
                   </span>
                 )}
-                <h3 className="text-xl font-black text-white">CashlySweeps</h3>
+                <h3 className="text-xl font-black text-white">SWEEPSTOWN</h3>
               </div>
               <p className="mt-3 text-sm text-[#fef3c7]/80">
                 Play trending games with credentials. Get access from our support team or jump in straight away.
@@ -473,7 +473,7 @@ export default function UserDashboardPage() {
           </div>
 
           <div className="mt-8 flex flex-col items-center justify-between gap-3 border-t border-[#EDC537]/20 pt-4 text-xs text-[#fef3c7]/70 md:flex-row">
-            <p>© {new Date().getFullYear()} CashlySweeps. All rights reserved.</p>
+            <p>© {new Date().getFullYear()} SWEEPSTOWN. All rights reserved.</p>
             <p>Built for players who love to play.</p>
           </div>
         </div>

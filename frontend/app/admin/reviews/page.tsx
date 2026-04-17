@@ -72,13 +72,18 @@ export default function AdminReviewsPage() {
         <div className="rounded-lg bg-red-500/10 px-4 py-3 text-sm text-red-400">{error}</div>
       )}
 
-      <section className="auth-card space-y-4 rounded-2xl border border-zinc-700/40 bg-zinc-900/60 p-6">
-        <h2 className="text-xl font-bold">Add review</h2>
+      <section className="space-y-4 rounded-xl border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
+        <h2 className="text-base font-semibold text-white">Add review</h2>
         <div className="grid gap-4">
           <Input label="Reviewer name" value={form.reviewer} onChange={(e) => setForm((p) => ({ ...p, reviewer: e.target.value }))} />
           <div>
-            <label className="mb-1 block text-sm font-medium text-zinc-300">Review message</label>
-            <textarea value={form.message} onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))} rows={4} className="w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-zinc-100" />
+            <label className="mb-1.5 block text-sm font-medium !text-zinc-200">Review message</label>
+            <textarea
+              value={form.message}
+              onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))}
+              rows={4}
+              className="w-full rounded-lg border border-zinc-600 bg-zinc-950 px-3 py-2.5 text-sm text-zinc-100 placeholder:text-zinc-500 focus:border-zinc-500 focus:outline-none focus:ring-2 focus:ring-amber-500/35"
+            />
           </div>
           <Input label="Rating (1 to 5)" type="number" min={1} max={5} value={String(form.rating)} onChange={(e) => setForm((p) => ({ ...p, rating: Math.min(5, Math.max(1, parseInt(e.target.value || "5", 10))) }))} />
           <label className="inline-flex items-center gap-2 text-sm text-zinc-200">
@@ -88,15 +93,17 @@ export default function AdminReviewsPage() {
           <Button onClick={addReview} loading={saving} disabled={!form.reviewer.trim() || !form.message.trim()}>Add Review</Button>
         </div>
 
-        <div className="mt-6 space-y-3">
-          <h3 className="font-semibold">Existing reviews</h3>
+        <div className="mt-6 space-y-3 border-t border-white/[0.06] pt-6">
+          <h3 className="text-sm font-semibold text-zinc-200">Existing reviews</h3>
           {reviews.length === 0 ? (
             <p className="text-sm text-zinc-500">No reviews yet.</p>
           ) : (
             reviews.map((item) => (
-              <div key={item.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-zinc-700 bg-zinc-800/60 px-4 py-3">
+              <div key={item.id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] px-4 py-3">
                 <div className="min-w-0">
-                  <p className="font-medium">{item.reviewer} <span className="text-xs text-[#EDC537]">({item.rating}/5)</span></p>
+                  <p className="font-medium text-zinc-100">
+                    {item.reviewer} <span className="text-xs text-[#EDC537]">({item.rating}/5)</span>
+                  </p>
                   <p className="text-sm text-zinc-400">{item.message}</p>
                   <p className="text-xs text-zinc-500">{item.isFeatured ? "Featured on landing" : "Hidden from landing"}</p>
                 </div>

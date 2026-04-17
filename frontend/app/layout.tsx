@@ -18,8 +18,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CashlySweeps",
-  description: "CashlySweeps platform",
+  title: "SWEEPSTOWN",
+  description: "SWEEPSTOWN platform",
 };
 
 export default function RootLayout({

@@ -97,21 +97,21 @@ export default function AdminNewsPage() {
         </div>
       )}
 
-      <div className="auth-card mt-6 space-y-4 rounded-2xl border border-zinc-700/40 bg-zinc-900/60 p-6">
+      <div className="mt-6 space-y-4 rounded-xl border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
         <Input
           label="Title (optional)"
           value={form.title}
           onChange={(e) => setForm((p) => ({ ...p, title: e.target.value }))}
         />
         <div>
-          <label className="mb-1 block text-sm font-medium text-zinc-300">
+          <label className="mb-1.5 block text-sm font-medium !text-zinc-200">
             Upload poster image (local file)
           </label>
           <input
             type="file"
             accept="image/*"
             onChange={(e) => handleUpload(e.target.files?.[0] ?? null)}
-            className="rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-sm text-zinc-200"
+            className="w-full max-w-md cursor-pointer rounded-lg border border-zinc-600 bg-zinc-950 px-3 py-2 text-sm text-zinc-200 file:mr-3 file:rounded-md file:border-0 file:bg-zinc-800 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-zinc-200"
           />
           {uploading && <p className="mt-1 text-xs text-cyan-300">Uploading...</p>}
           <p className="mt-1 text-xs text-zinc-500">
@@ -133,7 +133,7 @@ export default function AdminNewsPage() {
         </div>
       </div>
 
-      <div className="mt-8 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900/50">
+      <div className="mt-8 overflow-hidden rounded-xl border border-white/[0.08] bg-white/[0.02]">
         {loading ? (
           <div className="p-6 text-zinc-400">Loading...</div>
         ) : items.length === 0 ? (
@@ -141,7 +141,7 @@ export default function AdminNewsPage() {
         ) : (
           <table className="w-full">
             <thead>
-              <tr className="border-b border-zinc-800 text-left text-sm text-zinc-400">
+              <tr className="border-b border-white/[0.06] text-left text-sm text-zinc-400">
                 <th className="px-4 py-3">Preview</th>
                 <th className="px-4 py-3">Title</th>
                 <th className="px-4 py-3">Status</th>
@@ -150,7 +150,7 @@ export default function AdminNewsPage() {
             </thead>
             <tbody>
               {items.map((item) => (
-                <tr key={item.id} className="border-b border-zinc-800/70 last:border-0">
+                <tr key={item.id} className="border-b border-white/[0.05] last:border-0">
                   <td className="px-4 py-3">
                     <img src={item.imageUrl} alt="" className="h-12 w-24 rounded object-cover" />
                   </td>

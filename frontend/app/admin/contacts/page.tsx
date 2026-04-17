@@ -117,17 +117,17 @@ export default function AdminContactsPage() {
         </div>
       )}
 
-      <section className="auth-card space-y-4 rounded-2xl border border-zinc-700/40 bg-zinc-900/60 p-6">
-        <h2 className="text-xl font-bold">Contacts</h2>
+      <section className="space-y-4 rounded-xl border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
+        <h2 className="text-base font-semibold text-white">Contacts</h2>
         <div>
-          <label className="mb-1 block text-sm font-medium text-zinc-300">
+          <label className="mb-1.5 block text-sm font-medium !text-zinc-200">
             Brand logo
           </label>
           <input
             type="file"
             accept="image/*"
             onChange={(e) => uploadLogo(e.target.files?.[0] ?? null)}
-            className="rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-sm text-zinc-200"
+            className="w-full max-w-md cursor-pointer rounded-lg border border-zinc-600 bg-zinc-950 px-3 py-2 text-sm text-zinc-200 file:mr-3 file:rounded-md file:border-0 file:bg-zinc-800 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-zinc-200"
           />
           {uploadingLogo && (
             <p className="mt-1 text-xs text-cyan-300">Uploading logo...</p>
@@ -144,14 +144,14 @@ export default function AdminContactsPage() {
           )}
         </div>
         <div>
-          <label className="mb-1 block text-sm font-medium text-zinc-300">
+          <label className="mb-1.5 block text-sm font-medium !text-zinc-200">
             Lobby video (hero section on dashboard)
           </label>
           <input
             type="file"
             accept="video/mp4,video/webm,video/ogg"
             onChange={(e) => uploadLobbyVideo(e.target.files?.[0] ?? null)}
-            className="rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-sm text-zinc-200"
+            className="w-full max-w-md cursor-pointer rounded-lg border border-zinc-600 bg-zinc-950 px-3 py-2 text-sm text-zinc-200 file:mr-3 file:rounded-md file:border-0 file:bg-zinc-800 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-zinc-200"
           />
           {uploadingLobbyVideo && (
             <p className="mt-1 text-xs text-cyan-300">Uploading lobby video...</p>

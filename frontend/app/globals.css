@@ -1,4 +1,8 @@
-@import "tailwindcss";
+/* File path avoids Turbopack resolving bare "tailwindcss" from the repo root (E_Gaming/) */
+@import "../node_modules/tailwindcss/index.css";
+
+/* Manual dark mode for /admin and /login (wrap root with class `dark`) */
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* Bright theme: cream backgrounds, red #990808, yellow #EDC537 */
 :root {
@@ -378,7 +382,11 @@ body {
     0 8px 24px rgb(0 0 0 / 0.06);
 }
 
-/* Auth card: bright inputs and labels when inside .auth-card */
+/*
+ * Auth card: high-contrast form colors for light/cream cards.
+ * Do not use .auth-card on dark admin panels — these rules beat single-class
+ * Tailwind utilities (e.g. text-zinc-300) and will make labels look “invisible”.
+ */
 .auth-card label {
   color: #1a1a1a;
 }

@@ -1,4 +1,4 @@
-// CashlySweeps Database Schema - Phase 1
+// SWEEPSTOWN Database Schema
 // https://pris.ly/d/prisma-schema
 
 generator client {
@@ -6,8 +6,10 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // Supabase: use direct DB for migrate/introspect; pooler URL alone can hang on migrate deploy
+  directUrl = env("DIRECT_URL")
 }
 
 // User model - stores auth and contact info for admin
@@ -166,6 +168,25 @@ enum AuthAction {
 enum PolicyDocumentKey {
   PRIVACY_POLICY
   SOCIAL_RESPONSIBILITY
+}
+
+// Emails allowed to use admin OTP sign-in (bootstrap + POST /admin/promote).
+model Admin {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+// Single admin OTP login: `otp` stores bcrypt hash of the 6-digit code (never plaintext).
+model AdminOTP {
+  id        String   @id @default(uuid())
+  email     String
+  otp       String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([email])
 }
 
 // Games displayed on landing page

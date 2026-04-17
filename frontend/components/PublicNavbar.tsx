@@ -69,11 +69,11 @@ export function PublicNavbar() {
           <Link href="/dashboard" className="group relative flex items-center gap-3 text-xl font-black tracking-wide text-white">
             <span className="absolute -inset-2 -z-10 rounded-xl bg-gradient-to-r from-[#990808]/30 to-[#EDC537]/30 opacity-0 blur-xl transition duration-500 group-hover:opacity-100" />
             {logoUrl ? (
-              <img src={logoUrl} alt="CashlySweeps logo" className="h-10 w-10 rounded-xl object-cover ring-1 ring-[#EDC537]/50 shadow-[0_0_24px_rgba(237,197,55,0.35)] transition-transform duration-300 group-hover:scale-105" />
+              <img src={logoUrl} alt="SWEEPSTOWN logo" className="h-10 w-10 rounded-xl object-cover ring-1 ring-[#EDC537]/50 shadow-[0_0_24px_rgba(237,197,55,0.35)] transition-transform duration-300 group-hover:scale-105" />
             ) : (
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#990808] to-[#EDC537] text-sm font-black shadow-[0_0_24px_rgba(237,197,55,0.35)]">CS</span>
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#990808] to-[#EDC537] text-sm font-black shadow-[0_0_24px_rgba(237,197,55,0.35)]">ST</span>
             )}
-            <span className="inline-block transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-105">CashlySweeps</span>
+            <span className="inline-block transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-105">SWEEPSTOWN</span>
           </Link>
 
           <nav className="hidden items-center gap-2 lg:flex">

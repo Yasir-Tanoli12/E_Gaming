@@ -10,10 +10,7 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  if (
-    (pathname === "/login" || pathname === "/register" || pathname === "/verify-email") &&
-    hasAccessCookie
-  ) {
+  if (pathname === "/login" && hasAccessCookie) {
     const dashboardUrl = request.nextUrl.clone();
     dashboardUrl.pathname = "/admin/dashboard";
     return NextResponse.redirect(dashboardUrl);
@@ -30,6 +27,19 @@ export function middleware(request: NextRequest) {
   };
 
   const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+  const connectSrcParts = new Set<string>(["'self'", apiUrl]);
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  if (supabaseUrl) {
+    try {
+      const u = new URL(supabaseUrl);
+      connectSrcParts.add(`${u.protocol}//${u.host}`);
+      if (u.protocol === "https:") {
+        connectSrcParts.add(`wss://${u.host}`);
+      }
+    } catch {
+      /* ignore invalid URL */
+    }
+  }
   const cspDirectives = [
     "default-src 'self'",
     "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
@@ -37,7 +47,7 @@ export function middleware(request: NextRequest) {
     "img-src 'self' data: blob: https: http:",
     "media-src 'self' data: blob: https: http:",
     "font-src 'self' data:",
-    `connect-src 'self' ${apiUrl}`,
+    `connect-src ${Array.from(connectSrcParts).join(" ")}`,
     "frame-ancestors 'none'",
     "base-uri 'self'",
     "form-action 'self'",

@@ -54,6 +54,10 @@ export class HttpExceptionFilter implements ExceptionFilter {
       } else {
         message = String(exceptionResponse);
       }
+      if (isProd && status === HttpStatus.INTERNAL_SERVER_ERROR) {
+        message = 'An error occurred. Please try again later.';
+        error = 'Internal Server Error';
+      }
     } else if (this.isDatabaseUnavailableError(exception)) {
       status = HttpStatus.SERVICE_UNAVAILABLE;
       error = 'Service Unavailable';

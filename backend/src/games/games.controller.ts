@@ -17,15 +17,14 @@ import { GamesService } from './games.service';
 import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { SetTopGamesDto } from './dto/set-top-games.dto';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { RolesGuard } from '../auth/roles.guard';
-import { Roles } from '../auth/roles.decorator';
 import { Public } from '../auth/public.decorator';
-import { UserRole } from '@prisma/client';
+import { AdminAuthGuard } from '../admin/admin-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
+import type { Request } from 'express';
+import { getPublicApiOrigin } from '../common/get-public-api-origin';
 
 @Controller('games')
 export class GamesController {
@@ -45,29 +44,25 @@ export class GamesController {
     return this.gamesService.findTopGames();
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Post('top-selection')
   setTopSelection(@Body() dto: SetTopGamesDto) {
     return this.gamesService.setTopGames(dto.ids ?? []);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Get('admin')
   findAllAdmin() {
     return this.gamesService.findAllAdmin();
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.gamesService.findOne(id);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Post('upload-media')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -101,33 +96,30 @@ export class GamesController {
   )
   uploadMedia(
     @UploadedFile() file: { filename: string } | undefined,
-    @Req() req: { protocol: string; get(name: string): string | undefined },
+    @Req() req: Request,
   ) {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
-    const host = req.get('host') ?? 'localhost:3001';
+    const origin = getPublicApiOrigin(req);
     return {
-      url: `${req.protocol}://${host}/uploads/games/${file.filename}`,
+      url: `${origin}/uploads/games/${file.filename}`,
     };
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Post()
   create(@Body() createGameDto: CreateGameDto) {
     return this.gamesService.create(createGameDto);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateGameDto: UpdateGameDto) {
     return this.gamesService.update(id, updateGameDto);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.gamesService.remove(id);

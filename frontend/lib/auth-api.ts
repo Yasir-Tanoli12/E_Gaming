@@ -1,57 +1,28 @@
 import { apiRequest } from "./api";
-import type {
-  AuthTokens,
-  RegisterInput,
-  RegisterResponse,
-  LoginInput,
-  LoginResponse,
-  VerifyCodeInput,
-  ResetPasswordInput,
-  User,
-} from "./types/auth";
+import type { AuthTokens, User } from "./types/auth";
 
 const AUTH = "/auth";
+const ADMIN = "/admin";
 
 export const authApi = {
-  register(body: RegisterInput) {
-    return apiRequest<RegisterResponse>(`${AUTH}/register`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    });
-  },
-
-  verifyEmail(body: VerifyCodeInput) {
-    return apiRequest<AuthTokens>(`${AUTH}/verify-email`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    });
-  },
-
-  login(body: LoginInput) {
-    return apiRequest<LoginResponse>(`${AUTH}/login`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    });
-  },
-
-  verifyLogin(body: VerifyCodeInput) {
-    return apiRequest<AuthTokens>(`${AUTH}/verify-login`, {
-      method: "POST",
-      body: JSON.stringify(body),
-    });
-  },
-
-  requestPasswordReset(email: string) {
-    return apiRequest<{ message: string }>(`${AUTH}/request-password-reset`, {
+  requestAdminOtp(email: string) {
+    return apiRequest<{ message: string }>(`${ADMIN}/request-otp`, {
       method: "POST",
       body: JSON.stringify({ email }),
     });
   },
 
-  resetPassword(body: ResetPasswordInput) {
-    return apiRequest<{ message: string }>(`${AUTH}/reset-password`, {
+  verifyAdminOtp(body: { email: string; otp: string }) {
+    return apiRequest<AuthTokens>(`${ADMIN}/verify-otp`, {
       method: "POST",
       body: JSON.stringify(body),
+    });
+  },
+
+  promoteAdmin(email: string) {
+    return apiRequest<{ message: string; email: string }>(`${ADMIN}/promote`, {
+      method: "POST",
+      body: JSON.stringify({ email }),
     });
   },
 

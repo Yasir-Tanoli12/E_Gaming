@@ -57,19 +57,19 @@ export default function BlogsPage() {
             {logoUrl ? (
               <img
                 src={logoUrl}
-                alt="CashlySweeps logo"
+                alt="SWEEPSTOWN logo"
                 className="h-12 w-12 rounded-xl object-cover ring-1 ring-[#EDC537]/50 shadow-[0_0_24px_rgba(237,197,55,0.35)]"
               />
             ) : (
               <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#990808] to-[#EDC537] text-sm font-black text-white shadow-[0_0_24px_rgba(237,197,55,0.35)]">
-                CS
+                ST
               </span>
             )}
             <div>
             <p className="text-xs uppercase tracking-[0.2em] text-[#9a7000]">Neon Editorial</p>
             <h1 className="mt-2 text-4xl font-black text-[#7a0b0b] md:text-5xl">Blogs</h1>
             <p className="mt-2 max-w-2xl text-sm text-[#5b3b18]">
-              Fresh posts, updates, and stories with a glowing CashlySweeps vibe.
+              Fresh posts, updates, and stories with a glowing SWEEPSTOWN vibe.
             </p>
             </div>
           </div>

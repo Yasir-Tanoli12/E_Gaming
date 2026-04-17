@@ -1,7 +1,11 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, UserRole } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 
 const prisma = new PrismaClient();
+
+/** Primary admin — must run `npm run prisma:seed` (or migrate + seed) so this row exists. */
+const BOOTSTRAP_ADMIN_EMAIL = 'moeedabdul261@gmail.com';
 
 const SAMPLE_GAMES = [
   {
@@ -42,36 +46,42 @@ const SAMPLE_GAMES = [
 ];
 
 async function main() {
-  // Create admin user
-  const adminEmail = process.env.ADMIN_EMAIL ?? 'admin@cashlysweeps.com';
-  const adminPassword = process.env.ADMIN_PASSWORD ?? 'Admin@123';
+  const adminEmail = BOOTSTRAP_ADMIN_EMAIL.toLowerCase();
+
+  await prisma.admin.upsert({
+    where: { email: adminEmail },
+    create: { email: adminEmail },
+    update: {},
+  });
+  console.log('Admin allowlist entry:', adminEmail);
 
   const existingUser = await prisma.user.findUnique({
     where: { email: adminEmail },
   });
 
   if (!existingUser) {
-    const passwordHash = await bcrypt.hash(adminPassword, 12);
+    const passwordHash = await bcrypt.hash(crypto.randomUUID() + crypto.randomUUID(), 12);
     await prisma.user.create({
       data: {
         email: adminEmail,
         passwordHash,
         name: 'Admin',
-        role: 'ADMIN',
+        role: UserRole.ADMIN,
         emailVerified: true,
       },
     });
-    console.log('Created admin user:', adminEmail);
-    console.log('Default password:', adminPassword);
+    console.log('Created admin user for OTP sign-in:', adminEmail);
   } else {
     await prisma.user.update({
       where: { email: adminEmail },
-      data: { emailVerified: true },
+      data: {
+        role: UserRole.ADMIN,
+        emailVerified: true,
+      },
     });
-    console.log('Admin user already exists:', adminEmail);
+    console.log('Admin user already exists, ensured ADMIN role:', adminEmail);
   }
 
-  // Create sample games if none exist
   const gameCount = await prisma.game.count();
   if (gameCount === 0) {
     await prisma.game.createMany({

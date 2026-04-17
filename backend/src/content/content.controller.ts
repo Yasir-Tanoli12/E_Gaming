@@ -14,14 +14,11 @@ import {
   UseInterceptors,
   UseGuards,
 } from '@nestjs/common';
-import { UserRole } from '@prisma/client';
-import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { Public } from '../auth/public.decorator';
-import { Roles } from '../auth/roles.decorator';
-import { RolesGuard } from '../auth/roles.guard';
+import { AdminAuthGuard } from '../admin/admin-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage, memoryStorage } from 'multer';
-import type { Response } from 'express';
+import type { Request, Response } from 'express';
 import { extname, join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
 import { ContentService } from './content.service';
@@ -35,6 +32,7 @@ import { UpdateContactsDto } from './dto/update-contacts.dto';
 import { UpdateFaqDto } from './dto/update-faq.dto';
 import { UpdatePrivacyPolicyDto } from './dto/update-privacy-policy.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
+import { getPublicApiOrigin } from '../common/get-public-api-origin';
 
 @Controller('content')
 export class ContentController {
@@ -65,15 +63,13 @@ export class ContentController {
     return res.send(document.data);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Get('admin')
   getAdminContent() {
     return this.contentService.getAdminContent();
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Post('logo')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -105,18 +101,17 @@ export class ContentController {
   )
   async uploadLogo(
     @UploadedFile() file: { filename: string } | undefined,
-    @Req() req: { protocol: string; get(name: string): string | undefined },
+    @Req() req: Request,
   ) {
     if (!file) {
       throw new BadRequestException('Only image files are allowed');
     }
-    const host = req.get('host') ?? 'localhost:3001';
-    const logoUrl = `${req.protocol}://${host}/uploads/branding/${file.filename}`;
+    const origin = getPublicApiOrigin(req);
+    const logoUrl = `${origin}/uploads/branding/${file.filename}`;
     return this.contentService.updateLogo(logoUrl);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Post('lobby-video')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -146,88 +141,77 @@ export class ContentController {
   )
   async uploadLobbyVideo(
     @UploadedFile() file: { filename: string } | undefined,
-    @Req() req: { protocol: string; get(name: string): string | undefined },
+    @Req() req: Request,
   ) {
     if (!file) {
       throw new BadRequestException('Only video files (MP4, WebM, OGG) are allowed');
     }
-    const host = req.get('host') ?? 'localhost:3001';
-    const videoUrl = `${req.protocol}://${host}/uploads/lobby/${file.filename}`;
+    const origin = getPublicApiOrigin(req);
+    const videoUrl = `${origin}/uploads/lobby/${file.filename}`;
     return this.contentService.updateLobbyVideo(videoUrl);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Patch('contacts')
   updateContacts(@Body() dto: UpdateContactsDto) {
     return this.contentService.updateContacts(dto);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Post('blogs')
   createBlog(@Body() dto: CreateBlogDto) {
     return this.contentService.createBlog(dto);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Patch('blogs/:id')
   updateBlog(@Param('id') id: string, @Body() dto: UpdateBlogDto) {
     return this.contentService.updateBlog(id, dto);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Delete('blogs/:id')
   removeBlog(@Param('id') id: string) {
     return this.contentService.removeBlog(id);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Post('faqs')
   createFaq(@Body() dto: CreateFaqDto) {
     return this.contentService.createFaq(dto);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Patch('faqs/:id')
   updateFaq(@Param('id') id: string, @Body() dto: UpdateFaqDto) {
     return this.contentService.updateFaq(id, dto);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Delete('faqs/:id')
   removeFaq(@Param('id') id: string) {
     return this.contentService.removeFaq(id);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Post('reviews')
   createReview(@Body() dto: CreateReviewDto) {
     return this.contentService.createReview(dto);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Patch('reviews/:id')
   updateReview(@Param('id') id: string, @Body() dto: UpdateReviewDto) {
     return this.contentService.updateReview(id, dto);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Delete('reviews/:id')
   removeReview(@Param('id') id: string) {
     return this.contentService.removeReview(id);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Post('documents/:key')
   @UseInterceptors(
     FileInterceptor('file', {
@@ -251,15 +235,13 @@ export class ContentController {
     return this.contentService.upsertPolicyDocument(key, file);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Patch('age-warning')
   updateAgeWarning(@Body() dto: UpdateAgeWarningDto) {
     return this.contentService.updateAgeWarning(dto);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Patch('about-us')
   updateAboutUs(
     @Body() dto: UpdateAboutUsDto,
@@ -268,8 +250,7 @@ export class ContentController {
     return this.contentService.updateAboutUs(dto, req.user?.email);
   }
 
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
+  @UseGuards(AdminAuthGuard)
   @Patch('privacy-policy')
   updatePrivacyPolicy(
     @Body() dto: UpdatePrivacyPolicyDto,

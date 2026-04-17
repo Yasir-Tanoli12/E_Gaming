@@ -13,6 +13,8 @@ import { UsersModule } from './users/users.module';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
 import { NewsModule } from './news/news.module';
 import { ContentModule } from './content/content.module';
+import { AdminModule } from './admin/admin.module';
+import { SupabaseModule } from './supabase/supabase.module';
 
 @Module({
   imports: [
@@ -25,13 +27,15 @@ import { ContentModule } from './content/content.module';
       ttl: 60 * 1000,
       max: 100,
     }),
-    ThrottlerModule.forRoot([{ ttl: 60000, limit: 100 }]),
+    ThrottlerModule.forRoot([{ ttl: 60000, limit: 120 }]),
     PrismaModule,
     AuthModule,
     GamesModule,
     UsersModule,
     NewsModule,
     ContentModule,
+    AdminModule,
+    SupabaseModule,
   ],
   controllers: [AppController],
   providers: [

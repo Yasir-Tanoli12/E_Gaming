@@ -28,7 +28,7 @@ export class ContentService {
   private static readonly ABOUT_US_BLOG_ID = 'about-us-page';
   private static readonly AGE_WARNING_BLOG_ID = 'age-warning-config';
   private static readonly ABOUT_US_DEFAULT_CONTENT =
-    'CashlySweeps is built to provide a fast, immersive, and responsible online gaming experience with secure access, live updates, and responsive support for all players.';
+    'SWEEPSTOWN is built to provide a fast, immersive, and responsible online gaming experience with secure access, live updates, and responsive support for all players.';
   private static readonly AGE_WARNING_DEFAULT = {
     title: '18+ Content Notice',
     message:
@@ -539,7 +539,7 @@ export class ContentService {
       where: { id: ContentService.ABOUT_US_BLOG_ID },
       update: {
         title: 'About Us',
-        excerpt: 'About CashlySweeps',
+        excerpt: 'About SWEEPSTOWN',
         content: clean,
       },
       create: {

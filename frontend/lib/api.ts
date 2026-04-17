@@ -69,7 +69,8 @@ function getErrorMessage(payload: unknown, fallback: string): string {
 
 function dispatchAuthExpired(path: string) {
   if (typeof window === "undefined") return;
-  if (path.startsWith("/auth/login") || path.startsWith("/auth/register")) return;
+  if (path.startsWith("/auth/login")) return;
+  if (path.startsWith("/admin/verify-otp")) return;
   window.dispatchEvent(new CustomEvent(AUTH_EXPIRED_EVENT));
 }
 

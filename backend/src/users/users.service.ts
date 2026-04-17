@@ -34,21 +34,39 @@ export class UsersService {
     }
     const targetUser = await this.prisma.user.findUniqueOrThrow({
       where: { id: userId },
-      select: { role: true, id: true },
+      select: { role: true, id: true, email: true },
     });
     if (targetUser.id === currentUserId && newRole === UserRole.USER) {
       throw new ForbiddenException('You cannot demote yourself');
     }
-    return this.prisma.user.update({
-      where: { id: userId },
-      data: { role: newRole },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        updatedAt: true,
-      },
+
+    const emailLower = targetUser.email.trim().toLowerCase();
+
+    return this.prisma.$transaction(async (tx) => {
+      const updated = await tx.user.update({
+        where: { id: userId },
+        data: { role: newRole },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          role: true,
+          updatedAt: true,
+        },
+      });
+
+      if (newRole === UserRole.USER) {
+        await tx.admin.deleteMany({ where: { email: emailLower } });
+        await tx.adminOTP.deleteMany({ where: { email: emailLower } });
+      } else if (newRole === UserRole.ADMIN) {
+        await tx.admin.upsert({
+          where: { email: emailLower },
+          create: { email: emailLower },
+          update: {},
+        });
+      }
+
+      return updated;
     });
   }
 
