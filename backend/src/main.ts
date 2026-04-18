@@ -9,23 +9,6 @@ import { join } from 'path';
 import * as express from 'express';
 import { ConfigService } from '@nestjs/config';
 
-function getCorsOriginOption():
-  | boolean
-  | string
-  | RegExp
-  | (string | RegExp)[]
-  | undefined {
-  const raw = process.env.CORS_ORIGINS?.trim();
-  if (raw) {
-    const list = raw
-      .split(',')
-      .map((s) => s.trim())
-      .filter(Boolean);
-    return list.length === 1 ? list[0] : list;
-  }
-  return process.env.FRONTEND_URL ?? 'http://localhost:3000';
-}
-
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     bufferLogs: true,
@@ -62,15 +45,15 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: getCorsOriginOption(),
-    credentials: true,
+    origin: '*', // we will tighten later
   });
 
   app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
 
-  const port = config.get<number>('PORT') ?? 3001;
-  await app.listen(port);
+  await app.listen(process.env.PORT || 3001);
   const logger = new Logger('Bootstrap');
-  logger.log(`Listening on port ${port} (NODE_ENV=${nodeEnv ?? 'undefined'})`);
+  logger.log(
+    `Listening on port ${process.env.PORT || 3001} (NODE_ENV=${nodeEnv ?? 'undefined'})`,
+  );
 }
 bootstrap();
