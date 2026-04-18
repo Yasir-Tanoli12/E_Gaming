@@ -1,0 +1,82 @@
+{
+  "contacts": {
+    "facebook": "https://web.facebook.com/?_rdc=1&_rdr#",
+    "whatsapp": "https://www.whatsapp.com/",
+    "instagram": "",
+    "email": ""
+  },
+  "blogs": [
+    {
+      "id": "589787e3-df8a-4459-89b5-69ee1e74d98a",
+      "title": "The Power of Going Alone",
+      "excerpt": "Dr. Amelia Cruz",
+      "content": "Solo travel forces you to rely on yourself. When Liam missed his train to Porto, there was no one to blame and no one to fix it. Instead of panicking, he explored the small coastal town he was stranded in — and found it to be the highlight of his trip.",
+      "imageUrl": "http://localhost:3001/uploads/games/1771694895850-511332372.jfif",
+      "createdAt": "2026-02-21T17:28:18.738Z",
+      "updatedAt": "2026-02-21T17:28:18.738Z"
+    },
+    {
+      "id": "637926cb-4c1f-4b4b-a944-bbeca909cc2c",
+      "title": "Chasing Sunsets: A Solo Travel Story",
+      "excerpt": "By Sophia Bennett",
+      "content": "When Liam Turner booked a one-way ticket to Lisbon, his friends thought he was reckless.\n\nFresh out of college and unsure about his career, Liam felt stuck. “I wasn’t lost,” he later said. “I was just comfortable being uncomfortable.”\n\nThat trip changed everything.",
+      "imageUrl": "http://localhost:3001/uploads/games/1771694574909-67185017.jpg",
+      "createdAt": "2026-02-21T17:23:36.042Z",
+      "updatedAt": "2026-02-21T17:23:36.042Z"
+    },
+    {
+      "id": "56722ac2-8ac5-416d-b740-3607b0b8307d",
+      "title": "The Turning Point",
+      "excerpt": "By Emily Forkrt",
+      "content": "For Emily, the breakthrough came when she adopted a simple rule I call the 90-Minute Focus Block:\n\nTurn off all notifications\n\nSet a 90-minute timer\n\nWork on only one clearly defined task\n\nTake a 20-minute break afterward\n\nWithin two weeks, Emily reported a 40% increase in completed projects.",
+      "createdAt": "2026-02-21T17:17:20.818Z",
+      "updatedAt": "2026-02-21T17:17:20.818Z"
+    },
+    {
+      "id": "8cdd39b3-6595-474a-88c2-62e16e018381",
+      "title": "Finding Focus in a Noisy World",
+      "excerpt": "By Daniel Harper",
+      "content": "Last year, when Emily Carter, a freelance designer from Portland, reached out to me, she was overwhelmed. She described her days as “busy but unproductive.” Despite working 10-hour days, she felt she had nothing meaningful to show for it.\n\nEmily’s story isn’t unique.\n\nIn fact, according to workplace consultant Dr. Marcus Lee, distraction is now the biggest barrier to deep work. “We’re not short on time,” he explains. “We’re short on attention.”",
+      "createdAt": "2026-02-21T17:16:32.819Z",
+      "updatedAt": "2026-02-21T17:16:32.819Z"
+    },
+    {
+      "id": "66cebf6d-67e8-4acd-9e69-080be4f74666",
+      "title": "HI",
+      "excerpt": "hi",
+      "content": "hellcghdfjksdgfgskd",
+      "createdAt": "2026-02-21T16:37:29.190Z",
+      "updatedAt": "2026-02-21T16:37:29.190Z"
+    }
+  ],
+  "faqs": [
+    {
+      "id": "0976e316-b445-43a5-8fdb-013513661427",
+      "question": "How long does shipping take?",
+      "answer": "Standard shipping takes 3-5 business days. Expedited shipping options are available at checkout.",
+      "createdAt": "2026-02-21T17:14:48.916Z",
+      "updatedAt": "2026-02-21T17:14:48.916Z"
+    },
+    {
+      "id": "e18e3baf-0f1f-42f4-90aa-a07985f9188b",
+      "question": "What are your shipping rates?",
+      "answer": "We offer free standard shipping on all orders over \n. Orders under \n have a flat shipping rate of",
+      "createdAt": "2026-02-21T17:14:29.587Z",
+      "updatedAt": "2026-02-21T17:14:29.587Z"
+    },
+    {
+      "id": "fd04cd95-c3d3-4864-9c8f-5ba4ccd74a40",
+      "question": "How can I update my billing information?",
+      "answer": "Go to \"My Account\" > \"Payment Methods\" to edit or update your details.",
+      "createdAt": "2026-02-21T17:14:03.682Z",
+      "updatedAt": "2026-02-21T17:14:03.682Z"
+    },
+    {
+      "id": "1f91f9e7-b934-4d25-be40-e4a5dcc81af7",
+      "question": "Do I need to create an account to make a purchase?",
+      "answer": "No, you can check out as a guest, but creating an account allows for faster checkout and order tracking.",
+      "createdAt": "2026-02-21T17:13:24.171Z",
+      "updatedAt": "2026-02-21T17:13:24.171Z"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Environment — never commit secrets (keep *.env.example in repo)
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env
+
+# Builds & caches
+dist/
+build/
+.next/
+out/
+.turbo/
+*.tsbuildinfo
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-error.log*
+
+# IDE / tooling
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Tests
+coverage/
+
+# Uploads (local dev artifacts; do not ship user uploads)
+backend/uploads/

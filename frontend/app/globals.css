@@ -1,8 +1,23 @@
-@import "tailwindcss";
+/* File path avoids Turbopack resolving bare "tailwindcss" from the repo root (E_Gaming/) */
+@import "../node_modules/tailwindcss/index.css";
 
+/* Manual dark mode for /admin and /login (wrap root with class `dark`) */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* Bright theme: cream backgrounds, red #990808, yellow #EDC537 */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #FFFBF5;
+  --foreground: #1a1a1a;
+  --color-primary: #990808;
+  --color-primary-light: #c41e1e;
+  --color-accent: #EDC537;
+  --color-accent-muted: #f5d76e;
+  --color-secondary: #7DD3FC;
+  --color-orange: #E85D04;
+  --color-bg-bright: #FFFBF5;
+  --color-bg-card: #ffffff;
+  --color-text-on-dark: #1a0a0a;
+  --color-text-on-yellow: #1a0a0a;
 }
 
 @theme inline {
@@ -12,15 +27,377 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-18px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float 8s ease-in-out infinite;
+  animation-delay: 1.2s;
+}
+
+@keyframes orbit {
+  0% {
+    transform: translateX(-20px) translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateX(25px) translateY(-15px) scale(1.1);
+  }
+  100% {
+    transform: translateX(-20px) translateY(0px) scale(1);
+  }
+}
+
+@keyframes orbit-reverse {
+  0% {
+    transform: translateX(20px) translateY(0px) scale(1);
+  }
+  50% {
+    transform: translateX(-25px) translateY(15px) scale(1.08);
+  }
+  100% {
+    transform: translateX(20px) translateY(0px) scale(1);
+  }
+}
+
+.animate-orbit {
+  animation: orbit 10s ease-in-out infinite;
+}
+
+.animate-orbit-reverse {
+  animation: orbit-reverse 12s ease-in-out infinite;
+}
+
+@keyframes qa-marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.qa-marquee-container {
+  overflow: hidden;
+}
+
+.qa-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: qa-marquee 35s linear infinite;
+}
+
+.qa-marquee-container:hover .qa-marquee-track {
+  animation-play-state: paused;
+}
+
+.qa-marquee-shell {
+  position: relative;
+  overflow: hidden;
+  border-radius: 1rem;
+  padding: 0.9rem 0;
+  background:
+    radial-gradient(circle at 15% 20%, rgb(153 8 8 / 0.12), transparent 42%),
+    radial-gradient(circle at 85% 80%, rgb(237 197 55 / 0.25), transparent 40%),
+    linear-gradient(120deg, #ffffff, #FFF8E7 50%, #ffffff);
+  box-shadow:
+    inset 0 0 0 1px rgb(237 197 55 / 0.35),
+    0 8px 32px rgb(237 197 55 / 0.2),
+    0 0 40px rgb(153 8 8 / 0.08);
+}
+
+.qa-marquee-glow {
+  position: absolute;
+  inset: -30% -10%;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 20% 30%, rgb(153 8 8 / 0.08), transparent 38%),
+    radial-gradient(circle at 80% 60%, rgb(237 197 55 / 0.2), transparent 36%);
+}
+
+.qa-marquee-card {
+  width: min(360px, 86vw);
+  flex-shrink: 0;
+  margin-right: 14px;
+  border-radius: 1rem;
+  background:
+    linear-gradient(130deg, #ffffff, #FFFDF5),
+    linear-gradient(90deg, rgb(153 8 8 / 0.06), rgb(237 197 55 / 0.15));
+  box-shadow:
+    inset 0 0 0 1px rgb(237 197 55 / 0.4),
+    0 10px 24px rgb(0 0 0 / 0.06),
+    0 0 20px rgb(237 197 55 / 0.12);
+  padding: 1rem 1.1rem;
+  backdrop-filter: blur(6px);
+}
+
+@keyframes radiant-drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(0, -18px, 0) scale(1.06);
+  }
+}
+
+.blog-radiant-page {
+  position: relative;
+  background:
+    radial-gradient(circle at 12% 15%, rgb(153 8 8 / 0.08), transparent 34%),
+    radial-gradient(circle at 86% 20%, rgb(237 197 55 / 0.2), transparent 32%),
+    linear-gradient(120deg, #FFFBF5, #FFF8E7 55%, #FFFBF5);
+}
+
+.blog-radiant-orb {
+  position: absolute;
+  width: 30rem;
+  height: 30rem;
+  border-radius: 9999px;
+  filter: blur(90px);
+  pointer-events: none;
+  animation: radiant-drift 9s ease-in-out infinite;
+}
+
+.blog-radiant-orb-left {
+  left: -9rem;
+  top: 2rem;
+  background: rgb(153 8 8 / 0.1);
+}
+
+.blog-radiant-orb-right {
+  right: -10rem;
+  top: 8rem;
+  background: rgb(237 197 55 / 0.18);
+  animation-delay: 1.2s;
+}
+
+.blog-feature-card {
+  position: relative;
+  border-radius: 1.25rem;
+  padding: 1rem;
+  background:
+    linear-gradient(145deg, #ffffff, #FFFDF5);
+  box-shadow:
+    inset 0 0 0 1px rgb(237 197 55 / 0.35),
+    0 8px 24px rgb(0 0 0 / 0.06),
+    0 0 30px rgb(237 197 55 / 0.1);
+  transition: transform 280ms ease, box-shadow 280ms ease;
+}
+
+.blog-feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow:
+    inset 0 0 0 1px rgb(237 197 55 / 0.5),
+    0 16px 36px rgb(0 0 0 / 0.08),
+    0 0 40px rgb(237 197 55 / 0.18);
+}
+
+.blog-feature-image {
+  transition: transform 460ms ease;
+}
+
+.blog-feature-card:hover .blog-feature-image {
+  transform: scale(1.05);
+}
+
+.blog-side-card,
+.blog-grid-card {
+  border-radius: 1rem;
+  padding: 0.85rem;
+  background:
+    linear-gradient(140deg, #ffffff, #FFFDF5);
+  box-shadow:
+    inset 0 0 0 1px rgb(237 197 55 / 0.25),
+    0 8px 20px rgb(0 0 0 / 0.05);
+  transition: transform 250ms ease, box-shadow 250ms ease, background 250ms ease;
+}
+
+.blog-side-card:hover,
+.blog-grid-card:hover {
+  transform: translateY(-4px);
+  background:
+    linear-gradient(140deg, #FFFDF5, #FFF8E7);
+  box-shadow:
+    inset 0 0 0 1px rgb(237 197 55 / 0.4),
+    0 14px 28px rgb(0 0 0 / 0.08),
+    0 0 24px rgb(237 197 55 / 0.12);
+}
+
+.blog-thumb-image {
+  transition: transform 360ms ease, filter 360ms ease;
+}
+
+.blog-side-card:hover .blog-thumb-image,
+.blog-grid-card:hover .blog-thumb-image {
+  transform: scale(1.07);
+  filter: saturate(1.15);
+}
+
+.about-radiant-page {
+  position: relative;
+  background:
+    radial-gradient(circle at 8% 12%, rgb(153 8 8 / 0.08), transparent 32%),
+    radial-gradient(circle at 86% 24%, rgb(237 197 55 / 0.2), transparent 33%),
+    linear-gradient(130deg, #FFFBF5, #FFF8E7 54%, #FFFBF5);
+}
+
+.about-radiant-orb {
+  position: absolute;
+  width: 28rem;
+  height: 28rem;
+  border-radius: 9999px;
+  filter: blur(88px);
+  pointer-events: none;
+  animation: radiant-drift 10s ease-in-out infinite;
+}
+
+.about-radiant-orb-left {
+  left: -8rem;
+  top: 4rem;
+  background: rgb(153 8 8 / 0.1);
+}
+
+.about-radiant-orb-right {
+  right: -10rem;
+  top: 12rem;
+  background: rgb(237 197 55 / 0.18);
+  animation-delay: 1.4s;
+}
+
+.about-content-card {
+  border-radius: 1.1rem;
+  padding: 1.2rem 1.1rem;
+  background:
+    linear-gradient(145deg, #ffffff, #FFFDF5);
+  box-shadow:
+    inset 0 0 0 1px rgb(237 197 55 / 0.3),
+    0 10px 24px rgb(0 0 0 / 0.05),
+    0 0 24px rgb(237 197 55 / 0.1);
+  transition:
+    opacity 540ms ease,
+    transform 540ms ease,
+    box-shadow 320ms ease;
+}
+
+.about-content-card:hover {
+  box-shadow:
+    inset 0 0 0 1px rgb(237 197 55 / 0.45),
+    0 16px 30px rgb(0 0 0 / 0.07),
+    0 0 32px rgb(237 197 55 / 0.15);
+}
+
+.about-content-card-hidden {
+  opacity: 0;
+  transform: translateY(26px) scale(0.98);
+}
+
+.about-content-card-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.about-credits-shell {
+  position: relative;
+  overflow: hidden;
+  min-height: 70vh;
+  max-height: 78vh;
+  perspective: 700px;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgb(0 0 0 / 1) 15%,
+    rgb(0 0 0 / 1) 85%,
+    transparent 100%
+  );
+}
+
+@keyframes about-credits-up {
+  0% {
+    transform: translateY(-25%);
+  }
+  100% {
+    transform: translateY(-75%);
+  }
+}
+
+.about-credits-track {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transform-origin: center bottom;
+  animation: about-credits-up 10s linear infinite;
+  padding: 0 1rem;
+  gap: 2.8rem;
+  will-change: transform;
+}
+
+.about-credits-card {
+  width: min(860px, 100%);
+  padding: 1.6rem 1.2rem;
+  border-radius: 1rem;
+  background:
+    linear-gradient(145deg, #ffffff, #FFFDF5);
+  box-shadow:
+    inset 0 0 0 1px rgb(237 197 55 / 0.3),
+    0 8px 24px rgb(0 0 0 / 0.06);
+}
+
+/*
+ * Auth card: high-contrast form colors for light/cream cards.
+ * Do not use .auth-card on dark admin panels — these rules beat single-class
+ * Tailwind utilities (e.g. text-zinc-300) and will make labels look “invisible”.
+ */
+.auth-card label {
+  color: #1a1a1a;
+}
+.auth-card input {
+  background: #ffffff;
+  border-color: rgb(237 197 55 / 0.5);
+  color: #1a1a1a;
+}
+.auth-card input::placeholder {
+  color: rgb(100 80 60);
+}
+.auth-card input:focus {
+  border-color: rgb(237 197 55);
 }

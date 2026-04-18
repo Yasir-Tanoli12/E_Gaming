@@ -1,0 +1,208 @@
+// SWEEPSTOWN Database Schema
+// https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  // Supabase: use direct DB for migrate/introspect; pooler URL alone can hang on migrate deploy
+  directUrl = env("DIRECT_URL")
+}
+
+// User model - stores auth and contact info for admin
+model User {
+  id                   String    @id @default(cuid())
+  email                String    @unique
+  phone                String?   // Optional phone for admin contact
+  passwordHash         String    @map("password_hash")
+  name                 String?   // Optional display name
+  role                 UserRole  @default(USER)
+  isActive             Boolean   @default(true) @map("is_active")
+  emailVerified        Boolean   @default(false) @map("email_verified")
+  failedLoginAttempts  Int       @default(0) @map("failed_login_attempts")
+  lockedUntil          DateTime? @map("locked_until")
+  createdAt            DateTime  @default(now()) @map("created_at")
+  updatedAt            DateTime  @updatedAt @map("updated_at")
+  lastLoginAt          DateTime? @map("last_login_at")
+
+  authLogs         AuthLog[]
+  verificationCodes VerificationCode[]
+  refreshTokens    RefreshToken[]
+}
+
+model NewsPoster {
+  id        String   @id @default(cuid())
+  title     String?
+  imageUrl  String   @map("image_url")
+  linkUrl   String?  @map("link_url")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([isActive])
+}
+
+model Contact {
+  id             String   @id @default("default")
+  facebook       String   @default("")
+  whatsapp       String   @default("")
+  instagram      String   @default("")
+  email          String   @default("")
+  logoUrl        String?  @map("logo_url")
+  lobbyVideoUrl  String?  @map("lobby_video_url")
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+}
+
+model Blog {
+  id        String   @id @default(cuid())
+  title     String
+  excerpt   String?
+  content   String?  @db.Text
+  imageUrl  String?  @map("image_url")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([createdAt(sort: Desc)])
+}
+
+model Faq {
+  id        String   @id @default(cuid())
+  question  String
+  answer    String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([createdAt(sort: Desc)])
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  reviewer   String
+  message    String   @db.Text
+  rating     Int      @default(5)
+  isFeatured Boolean  @default(true) @map("is_featured")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@index([isFeatured, createdAt(sort: Desc)])
+}
+
+model PrivacyPolicy {
+  id        String   @id @default("default")
+  content   String   @db.Text
+  privacyPolicyPdfUrl      String? @map("privacy_policy_pdf_url")
+  socialResponsibilityPdfUrl String? @map("social_responsibility_pdf_url")
+  updatedBy String?  @map("updated_by")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
+
+model PolicyDocument {
+  id        String            @id @default(cuid())
+  key       PolicyDocumentKey @unique
+  fileName  String            @map("file_name")
+  mimeType  String            @map("mime_type")
+  data      Bytes
+  createdAt DateTime          @default(now()) @map("created_at")
+  updatedAt DateTime          @updatedAt @map("updated_at")
+}
+
+// Email verification codes (signup, login 2FA, password reset)
+model VerificationCode {
+  id        String   @id @default(cuid())
+  userId    String?  @map("user_id")
+  email     String
+  code      String
+  type      VerificationCodeType
+  expiresAt DateTime @map("expires_at")
+  usedAt    DateTime? @map("used_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum VerificationCodeType {
+  EMAIL_VERIFY
+  LOGIN_OTP
+  PASSWORD_RESET
+}
+
+// Refresh tokens for secure token rotation
+model RefreshToken {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  tokenHash String   @map("token_hash")
+  expiresAt DateTime @map("expires_at")
+  revokedAt DateTime? @map("revoked_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+// Tracks signup and signin events for admin dashboard
+model AuthLog {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  action    AuthAction
+  ipAddress String?  @map("ip_address")
+  userAgent String?  @map("user_agent")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+enum AuthAction {
+  SIGNUP
+  SIGNIN
+}
+
+enum PolicyDocumentKey {
+  PRIVACY_POLICY
+  SOCIAL_RESPONSIBILITY
+}
+
+// Emails allowed to use admin OTP sign-in (bootstrap + POST /admin/promote).
+model Admin {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+// Single admin OTP login: `otp` stores bcrypt hash of the 6-digit code (never plaintext).
+model AdminOTP {
+  id        String   @id @default(uuid())
+  email     String
+  otp       String
+  expiresAt DateTime
+  attempts  Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([email])
+}
+
+// Games displayed on landing page
+model Game {
+  id           String   @id @default(cuid())
+  title        String
+  description  String?  @db.Text
+  thumbnailUrl String?  @map("thumbnail_url")
+  videoUrl     String?  @map("video_url")
+  gameLink     String   @map("game_link")
+  isTopGame    Boolean  @default(false) @map("is_top_game")
+  sortOrder    Int      @default(0) @map("sort_order")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@index([isActive, sortOrder])
+  @@index([isActive, id])
+}
