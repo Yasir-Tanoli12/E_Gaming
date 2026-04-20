@@ -5,6 +5,26 @@ const LOCAL_DEV_API_URL = "http://localhost:3001";
 function resolveApiBaseUrl(): string {
   const configured = process.env.NEXT_PUBLIC_API_URL?.trim();
   if (configured) {
+    let parsed: URL;
+    try {
+      parsed = new URL(configured);
+    } catch {
+      throw new Error(
+        "Invalid NEXT_PUBLIC_API_URL. Set a full URL like https://api.yourdomain.com and rebuild."
+      );
+    }
+
+    if (
+      process.env.NODE_ENV === "production" &&
+      (parsed.hostname === "localhost" ||
+        parsed.hostname === "127.0.0.1" ||
+        parsed.hostname === "::1")
+    ) {
+      throw new Error(
+        `Invalid NEXT_PUBLIC_API_URL for production: ${configured}. Do not use localhost in deployed frontend builds.`
+      );
+    }
+
     return configured.replace(/\/+$/, "");
   }
 
