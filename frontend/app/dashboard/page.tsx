@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { gamesApi, type Game } from "@/lib/games-api";
 import { newsApi, type NewsPoster } from "@/lib/news-api";
@@ -27,15 +27,17 @@ export default function UserDashboardPage() {
     async function load() {
       try {
         // Load content first so the first 18+ popup already uses admin text.
-        const publicContent = await contentApi.getPublic();
+        const publicContent = await contentApi.getPublicCached();
         setContent(publicContent);
         setAgeWarningReady(true);
         setShowAgeWarning(true);
 
-        // Keep the rest sequential to avoid saturating low DB pool limits.
-        const data = await gamesApi.list();
-        const top = await gamesApi.listTop();
-        const poster = await newsApi.current();
+        // Fetch independent dashboard resources in parallel for faster first interactive state.
+        const [data, top, poster] = await Promise.all([
+          gamesApi.list(),
+          gamesApi.listTop(),
+          newsApi.current(),
+        ]);
         setGames(data);
         setTopGames(top);
         setNewsPoster(poster);
@@ -55,13 +57,17 @@ export default function UserDashboardPage() {
     load();
   }, []);
 
-  const topIds = new Set(topGames.map((g) => g.id));
-  const orderedGames = [...games].sort((a, b) => {
-    const aTop = topIds.has(a.id) ? 1 : 0;
-    const bTop = topIds.has(b.id) ? 1 : 0;
-    if (aTop !== bTop) return bTop - aTop;
-    return (a.sortOrder ?? 0) - (b.sortOrder ?? 0);
-  });
+  const topIds = useMemo(() => new Set(topGames.map((g) => g.id)), [topGames]);
+  const orderedGames = useMemo(
+    () =>
+      [...games].sort((a, b) => {
+        const aTop = topIds.has(a.id) ? 1 : 0;
+        const bTop = topIds.has(b.id) ? 1 : 0;
+        if (aTop !== bTop) return bTop - aTop;
+        return (a.sortOrder ?? 0) - (b.sortOrder ?? 0);
+      }),
+    [games, topIds]
+  );
   const contacts = content?.contacts;
   const logoUrl = contacts?.logoUrl ?? "";
   const apiBaseUrl = getApiBaseUrl();
@@ -79,7 +85,10 @@ export default function UserDashboardPage() {
     orderedGames.find((game) => game.videoUrl)?.videoUrl ??
     null;
   const reviewItems = content?.reviews ?? [];
-  const movingReviewItems = reviewItems.length > 0 ? [...reviewItems, ...reviewItems] : [];
+  const movingReviewItems = useMemo(
+    () => (reviewItems.length > 0 ? [...reviewItems, ...reviewItems] : []),
+    [reviewItems]
+  );
   const ageWarning = content?.ageWarning ?? {
     title: "18+ Content Notice",
     message:
@@ -88,6 +97,11 @@ export default function UserDashboardPage() {
     exitButtonLabel: "Exit",
     exitUrl: "https://www.google.com",
   };
+
+  const handleGamePlayRequest = useCallback((clickedGame: Game) => {
+    setSelectedGame(clickedGame);
+    setShowCredentialOptions(false);
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#FFFBF5] text-[#1a1a1a]">
@@ -331,10 +345,7 @@ export default function UserDashboardPage() {
                   <GameCard
                     game={game}
                     isTop={topIds.has(game.id)}
-                    onPlayRequest={(clickedGame) => {
-                      setSelectedGame(clickedGame);
-                      setShowCredentialOptions(false);
-                    }}
+                    onPlayRequest={handleGamePlayRequest}
                   />
                 </div>
               ))}

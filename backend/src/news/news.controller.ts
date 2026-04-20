@@ -7,6 +7,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { NewsService } from './news.service';
@@ -28,8 +29,14 @@ export class NewsController {
 
   @UseGuards(AdminAuthGuard)
   @Get()
-  findAll() {
-    return this.newsService.findAll();
+  findAll(
+    @Query('page') page?: string,
+    @Query('pageSize') pageSize?: string,
+  ) {
+    return this.newsService.findAll(
+      page ? Number(page) : undefined,
+      pageSize ? Number(pageSize) : undefined,
+    );
   }
 
   @UseGuards(AdminAuthGuard)

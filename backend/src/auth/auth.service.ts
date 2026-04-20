@@ -65,7 +65,18 @@ export class AuthService {
         revokedAt: null,
         expiresAt: { gt: new Date() },
       },
-      include: { user: true },
+      select: {
+        id: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            phone: true,
+            role: true,
+          },
+        },
+      },
     });
 
     if (!record) {

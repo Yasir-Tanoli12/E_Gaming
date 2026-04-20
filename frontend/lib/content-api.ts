@@ -55,24 +55,58 @@ export interface SiteContent {
   socialResponsibilityPdfUrl?: string | null;
 }
 
+const PUBLIC_CONTENT_TTL_MS = 60_000;
+let publicContentCache: { value: SiteContent; expiresAt: number } | null = null;
+let publicContentInFlight: Promise<SiteContent> | null = null;
+
+function clearPublicContentCache() {
+  publicContentCache = null;
+  publicContentInFlight = null;
+}
+
 export const contentApi = {
+  async getPublicCached(options?: { ttlMs?: number; forceRefresh?: boolean }) {
+    const ttlMs = options?.ttlMs ?? PUBLIC_CONTENT_TTL_MS;
+    const now = Date.now();
+    if (!options?.forceRefresh && publicContentCache && publicContentCache.expiresAt > now) {
+      return publicContentCache.value;
+    }
+    if (!options?.forceRefresh && publicContentInFlight) {
+      return publicContentInFlight;
+    }
+
+    publicContentInFlight = apiRequest<SiteContent>("/content/public")
+      .then((data) => {
+        publicContentCache = { value: data, expiresAt: Date.now() + ttlMs };
+        return data;
+      })
+      .finally(() => {
+        publicContentInFlight = null;
+      });
+
+    return publicContentInFlight;
+  },
   async uploadLobbyVideo(file: File): Promise<{ lobbyVideoUrl: string | null; updatedAt: string }> {
     const formData = new FormData();
     formData.append("file", file);
-    return apiFormRequest<{ lobbyVideoUrl: string | null; updatedAt: string }>(
+    const result = await apiFormRequest<{ lobbyVideoUrl: string | null; updatedAt: string }>(
       "/content/lobby-video",
       "POST",
       formData
     );
+    clearPublicContentCache();
+    return result;
   },
   async uploadLogo(file: File): Promise<{ logoUrl: string | null; updatedAt: string }> {
     const formData = new FormData();
     formData.append("file", file);
-    return apiFormRequest<{ logoUrl: string | null; updatedAt: string }>(
+    const result = await apiFormRequest<{ logoUrl: string | null; updatedAt: string }>(
       "/content/logo",
       "POST",
       formData
     );
+    clearPublicContentCache();
+    return result;
   },
   async uploadPolicyDocument(
     key: "privacy-policy" | "social-responsibility",
@@ -80,16 +114,18 @@ export const contentApi = {
   ): Promise<{ id: string; key: string; fileName: string; mimeType: string; updatedAt: string }> {
     const formData = new FormData();
     formData.append("file", file);
-    return apiFormRequest<{
+    const result = await apiFormRequest<{
       id: string;
       key: string;
       fileName: string;
       mimeType: string;
       updatedAt: string;
     }>(`/content/documents/${key}`, "POST", formData);
+    clearPublicContentCache();
+    return result;
   },
   getPublic() {
-    return apiRequest<SiteContent>("/content/public");
+    return this.getPublicCached();
   },
   getAdmin() {
     return apiRequest<SiteContent>("/content/admin");
@@ -98,57 +134,87 @@ export const contentApi = {
     return apiRequest<SiteContacts>("/content/contacts", {
       method: "PATCH",
       body: JSON.stringify(body),
+    }).then((result) => {
+      clearPublicContentCache();
+      return result;
     });
   },
   createBlog(body: Omit<BlogItem, "id" | "createdAt" | "updatedAt">) {
     return apiRequest<BlogItem>("/content/blogs", {
       method: "POST",
       body: JSON.stringify(body),
+    }).then((result) => {
+      clearPublicContentCache();
+      return result;
     });
   },
   updateBlog(id: string, body: Partial<BlogItem>) {
     return apiRequest<BlogItem>(`/content/blogs/${id}`, {
       method: "PATCH",
       body: JSON.stringify(body),
+    }).then((result) => {
+      clearPublicContentCache();
+      return result;
     });
   },
   removeBlog(id: string) {
     return apiRequest<{ removed: boolean }>(`/content/blogs/${id}`, {
       method: "DELETE",
+    }).then((result) => {
+      clearPublicContentCache();
+      return result;
     });
   },
   createFaq(body: Omit<FaqItem, "id" | "createdAt" | "updatedAt">) {
     return apiRequest<FaqItem>("/content/faqs", {
       method: "POST",
       body: JSON.stringify(body),
+    }).then((result) => {
+      clearPublicContentCache();
+      return result;
     });
   },
   updateFaq(id: string, body: Partial<FaqItem>) {
     return apiRequest<FaqItem>(`/content/faqs/${id}`, {
       method: "PATCH",
       body: JSON.stringify(body),
+    }).then((result) => {
+      clearPublicContentCache();
+      return result;
     });
   },
   removeFaq(id: string) {
     return apiRequest<{ removed: boolean }>(`/content/faqs/${id}`, {
       method: "DELETE",
+    }).then((result) => {
+      clearPublicContentCache();
+      return result;
     });
   },
   createReview(body: Omit<ReviewItem, "id" | "createdAt" | "updatedAt">) {
     return apiRequest<ReviewItem>("/content/reviews", {
       method: "POST",
       body: JSON.stringify(body),
+    }).then((result) => {
+      clearPublicContentCache();
+      return result;
     });
   },
   updateReview(id: string, body: Partial<ReviewItem>) {
     return apiRequest<ReviewItem>(`/content/reviews/${id}`, {
       method: "PATCH",
       body: JSON.stringify(body),
+    }).then((result) => {
+      clearPublicContentCache();
+      return result;
     });
   },
   removeReview(id: string) {
     return apiRequest<{ removed: boolean }>(`/content/reviews/${id}`, {
       method: "DELETE",
+    }).then((result) => {
+      clearPublicContentCache();
+      return result;
     });
   },
   updatePrivacyPolicy(content: string) {
@@ -158,7 +224,10 @@ export const contentApi = {
         method: "PATCH",
         body: JSON.stringify({ content }),
       }
-    );
+    ).then((result) => {
+      clearPublicContentCache();
+      return result;
+    });
   },
   updateAboutUs(content: string) {
     return apiRequest<{ id: string; title: string; content: string; updatedAt: string }>(
@@ -167,7 +236,10 @@ export const contentApi = {
         method: "PATCH",
         body: JSON.stringify({ content }),
       }
-    );
+    ).then((result) => {
+      clearPublicContentCache();
+      return result;
+    });
   },
   updateAgeWarning(body: Partial<SiteContent["ageWarning"]>) {
     return apiRequest<{ id: string; content: string; updatedAt: string }>(
@@ -176,6 +248,9 @@ export const contentApi = {
         method: "PATCH",
         body: JSON.stringify(body),
       }
-    );
+    ).then((result) => {
+      clearPublicContentCache();
+      return result;
+    });
   },
 };

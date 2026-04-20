@@ -4,10 +4,21 @@ import { UpdateNewsDto } from './dto/update-news.dto';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { PrismaService } from '../prisma/prisma.service';
+import { Prisma, type NewsPoster } from '@prisma/client';
+
+const NEWS_LIST_LIMIT_DEFAULT = 50;
+const NEWS_LIST_LIMIT_MAX = 200;
+const NEWS_CURRENT_CACHE_TTL_MS = 60 * 1000;
+type CurrentNews = Pick<
+  NewsPoster,
+  'id' | 'title' | 'imageUrl' | 'linkUrl' | 'isActive' | 'createdAt' | 'updatedAt'
+> | null;
 
 @Injectable()
 export class NewsService {
   constructor(private prisma: PrismaService) {}
+  private currentNewsCache: { value: CurrentNews; expiresAt: number } | null =
+    null;
   private readonly legacyNewsPath = join(
     process.cwd(),
     'data',
@@ -57,24 +68,49 @@ export class NewsService {
 
   async getCurrent() {
     await this.bootstrapFromLegacyFile();
-    return this.prisma.withPoolRetry(() =>
+    if (this.currentNewsCache && this.currentNewsCache.expiresAt > Date.now()) {
+      return this.currentNewsCache.value;
+    }
+    const current = await this.prisma.withPoolRetry(() =>
       this.prisma.newsPoster.findFirst({
         where: { isActive: true },
         orderBy: { createdAt: 'desc' },
+        select: {
+          id: true,
+          title: true,
+          imageUrl: true,
+          linkUrl: true,
+          isActive: true,
+          createdAt: true,
+          updatedAt: true,
+        },
       }),
     );
+    this.currentNewsCache = {
+      value: current,
+      expiresAt: Date.now() + NEWS_CURRENT_CACHE_TTL_MS,
+    };
+    return current;
   }
 
-  async findAll() {
+  async findAll(page = 1, pageSize = NEWS_LIST_LIMIT_DEFAULT) {
     await this.bootstrapFromLegacyFile();
+    const safePage = Number.isFinite(page) ? Math.max(1, Math.floor(page)) : 1;
+    const safePageSize = Number.isFinite(pageSize)
+      ? Math.min(Math.max(1, Math.floor(pageSize)), NEWS_LIST_LIMIT_MAX)
+      : NEWS_LIST_LIMIT_DEFAULT;
     return this.prisma.withPoolRetry(() =>
-      this.prisma.newsPoster.findMany({ orderBy: { createdAt: 'desc' } }),
+      this.prisma.newsPoster.findMany({
+        orderBy: { createdAt: 'desc' },
+        skip: (safePage - 1) * safePageSize,
+        take: safePageSize,
+      }),
     );
   }
 
   async create(dto: CreateNewsDto) {
     await this.bootstrapFromLegacyFile();
-    return this.prisma.withPoolRetry(() =>
+    const created = await this.prisma.withPoolRetry(() =>
       this.prisma.newsPoster.create({
         data: {
           title: dto.title ?? null,
@@ -83,34 +119,52 @@ export class NewsService {
         },
       }),
     );
+    this.currentNewsCache = null;
+    return created;
   }
 
   async update(id: string, dto: UpdateNewsDto) {
     await this.bootstrapFromLegacyFile();
-    const existing = await this.prisma.withPoolRetry(() =>
-      this.prisma.newsPoster.findUnique({ where: { id } }),
-    );
-    if (!existing) throw new NotFoundException('News poster not found');
-    return this.prisma.withPoolRetry(() =>
-      this.prisma.newsPoster.update({
-        where: { id },
-        data: {
-          title: dto.title ?? existing.title,
-          imageUrl: dto.imageUrl ?? existing.imageUrl,
-          isActive: dto.isActive ?? existing.isActive,
-        },
-      }),
-    );
+    try {
+      const updated = await this.prisma.withPoolRetry(() =>
+        this.prisma.newsPoster.update({
+          where: { id },
+          data: {
+            ...(dto.title !== undefined ? { title: dto.title } : {}),
+            ...(dto.imageUrl !== undefined ? { imageUrl: dto.imageUrl } : {}),
+            ...(dto.isActive !== undefined ? { isActive: dto.isActive } : {}),
+          },
+        }),
+      );
+      this.currentNewsCache = null;
+      return updated;
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException('News poster not found');
+      }
+      throw error;
+    }
   }
 
   async remove(id: string) {
     await this.bootstrapFromLegacyFile();
-    const existing = await this.prisma.withPoolRetry(() =>
-      this.prisma.newsPoster.findUnique({ where: { id } }),
-    );
-    if (!existing) throw new NotFoundException('News poster not found');
-    return this.prisma.withPoolRetry(() =>
-      this.prisma.newsPoster.delete({ where: { id } }),
-    );
+    try {
+      const deleted = await this.prisma.withPoolRetry(() =>
+        this.prisma.newsPoster.delete({ where: { id } }),
+      );
+      this.currentNewsCache = null;
+      return deleted;
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2025'
+      ) {
+        throw new NotFoundException('News poster not found');
+      }
+      throw error;
+    }
   }
 }

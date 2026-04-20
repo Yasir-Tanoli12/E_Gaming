@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { memo, useRef, useState } from "react";
 import type { Game } from "@/lib/games-api";
 import { OptimizedImage } from "./OptimizedImage";
 
@@ -10,7 +10,7 @@ interface GameCardProps {
   onPlayRequest?: (game: Game) => void;
 }
 
-export function GameCard({ game, isTop = false, onPlayRequest }: GameCardProps) {
+function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps) {
   const [hovered, setHovered] = useState(false);
   const [thumbError, setThumbError] = useState(false);
   const [videoError, setVideoError] = useState(false);
@@ -142,3 +142,5 @@ export function GameCard({ game, isTop = false, onPlayRequest }: GameCardProps) 
     </div>
   );
 }
+
+export const GameCard = memo(GameCardComponent);

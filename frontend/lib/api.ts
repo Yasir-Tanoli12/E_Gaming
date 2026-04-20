@@ -83,13 +83,21 @@ async function parsePayload(res: Response): Promise<unknown> {
 }
 
 function getErrorMessage(payload: unknown, fallback: string): string {
+  const sanitizeMessage = (message: string): string => {
+    const trimmed = message.trim();
+    if (trimmed.startsWith("<") || /<html|<body|<head|<center/i.test(trimmed)) {
+      return "Server is temporarily unavailable. Please try again in a moment.";
+    }
+    return message;
+  };
+
   if (
     typeof payload === "object" &&
     payload !== null &&
     "message" in payload &&
     typeof (payload as { message?: unknown }).message === "string"
   ) {
-    return (payload as { message: string }).message;
+    return sanitizeMessage((payload as { message: string }).message);
   }
   if (
     typeof payload === "object" &&
@@ -97,7 +105,7 @@ function getErrorMessage(payload: unknown, fallback: string): string {
     "message" in payload &&
     Array.isArray((payload as { message?: unknown }).message)
   ) {
-    return (payload as { message: string[] }).message.join(", ");
+    return sanitizeMessage((payload as { message: string[] }).message.join(", "));
   }
   return fallback;
 }
