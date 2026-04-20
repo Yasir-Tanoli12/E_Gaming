@@ -26,7 +26,6 @@ async function bootstrap() {
   }
 
   app.enableShutdownHooks();
-
   app.useGlobalFilters(new HttpExceptionFilter());
 
   app.use(cookieParser());
@@ -45,16 +44,23 @@ async function bootstrap() {
   );
 
   app.enableCors({
-    origin: ['https://sweepstown.com', 'https://www.sweepstown.com', 'http://localhost:3000'],
+    origin: [
+      'https://sweepstown.com',
+      'https://www.sweepstown.com',
+      'http://sweepstown.com',
+      'http://www.sweepstown.com',
+      'http://localhost:3000',
+    ],
     credentials: true,
   });
 
   app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
 
-  await app.listen(process.env.PORT || 3001);
+  const port = process.env.PORT || 3001;
+  await app.listen(port);
+
   const logger = new Logger('Bootstrap');
-  logger.log(
-    `Listening on port ${process.env.PORT || 3001} (NODE_ENV=${nodeEnv ?? 'undefined'})`,
-  );
+  logger.log(`Listening on port ${port} (NODE_ENV=${nodeEnv ?? 'undefined'})`);
 }
+
 bootstrap();

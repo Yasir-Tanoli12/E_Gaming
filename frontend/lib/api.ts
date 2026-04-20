@@ -1,8 +1,25 @@
 export const AUTH_EXPIRED_EVENT = "app:auth-expired";
 const REQUEST_TIMEOUT_MS = Number(process.env.NEXT_PUBLIC_API_TIMEOUT_MS ?? 15000);
+const LOCAL_DEV_API_URL = "http://localhost:3001";
 
-export const getApiBaseUrl = () =>
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
+function resolveApiBaseUrl(): string {
+  const configured = process.env.NEXT_PUBLIC_API_URL?.trim();
+  if (configured) {
+    return configured.replace(/\/+$/, "");
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "Missing NEXT_PUBLIC_API_URL in production. Set it in your frontend deployment environment and rebuild."
+    );
+  }
+
+  return LOCAL_DEV_API_URL;
+}
+
+const API_BASE_URL = resolveApiBaseUrl();
+
+export const getApiBaseUrl = () => API_BASE_URL;
 
 /**
  * Auth uses httpOnly cookies - no client-side token storage.
