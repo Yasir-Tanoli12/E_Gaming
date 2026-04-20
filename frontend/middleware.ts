@@ -26,8 +26,22 @@ export function middleware(request: NextRequest) {
     "X-XSS-Protection": "1; mode=block",
   };
 
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
-  const connectSrcParts = new Set<string>(["'self'", apiUrl]);
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL?.trim();
+  const connectSrcParts = new Set<string>(["'self'", "https:", "wss:"]);
+  if (process.env.NODE_ENV !== "production") {
+    connectSrcParts.add("http://localhost:3001");
+  }
+  if (apiUrl) {
+    try {
+      const u = new URL(apiUrl);
+      connectSrcParts.add(`${u.protocol}//${u.host}`);
+      if (u.protocol === "https:") {
+        connectSrcParts.add(`wss://${u.host}`);
+      }
+    } catch {
+      /* ignore invalid API URL */
+    }
+  }
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
   if (supabaseUrl) {
     try {
