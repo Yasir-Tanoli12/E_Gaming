@@ -44,25 +44,8 @@ async function bootstrap() {
     }),
   );
 
-  const corsOriginsRaw = config.get<string>('CORS_ORIGINS') ?? '';
-  const configuredOrigins = corsOriginsRaw
-    .split(',')
-    .map((origin) => origin.trim())
-    .filter(Boolean);
-  const defaultFrontendOrigin =
-    config.get<string>('FRONTEND_URL') ?? 'http://localhost:3000';
-  const allowedOrigins = configuredOrigins.length
-    ? configuredOrigins
-    : [defaultFrontendOrigin];
-
   app.enableCors({
-    origin: (origin, callback) => {
-      // Allow non-browser clients (no Origin header) plus configured browser origins.
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      return callback(new Error(`CORS blocked for origin: ${origin}`), false);
-    },
+    origin: ['https://sweepstown.com', 'https://www.sweepstown.com', 'http://localhost:3000'],
     credentials: true,
   });
 
