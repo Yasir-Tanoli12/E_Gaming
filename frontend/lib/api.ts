@@ -111,11 +111,12 @@ export async function apiRequest<T>(
   options: RequestInit = {}
 ): Promise<T> {
   const url = `${getApiBaseUrl()}${path}`;
-  const headers: HeadersInit = {
-    "Content-Type": "application/json",
-    ...(options.headers ?? {}),
-  };
   const method = (options.method ?? "GET").toUpperCase();
+  const headers = new Headers(options.headers ?? {});
+  const hasBody = options.body !== undefined && options.body !== null;
+  if (hasBody && !(options.body instanceof FormData) && !headers.has("Content-Type")) {
+    headers.set("Content-Type", "application/json");
+  }
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
   try {
