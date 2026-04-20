@@ -37,9 +37,7 @@ function resolveApiBaseUrl(): string {
   return LOCAL_DEV_API_URL;
 }
 
-const API_BASE_URL = resolveApiBaseUrl();
-
-export const getApiBaseUrl = () => API_BASE_URL;
+export const getApiBaseUrl = () => resolveApiBaseUrl();
 
 /**
  * Auth uses httpOnly cookies - no client-side token storage.
