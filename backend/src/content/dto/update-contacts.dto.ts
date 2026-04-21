@@ -15,6 +15,10 @@ export class UpdateContactsDto {
 
   @IsOptional()
   @IsString()
+  telegram?: string;
+
+  @IsOptional()
+  @IsString()
   email?: string;
 
   @IsOptional()

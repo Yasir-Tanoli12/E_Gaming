@@ -16,6 +16,7 @@ export default function AdminContactsPage() {
     facebook: "",
     whatsapp: "",
     instagram: "",
+    telegram: "",
     email: "",
     logoUrl: "",
     lobbyVideoUrl: "",
@@ -46,6 +47,7 @@ export default function AdminContactsPage() {
         facebook: contacts.facebook,
         whatsapp: contacts.whatsapp,
         instagram: contacts.instagram,
+        telegram: contacts.telegram,
         email: contacts.email,
         logoUrl: contacts.logoUrl || undefined,
       });
@@ -107,7 +109,8 @@ export default function AdminContactsPage() {
       <div>
         <h1 className="text-2xl font-black sm:text-3xl">Contacts</h1>
         <p className="mt-1 text-sm text-zinc-400">
-          Manage logo, lobby video, and social links.
+          Manage logo, lobby video, and contact links (shown in the site header, footer, and
+          credential help).
         </p>
       </div>
 
@@ -187,12 +190,20 @@ export default function AdminContactsPage() {
             placeholder="+92..."
           />
           <Input
-            label="Instagram URL"
+            label="Instagram URL or @username"
             value={contacts.instagram}
             onChange={(e) =>
               setContacts((p) => ({ ...p, instagram: e.target.value }))
             }
-            placeholder="https://instagram.com/..."
+            placeholder="https://instagram.com/... or @handle"
+          />
+          <Input
+            label="Telegram URL or @username"
+            value={contacts.telegram}
+            onChange={(e) =>
+              setContacts((p) => ({ ...p, telegram: e.target.value }))
+            }
+            placeholder="https://t.me/... or @channel"
           />
           <Input
             label="Support Email"

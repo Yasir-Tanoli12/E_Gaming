@@ -9,6 +9,8 @@ import { getApiBaseUrl } from "@/lib/api";
 import { GameCard } from "@/components/GameCard";
 import { Button } from "@/components/ui/Button";
 import { PublicNavbar } from "@/components/PublicNavbar";
+import { SocialContactIcons } from "@/components/SocialContactIcons";
+import { mailtoHref } from "@/lib/contact-links";
 
 export default function UserDashboardPage() {
   const [games, setGames] = useState<Game[]>([]);
@@ -75,11 +77,12 @@ export default function UserDashboardPage() {
     `${apiBaseUrl}/content/documents/privacy-policy`;
   const socialResponsibilityPdfUrl =
     `${apiBaseUrl}/content/documents/social-responsibility`;
-  const whatsappLink = contacts?.whatsapp
-    ? contacts.whatsapp.startsWith("http")
-      ? contacts.whatsapp
-      : `https://wa.me/${contacts.whatsapp.replace(/\D/g, "")}`
-    : "";
+  const hasCredentialChannels =
+    !!contacts?.facebook ||
+    !!contacts?.whatsapp ||
+    !!contacts?.instagram ||
+    !!(contacts?.telegram && contacts.telegram.trim()) ||
+    !!contacts?.email?.trim();
   const heroVideo =
     contacts?.lobbyVideoUrl ??
     orderedGames.find((game) => game.videoUrl)?.videoUrl ??
@@ -272,39 +275,15 @@ export default function UserDashboardPage() {
                   <p className="mt-3 text-base text-zinc-700">
                     Contact admin for credentials:
                   </p>
-                  <div className="mt-5 flex flex-wrap gap-3">
-                    <a
-                      href={contacts?.facebook || "#"}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label="Messenger"
-                      title="Messenger"
-                      className={`inline-flex h-11 w-11 items-center justify-center rounded-xl transition ${
-                        contacts?.facebook
-                          ? "border border-[#EDC537]/50 bg-[#990808]/25 text-[#fef3c7] shadow-[0_0_22px_rgba(237,197,55,0.3)] hover:-translate-y-0.5 hover:bg-[#990808]/35"
-                          : "pointer-events-none border border-zinc-700 bg-zinc-800 text-zinc-500"
-                      }`}
-                    >
-                      <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
-                        <path d="M12 2C6.48 2 2 6.15 2 11.27c0 2.92 1.46 5.52 3.74 7.22V22l3.35-1.84c.9.25 1.88.38 2.91.38 5.52 0 10-4.15 10-9.27S17.52 2 12 2zm.99 12.5-2.55-2.72-4.9 2.72 5.39-5.73 2.63 2.72 4.82-2.72-5.39 5.73z" />
-                      </svg>
-                    </a>
-                    <a
-                      href={whatsappLink || "#"}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label="WhatsApp"
-                      title="WhatsApp"
-                      className={`inline-flex h-11 w-11 items-center justify-center rounded-xl transition ${
-                        whatsappLink
-                          ? "border border-[#EDC537]/50 bg-[#EDC537]/20 text-[#1a0a0a] shadow-[0_0_22px_rgba(237,197,55,0.35)] hover:-translate-y-0.5 hover:bg-[#EDC537]/30"
-                          : "pointer-events-none border border-zinc-700 bg-zinc-800 text-zinc-500"
-                      }`}
-                    >
-                      <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
-                        <path d="M20.52 3.48A11.86 11.86 0 0 0 12.07 0C5.54 0 .2 5.34.2 11.86c0 2.09.55 4.14 1.59 5.95L0 24l6.37-1.67a11.86 11.86 0 0 0 5.7 1.46h.01c6.53 0 11.87-5.33 11.87-11.86 0-3.17-1.23-6.15-3.43-8.45zM12.08 21.8h-.01a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.78.99 1.01-3.68-.23-.38a9.86 9.86 0 0 1-1.51-5.27c0-5.45 4.44-9.88 9.91-9.88a9.8 9.8 0 0 1 7.02 2.91 9.79 9.79 0 0 1 2.9 6.98c0 5.45-4.44 9.89-9.91 9.89zm5.43-7.42c-.3-.15-1.77-.87-2.05-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.95 1.16-.17.2-.35.22-.65.08-.3-.15-1.27-.47-2.42-1.5-.9-.8-1.5-1.8-1.68-2.1-.18-.3-.02-.46.13-.6.14-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.67-1.62-.92-2.22-.24-.58-.48-.5-.67-.51h-.57c-.2 0-.53.08-.8.38-.27.3-1.03 1-1.03 2.45 0 1.45 1.05 2.85 1.2 3.05.15.2 2.07 3.16 5.01 4.43.7.3 1.25.48 1.68.62.7.22 1.33.2 1.83.12.56-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.08-.12-.27-.2-.57-.35z" />
-                      </svg>
-                    </a>
+                  <div className="mt-5 flex flex-wrap items-center gap-3">
+                    {hasCredentialChannels ? (
+                      <SocialContactIcons contacts={contacts} size="lg" gapClass="gap-3" />
+                    ) : (
+                      <p className="text-sm text-zinc-500">
+                        Add Facebook, WhatsApp, Instagram, Telegram, or support email in Admin →
+                        Contacts.
+                      </p>
+                    )}
                     <Button
                       variant="secondary"
                       onClick={() => setShowCredentialOptions(false)}
@@ -447,37 +426,22 @@ export default function UserDashboardPage() {
             <div id="support">
               <p className="text-xs uppercase tracking-[0.2em] text-[#EDC537]">Contact</p>
               <div className="mt-3 space-y-2 text-sm text-[#fef3c7]/80">
-                <p>{contacts?.email || "moeeedahmed07@gmail.com"}</p>
+                {contacts?.email?.trim() ? (
+                  <a
+                    href={mailtoHref(contacts.email)}
+                    className="block text-[#fef3c7] underline-offset-2 transition hover:text-white hover:underline"
+                  >
+                    {contacts.email}
+                  </a>
+                ) : null}
                 <p>24/7 Live Support</p>
-                <div className="mt-1 flex gap-2">
-                  {contacts?.facebook && (
-                    <a
-                      href={contacts.facebook}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label="Facebook"
-                      title="Facebook"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#EDC537]/40 bg-[#990808]/20 text-[#fef3c7] shadow-[0_0_16px_rgba(237,197,55,0.3)] transition hover:-translate-y-0.5 hover:bg-[#990808]/30"
-                    >
-                      <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
-                        <path d="M22 12a10 10 0 1 0-11.56 9.88v-6.99H7.9V12h2.54V9.8c0-2.5 1.5-3.88 3.79-3.88 1.1 0 2.24.2 2.24.2v2.47h-1.27c-1.26 0-1.65.78-1.65 1.58V12h2.8l-.45 2.89h-2.35v6.99A10 10 0 0 0 22 12z" />
-                      </svg>
-                    </a>
-                  )}
-                  {contacts?.whatsapp && (
-                    <a
-                      href={contacts.whatsapp.startsWith("http") ? contacts.whatsapp : `https://wa.me/${contacts.whatsapp.replace(/\D/g, "")}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      aria-label="WhatsApp"
-                      title="WhatsApp"
-                      className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#EDC537]/40 bg-[#EDC537]/20 text-[#1a0a0a] shadow-[0_0_16px_rgba(237,197,55,0.3)] transition hover:-translate-y-0.5 hover:bg-[#EDC537]/30"
-                    >
-                      <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current" aria-hidden="true">
-                        <path d="M20.52 3.48A11.86 11.86 0 0 0 12.07 0C5.54 0 .2 5.34.2 11.86c0 2.09.55 4.14 1.59 5.95L0 24l6.37-1.67a11.86 11.86 0 0 0 5.7 1.46h.01c6.53 0 11.87-5.33 11.87-11.86 0-3.17-1.23-6.15-3.43-8.45zM12.08 21.8h-.01a9.9 9.9 0 0 1-5.04-1.38l-.36-.21-3.78.99 1.01-3.68-.23-.38a9.86 9.86 0 0 1-1.51-5.27c0-5.45 4.44-9.88 9.91-9.88a9.8 9.8 0 0 1 7.02 2.91 9.79 9.79 0 0 1 2.9 6.98c0 5.45-4.44 9.89-9.91 9.89zm5.43-7.42c-.3-.15-1.77-.87-2.05-.96-.27-.1-.47-.15-.67.15-.2.3-.77.96-.95 1.16-.17.2-.35.22-.65.08-.3-.15-1.27-.47-2.42-1.5-.9-.8-1.5-1.8-1.68-2.1-.18-.3-.02-.46.13-.6.14-.14.3-.35.45-.52.15-.18.2-.3.3-.5.1-.2.05-.38-.02-.53-.08-.15-.67-1.62-.92-2.22-.24-.58-.48-.5-.67-.51h-.57c-.2 0-.53.08-.8.38-.27.3-1.03 1-1.03 2.45 0 1.45 1.05 2.85 1.2 3.05.15.2 2.07 3.16 5.01 4.43.7.3 1.25.48 1.68.62.7.22 1.33.2 1.83.12.56-.08 1.77-.72 2.02-1.42.25-.7.25-1.3.17-1.42-.08-.12-.27-.2-.57-.35z" />
-                      </svg>
-                    </a>
-                  )}
+                <div className="mt-1">
+                  <SocialContactIcons
+                    contacts={contacts}
+                    size="sm"
+                    gapClass="gap-2"
+                    includeEmailIcon={!contacts?.email?.trim()}
+                  />
                 </div>
               </div>
             </div>

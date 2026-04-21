@@ -4,6 +4,8 @@ export interface SiteContacts {
   facebook: string;
   whatsapp: string;
   instagram: string;
+  /** Public profile, @username, or t.me link — optional until API returns it. */
+  telegram?: string;
   email: string;
   logoUrl?: string | null;
   lobbyVideoUrl?: string | null;

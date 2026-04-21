@@ -78,6 +78,7 @@ export class ContentService {
         facebook?: string;
         whatsapp?: string;
         instagram?: string;
+        telegram?: string;
         email?: string;
         logoUrl?: string;
       };
@@ -137,6 +138,7 @@ export class ContentService {
       !contact.facebook &&
       !contact.whatsapp &&
       !contact.instagram &&
+      !contact.telegram &&
       !contact.email &&
       !contact.logoUrl
     ) {
@@ -146,6 +148,7 @@ export class ContentService {
           facebook: legacy.contacts.facebook ?? '',
           whatsapp: legacy.contacts.whatsapp ?? '',
           instagram: legacy.contacts.instagram ?? '',
+          telegram: legacy.contacts.telegram ?? '',
           email: legacy.contacts.email ?? '',
           logoUrl: legacy.contacts.logoUrl ?? null,
         },
@@ -243,6 +246,7 @@ export class ContentService {
               facebook: true,
               whatsapp: true,
               instagram: true,
+              telegram: true,
               email: true,
               logoUrl: true,
               lobbyVideoUrl: true,
@@ -325,6 +329,7 @@ export class ContentService {
         facebook: '',
         whatsapp: '',
         instagram: '',
+        telegram: '',
         email: '',
         logoUrl: null,
         lobbyVideoUrl: null,
@@ -402,6 +407,7 @@ export class ContentService {
         facebook: '',
         whatsapp: '',
         instagram: '',
+        telegram: '',
         email: '',
         logoUrl: null,
         lobbyVideoUrl: null,
