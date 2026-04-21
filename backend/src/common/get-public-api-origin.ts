@@ -6,7 +6,11 @@ import type { Request } from 'express';
 export function getPublicApiOrigin(req: Request): string {
   const fromEnv = process.env.API_URL?.trim() || process.env.PUBLIC_API_URL?.trim();
   if (fromEnv) {
-    return fromEnv.replace(/\/$/, '');
+    try {
+      return new URL(fromEnv).origin;
+    } catch {
+      return fromEnv.replace(/\/$/, '');
+    }
   }
   const protoHeader = req.headers['x-forwarded-proto'];
   const proto =

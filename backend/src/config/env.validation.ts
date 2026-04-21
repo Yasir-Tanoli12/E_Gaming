@@ -26,6 +26,8 @@ export const envSchema = Joi.object({
   /** Public API base URL (no trailing slash) for generated asset links; optional behind reverse proxy */
   API_URL: Joi.string().uri().optional(),
   PUBLIC_API_URL: Joi.string().uri().optional(),
+  /** Origin where `/uploads` is reachable in the browser when it differs from API_URL (e.g. apex site vs /api) */
+  PUBLIC_UPLOADS_URL: Joi.string().uri().optional(),
   /** Express trust proxy (1 = first hop); set true in production behind Hostinger/nginx */
   TRUST_PROXY: Joi.boolean()
     .truthy('true', 'yes', '1')
