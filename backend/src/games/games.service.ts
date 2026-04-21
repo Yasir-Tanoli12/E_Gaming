@@ -6,9 +6,11 @@ import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { normalizeUploadMediaUrl } from '../common/normalize-upload-media-url';
 
-const GAMES_CACHE_KEY = 'games:public';
-const TOP_GAMES_CACHE_KEY = 'games:top';
+/** Bump when public payload shape changes (e.g. media URL normalization). */
+const GAMES_CACHE_KEY = 'games:public:v3';
+const TOP_GAMES_CACHE_KEY = 'games:top:v3';
 const CACHE_TTL_MS = 60 * 1000;
 
 @Injectable()
@@ -79,6 +81,19 @@ export class GamesService {
     );
   }
 
+  private mapGameMediaUrls<
+    T extends {
+      thumbnailUrl: string | null;
+      videoUrl: string | null;
+    },
+  >(row: T): T {
+    return {
+      ...row,
+      thumbnailUrl: normalizeUploadMediaUrl(row.thumbnailUrl),
+      videoUrl: normalizeUploadMediaUrl(row.videoUrl),
+    };
+  }
+
   // Public: get active games for landing page (cached 60s)
   async findAll() {
     const cached = await this.cache.get<Awaited<ReturnType<typeof this.findAll>>>(GAMES_CACHE_KEY);
@@ -99,8 +114,9 @@ export class GamesService {
           },
         }),
       );
-      await this.cache.set(GAMES_CACHE_KEY, result, CACHE_TTL_MS);
-      return result;
+      const mapped = result.map((g) => this.mapGameMediaUrls(g));
+      await this.cache.set(GAMES_CACHE_KEY, mapped, CACHE_TTL_MS);
+      return mapped;
     } catch (error) {
       if (this.isDatabaseUnavailableError(error)) {
         this.logger.warn('Database unavailable in games.findAll; returning empty list.');
@@ -133,8 +149,9 @@ export class GamesService {
           },
         }),
       );
-      await this.cache.set(cacheKey, result, CACHE_TTL_MS);
-      return result;
+      const mapped = result.map((g) => this.mapGameMediaUrls(g));
+      await this.cache.set(cacheKey, mapped, CACHE_TTL_MS);
+      return mapped;
     } catch (error) {
       if (this.isDatabaseUnavailableError(error)) {
         this.logger.warn(
@@ -161,7 +178,7 @@ export class GamesService {
 
   // Admin: get all games including inactive
   async findAllAdmin() {
-    return this.prisma.game.findMany({
+    const rows = await this.prisma.game.findMany({
       orderBy: { sortOrder: 'asc' },
       select: {
         id: true,
@@ -176,6 +193,7 @@ export class GamesService {
         updatedAt: true,
       },
     });
+    return rows.map((g) => this.mapGameMediaUrls(g));
   }
 
   async findOne(id: string) {
@@ -197,7 +215,7 @@ export class GamesService {
     if (!game) {
       throw new NotFoundException('Game not found');
     }
-    return game;
+    return this.mapGameMediaUrls(game);
   }
 
   async create(dto: CreateGameDto) {
@@ -213,7 +231,7 @@ export class GamesService {
       },
     });
     await this.invalidateGamesCaches();
-    return result;
+    return this.mapGameMediaUrls(result);
   }
 
   async update(id: string, dto: UpdateGameDto) {
@@ -223,7 +241,7 @@ export class GamesService {
       data: dto as Record<string, unknown>,
     });
     await this.invalidateGamesCaches();
-    return result;
+    return this.mapGameMediaUrls(result);
   }
 
   async remove(id: string) {

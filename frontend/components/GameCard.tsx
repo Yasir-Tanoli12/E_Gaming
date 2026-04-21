@@ -74,7 +74,7 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(153,8,8,0.3),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(237,197,55,0.25),transparent_45%)] opacity-70" />
       <div className="relative aspect-video w-full overflow-hidden bg-[#0c1025]">
         {imageUrl && !thumbError ? (
-          // Native <img> so API /uploads URLs always load (no next/image / remotePatterns edge cases).
+          // Stack above hidden video; on hover fade out so hover video (higher z) shows.
           <img
             src={imageUrl}
             alt={game.title}
@@ -83,8 +83,8 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
             onError={() => setThumbError(true)}
             className={`absolute inset-0 h-full w-full object-cover transition-all duration-500 ${
               hovered && videoUrl && !videoError && !videoAsPrimary
-                ? "opacity-0 scale-105"
-                : "opacity-100 scale-100"
+                ? "pointer-events-none z-10 opacity-0 scale-105"
+                : "z-20 opacity-100 scale-100"
             }`}
           />
         ) : null}
@@ -103,8 +103,10 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
                 videoRef.current?.play().catch(() => {});
               }
             }}
-            className={`absolute inset-0 h-full w-full object-cover transition-all duration-500 ${
-              videoAsPrimary || hovered ? "opacity-100 scale-100" : "opacity-0 scale-105"
+            className={`absolute inset-0 h-full w-full object-cover transition-all duration-500 pointer-events-none ${
+              hovered || videoAsPrimary
+                ? "z-30 opacity-100 scale-100"
+                : "z-10 opacity-0 scale-105"
             }`}
           />
         ) : null}
