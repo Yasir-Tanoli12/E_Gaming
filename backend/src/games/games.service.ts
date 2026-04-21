@@ -50,6 +50,14 @@ export class GamesService {
     }
   }
 
+  private async invalidateGamesCaches() {
+    await this.cache.del(GAMES_CACHE_KEY);
+    const ids = this.readTopGameIds();
+    if (ids.length) {
+      await this.cache.del(`${TOP_GAMES_CACHE_KEY}:${ids.join(',')}`);
+    }
+  }
+
   private writeTopGameIds(ids: string[]) {
     const dir = join(process.cwd(), 'data');
     if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
@@ -139,8 +147,15 @@ export class GamesService {
   }
 
   async setTopGames(ids: string[]) {
+    const oldIds = this.readTopGameIds();
+    if (oldIds.length) {
+      await this.cache.del(`${TOP_GAMES_CACHE_KEY}:${oldIds.join(',')}`);
+    }
     this.writeTopGameIds(ids);
     await this.cache.del(GAMES_CACHE_KEY);
+    if (ids.length) {
+      await this.cache.del(`${TOP_GAMES_CACHE_KEY}:${ids.join(',')}`);
+    }
     return { topGameIds: ids };
   }
 
@@ -197,7 +212,7 @@ export class GamesService {
         isActive: dto.isActive ?? true,
       },
     });
-    await this.cache.del(GAMES_CACHE_KEY);
+    await this.invalidateGamesCaches();
     return result;
   }
 
@@ -207,7 +222,7 @@ export class GamesService {
       where: { id },
       data: dto as Record<string, unknown>,
     });
-    await this.cache.del(GAMES_CACHE_KEY);
+    await this.invalidateGamesCaches();
     return result;
   }
 
@@ -216,7 +231,7 @@ export class GamesService {
     const result = await this.prisma.game.delete({
       where: { id },
     });
-    await this.cache.del(GAMES_CACHE_KEY);
+    await this.invalidateGamesCaches();
     return result;
   }
 }

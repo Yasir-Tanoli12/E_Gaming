@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { gamesApi, type Game, type CreateGameInput } from "@/lib/games-api";
+import { resolveUploadMediaUrl } from "@/lib/media-url";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
@@ -296,7 +297,7 @@ export default function AdminGamesPage() {
                   <div className="h-16 w-24 shrink-0 overflow-hidden rounded-lg bg-zinc-800 ring-1 ring-white/10">
                     {g.thumbnailUrl ? (
                       <img
-                        src={g.thumbnailUrl}
+                        src={resolveUploadMediaUrl(g.thumbnailUrl) ?? ""}
                         alt=""
                         className="h-full w-full object-cover"
                       />
@@ -390,7 +391,7 @@ export default function AdminGamesPage() {
                       <div className="h-12 w-20 overflow-hidden rounded-md bg-zinc-800 ring-1 ring-white/10">
                         {g.thumbnailUrl ? (
                           <img
-                            src={g.thumbnailUrl}
+                            src={resolveUploadMediaUrl(g.thumbnailUrl) ?? ""}
                             alt=""
                             className="h-full w-full object-cover"
                           />

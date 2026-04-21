@@ -2,6 +2,7 @@
 
 import { memo, useRef, useState } from "react";
 import type { Game } from "@/lib/games-api";
+import { resolveUploadMediaUrl } from "@/lib/media-url";
 import { OptimizedImage } from "./OptimizedImage";
 
 interface GameCardProps {
@@ -15,14 +16,16 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
   const [thumbError, setThumbError] = useState(false);
   const [videoError, setVideoError] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const thumbnailUrl = game.thumbnailUrl;
+  const thumbnailUrl = resolveUploadMediaUrl(game.thumbnailUrl);
+  const resolvedVideoField = resolveUploadMediaUrl(game.videoUrl);
   const maybeThumbIsVideo =
     !!thumbnailUrl &&
     (thumbnailUrl.toLowerCase().includes(".mp4") ||
       thumbnailUrl.toLowerCase().includes(".webm") ||
       thumbnailUrl.toLowerCase().includes(".ogg"));
   // Backward compatibility: if old records stored video in thumbnailUrl
-  const videoUrl = game.videoUrl ?? (maybeThumbIsVideo ? thumbnailUrl : null);
+  const videoUrl =
+    resolvedVideoField ?? (maybeThumbIsVideo ? thumbnailUrl : null);
   const imageUrl = maybeThumbIsVideo ? null : thumbnailUrl;
 
   function handlePlay() {

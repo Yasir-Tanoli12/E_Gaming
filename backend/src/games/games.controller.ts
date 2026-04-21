@@ -10,7 +10,6 @@ import {
   UseInterceptors,
   UploadedFile,
   BadRequestException,
-  Req,
   Header,
 } from '@nestjs/common';
 import { GamesService } from './games.service';
@@ -23,9 +22,6 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
-import type { Request } from 'express';
-import { getPublicApiOrigin } from '../common/get-public-api-origin';
-
 @Controller('games')
 export class GamesController {
   constructor(private readonly gamesService: GamesService) {}
@@ -94,16 +90,13 @@ export class GamesController {
       limits: { fileSize: 100 * 1024 * 1024 },
     }),
   )
-  uploadMedia(
-    @UploadedFile() file: { filename: string } | undefined,
-    @Req() req: Request,
-  ) {
+  uploadMedia(@UploadedFile() file: { filename: string } | undefined) {
     if (!file) {
       throw new BadRequestException('No file uploaded');
     }
-    const origin = getPublicApiOrigin(req);
+    // Store relative paths so DB rows work with any public API host (see frontend resolveUploadMediaUrl).
     return {
-      url: `${origin}/uploads/games/${file.filename}`,
+      url: `/uploads/games/${file.filename}`,
     };
   }
 

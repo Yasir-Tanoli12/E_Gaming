@@ -6,6 +6,7 @@ import { gamesApi, type Game } from "@/lib/games-api";
 import { newsApi, type NewsPoster } from "@/lib/news-api";
 import { contentApi, type SiteContent } from "@/lib/content-api";
 import { getApiBaseUrl } from "@/lib/api";
+import { resolveUploadMediaUrl } from "@/lib/media-url";
 import { GameCard } from "@/components/GameCard";
 import { Button } from "@/components/ui/Button";
 import { PublicNavbar } from "@/components/PublicNavbar";
@@ -84,8 +85,10 @@ export default function UserDashboardPage() {
     !!(contacts?.telegram && contacts.telegram.trim()) ||
     !!contacts?.email?.trim();
   const heroVideo =
-    contacts?.lobbyVideoUrl ??
-    orderedGames.find((game) => game.videoUrl)?.videoUrl ??
+    resolveUploadMediaUrl(contacts?.lobbyVideoUrl ?? null) ??
+    orderedGames
+      .map((game) => resolveUploadMediaUrl(game.videoUrl))
+      .find((u) => !!u) ??
     null;
   const reviewItems = content?.reviews ?? [];
   const movingReviewItems = useMemo(

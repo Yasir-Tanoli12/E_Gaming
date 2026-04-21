@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { getApiBaseUrl } from "@/lib/api";
+import { resolveUploadMediaUrl } from "@/lib/media-url";
 
 function isUploadUrl(src: string): boolean {
   const base = getApiBaseUrl();
@@ -43,14 +44,15 @@ export function OptimizedImage({
   className,
   ...rest
 }: OptimizedImageProps) {
-  if (!src) {
+  const resolved = resolveUploadMediaUrl(src);
+  if (!resolved) {
     return null;
   }
 
-  if (isUploadUrl(src) && !isLocalhost(src)) {
+  if (isUploadUrl(resolved) && !isLocalhost(resolved)) {
     return (
       <Image
-        src={src}
+        src={resolved}
         alt={alt}
         fill={fill}
         width={!fill ? width : undefined}
@@ -67,7 +69,7 @@ export function OptimizedImage({
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={src}
+      src={resolved}
       alt={alt}
       loading={priority ? "eager" : "lazy"}
       decoding="async"
