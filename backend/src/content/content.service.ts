@@ -148,7 +148,9 @@ export class ContentService {
           facebook: legacy.contacts.facebook ?? '',
           whatsapp: legacy.contacts.whatsapp ?? '',
           instagram: legacy.contacts.instagram ?? '',
-          telegram: legacy.contacts.telegram ?? '',
+          telegram: legacy.contacts.telegram?.trim()
+            ? legacy.contacts.telegram
+            : null,
           email: legacy.contacts.email ?? '',
           logoUrl: legacy.contacts.logoUrl ?? null,
         },
@@ -324,16 +326,24 @@ export class ContentService {
         ),
       ]);
 
+    const contactsPayload = contacts
+      ? {
+          ...contacts,
+          // Public API: always a string for clients (DB column is nullable).
+          telegram: contacts.telegram ?? '',
+        }
+      : {
+          facebook: '',
+          whatsapp: '',
+          instagram: '',
+          telegram: '',
+          email: '',
+          logoUrl: null,
+          lobbyVideoUrl: null,
+        };
+
     const result = {
-      contacts: contacts ?? {
-        facebook: '',
-        whatsapp: '',
-        instagram: '',
-        telegram: '',
-        email: '',
-        logoUrl: null,
-        lobbyVideoUrl: null,
-      },
+      contacts: contactsPayload,
       blogs,
       faqs,
       reviews,
@@ -402,16 +412,23 @@ export class ContentService {
         ),
       ]);
 
+    const contactsPayload = contacts
+      ? {
+          ...contacts,
+          telegram: contacts.telegram ?? '',
+        }
+      : {
+          facebook: '',
+          whatsapp: '',
+          instagram: '',
+          telegram: '',
+          email: '',
+          logoUrl: null,
+          lobbyVideoUrl: null,
+        };
+
     return {
-      contacts: contacts ?? {
-        facebook: '',
-        whatsapp: '',
-        instagram: '',
-        telegram: '',
-        email: '',
-        logoUrl: null,
-        lobbyVideoUrl: null,
-      },
+      contacts: contactsPayload,
       blogs,
       faqs,
       reviews,
@@ -433,7 +450,12 @@ export class ContentService {
     await this.bootstrapFromLegacyFile();
     const result = await this.prisma.contact.update({
       where: { id: 'default' },
-      data: dto,
+      data: {
+        ...dto,
+        ...(dto.telegram !== undefined
+          ? { telegram: dto.telegram.trim() ? dto.telegram.trim() : null }
+          : {}),
+      },
     });
     await this.invalidatePublicCache();
     return result;

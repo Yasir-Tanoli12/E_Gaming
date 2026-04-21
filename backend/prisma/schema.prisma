@@ -50,7 +50,7 @@ model Contact {
   facebook       String   @default("")
   whatsapp       String   @default("")
   instagram      String   @default("")
-  telegram       String   @default("")
+  telegram       String?
   email          String   @default("")
   logoUrl        String?  @map("logo_url")
   lobbyVideoUrl  String?  @map("lobby_video_url")
