@@ -84,8 +84,9 @@ export default function AdminGamesPage() {
     setSubmitting(true);
     setError("");
     try {
-      if (/^https?:\/\//i.test(form.gameLink.trim())) {
-        setError("Game link must be a local path (for example: /games/snake).");
+      const link = form.gameLink.trim();
+      if (!/^https?:\/\/\S+/i.test(link)) {
+        setError("Game link must start with http:// or https:// (full URL to the game).");
         return;
       }
       const payload = {
@@ -170,8 +171,8 @@ export default function AdminGamesPage() {
             Game lobby
           </h1>
           <p className="text-sm leading-relaxed text-zinc-500">
-            Cards shown on the public dashboard: thumbnail, optional hover video, and an
-            internal route (not an external URL).
+            Cards on the public dashboard: thumbnail and optional hover video from uploads,
+            plus the game opens at a full https URL when players choose Play.
           </p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -245,10 +246,10 @@ export default function AdminGamesPage() {
               />
             </div>
             <Input
-              label="Game route"
+              label="Game URL (opens when users play)"
               value={form.gameLink}
               onChange={(e) => setForm({ ...form, gameLink: e.target.value })}
-              placeholder="/games/snake"
+              placeholder="https://example.com/game"
               required
               className="!border-white/10 !bg-[#0c0c0f] !text-zinc-100"
             />
@@ -377,7 +378,7 @@ export default function AdminGamesPage() {
                     Featured
                   </th>
                   <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-zinc-500">
-                    Route
+                    Game URL
                   </th>
                   <th className="px-5 py-3.5 text-xs font-semibold uppercase tracking-wider text-zinc-500">
                     Actions
