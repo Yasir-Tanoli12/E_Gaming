@@ -1,47 +1,32 @@
 "use client";
 
-import Image from "next/image";
-import { getApiBaseUrl } from "@/lib/api";
 import { resolveUploadMediaUrl } from "@/lib/media-url";
 
-function isUploadUrl(src: string): boolean {
-  const base = getApiBaseUrl();
-  return src.startsWith(base) && src.includes("/uploads/");
-}
-
-function isLocalhost(url: string): boolean {
-  try {
-    const host = new URL(url).hostname;
-    return host === "localhost" || host === "127.0.0.1" || host === "::1";
-  } catch {
-    return false;
-  }
-}
-
-interface OptimizedImageProps
-  extends Omit<React.ComponentProps<typeof Image>, "src"> {
+/**
+ * Renders upload / remote images with a plain &lt;img&gt; so the browser loads the URL directly.
+ * Avoids `next/image` (/_next/image?url=…) which returns 400 unless every host is listed in remotePatterns.
+ */
+export interface OptimizedImageProps
+  extends Omit<React.ImgHTMLAttributes<HTMLImageElement>, "src"> {
   src: string;
   alt: string;
   fill?: boolean;
   width?: number;
   height?: number;
+  /** Kept for API compatibility; native img ignores it unless you add srcSet later. */
   sizes?: string;
   priority?: boolean;
 }
 
-/**
- * Uses next/image for backend upload URLs (auto WebP/AVIF, lazy load).
- * Falls back to native img for external URLs not in remotePatterns.
- */
 export function OptimizedImage({
   src,
   alt,
   fill,
   width,
   height,
-  sizes = "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw",
+  sizes: _sizes,
   priority = false,
-  className,
+  className = "",
   ...rest
 }: OptimizedImageProps) {
   const resolved = resolveUploadMediaUrl(src);
@@ -49,31 +34,18 @@ export function OptimizedImage({
     return null;
   }
 
-  if (isUploadUrl(resolved) && !isLocalhost(resolved)) {
-    return (
-      <Image
-        src={resolved}
-        alt={alt}
-        fill={fill}
-        width={!fill ? width : undefined}
-        height={!fill ? height : undefined}
-        sizes={sizes}
-        priority={priority}
-        className={className}
-        loading={priority ? "eager" : "lazy"}
-        {...rest}
-      />
-    );
-  }
+  const fillClass = fill ? "absolute inset-0 h-full w-full" : "";
+  const mergedClass = [fillClass, className].filter(Boolean).join(" ");
 
   return (
-    // eslint-disable-next-line @next/next/no-img-element
     <img
       src={resolved}
       alt={alt}
+      width={fill ? undefined : width}
+      height={fill ? undefined : height}
       loading={priority ? "eager" : "lazy"}
       decoding="async"
-      className={className}
+      className={mergedClass || undefined}
       {...rest}
     />
   );

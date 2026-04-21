@@ -1,9 +1,8 @@
 "use client";
 
-import { memo, useRef, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import type { Game } from "@/lib/games-api";
 import { resolveUploadMediaUrl } from "@/lib/media-url";
-import { OptimizedImage } from "./OptimizedImage";
 
 interface GameCardProps {
   game: Game;
@@ -27,6 +26,19 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
   const videoUrl =
     resolvedVideoField ?? (maybeThumbIsVideo ? thumbnailUrl : null);
   const imageUrl = maybeThumbIsVideo ? null : thumbnailUrl;
+  /** Thumbnail failed or missing but video works — show video (not a blank card). */
+  const videoAsPrimary =
+    Boolean(videoUrl && !videoError && (!imageUrl || thumbError));
+
+  useEffect(() => {
+    setThumbError(false);
+    setVideoError(false);
+  }, [imageUrl, videoUrl]);
+
+  useEffect(() => {
+    if (!videoAsPrimary || !videoRef.current || videoError) return;
+    videoRef.current.play().catch(() => {});
+  }, [videoAsPrimary, videoUrl, videoError]);
 
   function handlePlay() {
     if (onPlayRequest) {
@@ -62,14 +74,17 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(153,8,8,0.3),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(237,197,55,0.25),transparent_45%)] opacity-70" />
       <div className="relative aspect-video w-full overflow-hidden bg-[#0c1025]">
         {imageUrl && !thumbError ? (
-          <OptimizedImage
+          // Native <img> so API /uploads URLs always load (no next/image / remotePatterns edge cases).
+          <img
             src={imageUrl}
             alt={game.title}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            loading="lazy"
+            decoding="async"
             onError={() => setThumbError(true)}
-            className={`object-cover transition-all duration-500 ${
-              hovered && videoUrl && !videoError ? "opacity-0 scale-105" : "opacity-100 scale-100"
+            className={`absolute inset-0 h-full w-full object-cover transition-all duration-500 ${
+              hovered && videoUrl && !videoError && !videoAsPrimary
+                ? "opacity-0 scale-105"
+                : "opacity-100 scale-100"
             }`}
           />
         ) : null}
@@ -81,20 +96,20 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
             muted
             loop
             playsInline
-            preload="metadata"
+            preload={videoAsPrimary ? "auto" : "metadata"}
             onError={() => setVideoError(true)}
             onLoadedData={() => {
-              if (hovered) {
+              if (hovered || videoAsPrimary) {
                 videoRef.current?.play().catch(() => {});
               }
             }}
             className={`absolute inset-0 h-full w-full object-cover transition-all duration-500 ${
-              hovered ? "opacity-100 scale-100" : "opacity-0 scale-105"
+              videoAsPrimary || hovered ? "opacity-100 scale-100" : "opacity-0 scale-105"
             }`}
           />
         ) : null}
 
-        {!imageUrl && (!videoUrl || videoError) ? (
+        {(!imageUrl || thumbError) && (!videoUrl || videoError) ? (
           <div className="absolute inset-0 flex h-full w-full items-center justify-center bg-gradient-to-br from-[#1a0a0a] to-[#0f0808]">
             <span className="text-4xl font-black text-[#EDC537]/70">
               {game.title.charAt(0)}

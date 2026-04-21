@@ -15,6 +15,23 @@ const tailwindPostcssRoot = path.join(
 const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 const apiParsed = new URL(apiUrl);
 
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+let supabaseHostPattern: { protocol: "https"; hostname: string; port: string; pathname: string } | null =
+  null;
+if (supabaseUrl) {
+  try {
+    const u = new URL(supabaseUrl);
+    supabaseHostPattern = {
+      protocol: "https",
+      hostname: u.hostname,
+      port: u.port || "",
+      pathname: "/**",
+    };
+  } catch {
+    supabaseHostPattern = null;
+  }
+}
+
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -50,6 +67,14 @@ const nextConfig: NextConfig = {
         port: apiParsed.port || "",
         pathname: "/uploads/**",
       },
+      // Storage / any code still using next/image against Supabase
+      {
+        protocol: "https",
+        hostname: "**.supabase.co",
+        port: "",
+        pathname: "/**",
+      },
+      ...(supabaseHostPattern ? [supabaseHostPattern] : []),
     ],
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048],

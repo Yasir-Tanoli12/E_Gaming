@@ -14,8 +14,9 @@ export interface Game {
 export interface CreateGameInput {
   title: string;
   description?: string;
-  thumbnailUrl?: string;
-  videoUrl?: string;
+  /** Upload path or null on PATCH to clear (never a pasted media URL in admin UI). */
+  thumbnailUrl?: string | null;
+  videoUrl?: string | null;
   gameLink: string;
   sortOrder?: number;
   isActive?: boolean;

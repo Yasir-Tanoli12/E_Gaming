@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { gamesApi, type Game, type CreateGameInput } from "@/lib/games-api";
+import {
+  gamesApi,
+  type Game,
+  type CreateGameInput,
+} from "@/lib/games-api";
 import { resolveUploadMediaUrl } from "@/lib/media-url";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -24,7 +28,9 @@ export default function AdminGamesPage() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [uploading, setUploading] = useState(false);
+  const [uploadTarget, setUploadTarget] = useState<"thumbnail" | "video" | null>(null);
+  const [thumbFileKey, setThumbFileKey] = useState(0);
+  const [videoFileKey, setVideoFileKey] = useState(0);
   const [topIds, setTopIds] = useState<string[]>([]);
   const [togglingTopId, setTogglingTopId] = useState<string | null>(null);
 
@@ -89,11 +95,21 @@ export default function AdminGamesPage() {
         setError("Game link must start with http:// or https:// (full URL to the game).");
         return;
       }
-      const payload = {
-        ...form,
+      const thumbTrim = (form.thumbnailUrl ?? "").trim();
+      const videoTrim = (form.videoUrl ?? "").trim();
+      if (!editing && !thumbTrim) {
+        setError("Choose a thumbnail image from your device (no URL field — use the file picker).");
+        return;
+      }
+      const payload: CreateGameInput = {
+        title: form.title,
         description: form.description || undefined,
-        thumbnailUrl: form.thumbnailUrl || undefined,
-        videoUrl: form.videoUrl || undefined,
+        gameLink: form.gameLink.trim(),
+        sortOrder: form.sortOrder,
+        isActive: form.isActive,
+        thumbnailUrl:
+          thumbTrim === "" ? (editing ? null : undefined) : thumbTrim,
+        videoUrl: videoTrim === "" ? (editing ? null : undefined) : videoTrim,
       };
       if (editing) {
         await gamesApi.update(editing.id, payload);
@@ -125,7 +141,7 @@ export default function AdminGamesPage() {
 
   async function handleThumbnailUpload(file: File | null) {
     if (!file) return;
-    setUploading(true);
+    setUploadTarget("thumbnail");
     setError("");
     try {
       const { url } = await gamesApi.uploadMedia(file);
@@ -133,13 +149,13 @@ export default function AdminGamesPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {
-      setUploading(false);
+      setUploadTarget(null);
     }
   }
 
   async function handleVideoUpload(file: File | null) {
     if (!file) return;
-    setUploading(true);
+    setUploadTarget("video");
     setError("");
     try {
       const { url } = await gamesApi.uploadMedia(file);
@@ -147,7 +163,7 @@ export default function AdminGamesPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {
-      setUploading(false);
+      setUploadTarget(null);
     }
   }
 
@@ -171,8 +187,8 @@ export default function AdminGamesPage() {
             Game lobby
           </h1>
           <p className="text-sm leading-relaxed text-zinc-500">
-            Cards on the public dashboard: thumbnail and optional hover video from uploads,
-            plus the game opens at a full https URL when players choose Play.
+            Thumbnail and hover video are always chosen as files from your computer (no image
+            or video URLs). Only the Play link is a typed URL.
           </p>
         </div>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -202,7 +218,9 @@ export default function AdminGamesPage() {
             {editing ? "Edit game" : "New game"}
           </h2>
           <p className="mt-1 text-xs text-zinc-500">
-            Upload media from this device; paths are stored relative to your API host.
+            Use <span className="font-medium text-zinc-400">Choose file</span> for thumbnail and
+            optional video — do not paste image or video links. The server stores the uploaded
+            file path automatically.
           </p>
           <form onSubmit={handleSubmit} className="mt-6 space-y-4">
             <Input
@@ -222,28 +240,79 @@ export default function AdminGamesPage() {
             />
             <div>
               <label className="mb-2 block text-sm font-medium !text-zinc-200">
-                Thumbnail
+                Thumbnail image <span className="font-normal text-zinc-500">(required — from device)</span>
               </label>
               <input
+                key={`thumb-${thumbFileKey}`}
                 type="file"
                 accept="image/*"
                 onChange={(e) => handleThumbnailUpload(e.target.files?.[0] ?? null)}
                 className={fileInputClass}
               />
-              {uploading && (
-                <p className="mt-2 text-xs text-amber-200/80">Uploading…</p>
+              {uploadTarget === "thumbnail" && (
+                <p className="mt-2 text-xs text-amber-200/80">Uploading thumbnail…</p>
+              )}
+              {form.thumbnailUrl ? (
+                <div className="mt-3 flex flex-wrap items-start gap-3">
+                  <img
+                    src={resolveUploadMediaUrl(form.thumbnailUrl) ?? ""}
+                    alt="Thumbnail preview"
+                    className="h-24 w-40 rounded-lg object-cover ring-1 ring-white/15"
+                  />
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="!text-xs"
+                    onClick={() => {
+                      setForm((p) => ({ ...p, thumbnailUrl: "" }));
+                      setThumbFileKey((k) => k + 1);
+                    }}
+                  >
+                    Remove & pick another file
+                  </Button>
+                </div>
+              ) : (
+                <p className="mt-2 text-xs text-zinc-600">No image selected yet.</p>
               )}
             </div>
             <div>
               <label className="mb-2 block text-sm font-medium !text-zinc-200">
-                Hover video (optional)
+                Hover video <span className="font-normal text-zinc-500">(optional — from device)</span>
               </label>
               <input
+                key={`vid-${videoFileKey}`}
                 type="file"
                 accept="video/*"
                 onChange={(e) => handleVideoUpload(e.target.files?.[0] ?? null)}
                 className={fileInputClass}
               />
+              {uploadTarget === "video" && (
+                <p className="mt-2 text-xs text-amber-200/80">Uploading video…</p>
+              )}
+              {form.videoUrl ? (
+                <div className="mt-3 flex flex-wrap items-start gap-3">
+                  <video
+                    src={resolveUploadMediaUrl(form.videoUrl) ?? ""}
+                    muted
+                    playsInline
+                    className="h-24 max-w-[240px] rounded-lg object-cover ring-1 ring-white/15"
+                    preload="metadata"
+                  />
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    className="!text-xs"
+                    onClick={() => {
+                      setForm((p) => ({ ...p, videoUrl: "" }));
+                      setVideoFileKey((k) => k + 1);
+                    }}
+                  >
+                    Remove & pick another file
+                  </Button>
+                </div>
+              ) : (
+                <p className="mt-2 text-xs text-zinc-600">No video selected (hover will use thumbnail only).</p>
+              )}
             </div>
             <Input
               label="Game URL (opens when users play)"
@@ -477,9 +546,9 @@ export default function AdminGamesPage() {
       )}
       {!loading && games.length > 0 && (
         <p className="text-xs leading-relaxed text-zinc-500">
-          <span className="font-medium text-zinc-400">Featured</span> games appear first on
-          the public lobby. Use a route like <code className="text-zinc-400">/games/snake</code>
-          , not an external URL.
+          <span className="font-medium text-zinc-400">Featured</span> games appear first on the
+          public lobby. Each game&apos;s Play link must be a full <code className="text-zinc-400">https://…</code>{" "}
+          URL; thumbnail and hover video are always uploaded files, not pasted links.
         </p>
       )}
     </div>
