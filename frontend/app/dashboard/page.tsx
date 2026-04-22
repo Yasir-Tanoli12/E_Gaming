@@ -144,14 +144,6 @@ export default function UserDashboardPage() {
               Browse our curated games. Play instantly with your credentials or
               get access from our support team. Click any game card to play or buy credentials.
             </p>
-            <div className="mt-7 flex flex-wrap items-center gap-3 text-xs">
-              <span className="rounded-full border border-[#EDC537]/50 bg-[#EDC537]/25 px-3 py-1 text-zinc-800">
-                Game previews
-              </span>
-              <span className="rounded-full border border-[#990808]/50 bg-[#990808]/20 px-3 py-1 text-zinc-800">
-                Get credentials
-              </span>
-            </div>
           </div>
           <div className="relative h-[420px] animate-fade-in animation-delay-200 rounded-3xl border border-[#EDC537]/40 bg-gradient-to-br from-[#990808]/25 to-[#EDC537]/20 p-3 shadow-[0_0_45px_rgba(237,197,55,0.3)] md:h-[500px]">
             <div className="absolute -inset-[1px] -z-10 rounded-3xl bg-[conic-gradient(from_0deg,rgba(237,197,55,0.4),rgba(153,8,8,0.45),rgba(237,197,55,0.4))] blur-sm" />
