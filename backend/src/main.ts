@@ -5,9 +5,12 @@ import compression from 'compression';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/http-exception.filter';
-import { join } from 'path';
 import * as express from 'express';
 import { ConfigService } from '@nestjs/config';
+import {
+  ensureUploadsTree,
+  getUploadsFilesystemRoot,
+} from './common/uploads-filesystem-root';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -54,13 +57,16 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.use('/uploads', express.static(join(process.cwd(), 'uploads')));
+  ensureUploadsTree();
+  const uploadsRoot = getUploadsFilesystemRoot();
+  app.use('/uploads', express.static(uploadsRoot));
 
   const port = process.env.PORT || 3001;
   await app.listen(port);
 
   const logger = new Logger('Bootstrap');
   logger.log(`Listening on port ${port} (NODE_ENV=${nodeEnv ?? 'undefined'})`);
+  logger.log(`Serving static files from ${uploadsRoot}`);
 }
 
 bootstrap();

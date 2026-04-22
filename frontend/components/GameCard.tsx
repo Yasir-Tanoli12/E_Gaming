@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useState } from "react";
 import type { Game } from "@/lib/games-api";
 import { resolveUploadMediaUrl } from "@/lib/media-url";
 
@@ -12,9 +12,8 @@ interface GameCardProps {
 
 function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps) {
   const [hovered, setHovered] = useState(false);
-  const [thumbError, setThumbError] = useState(false);
-  const [videoError, setVideoError] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const [thumbFailedSrc, setThumbFailedSrc] = useState<string | null>(null);
+  const [videoFailedSrc, setVideoFailedSrc] = useState<string | null>(null);
   const thumbnailUrl = resolveUploadMediaUrl(game.thumbnailUrl);
   const resolvedVideoField = resolveUploadMediaUrl(game.videoUrl);
   const maybeThumbIsVideo =
@@ -26,19 +25,11 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
   const videoUrl =
     resolvedVideoField ?? (maybeThumbIsVideo ? thumbnailUrl : null);
   const imageUrl = maybeThumbIsVideo ? null : thumbnailUrl;
+  const thumbError = Boolean(imageUrl && thumbFailedSrc === imageUrl);
+  const videoError = Boolean(videoUrl && videoFailedSrc === videoUrl);
   /** Thumbnail failed or missing but video works — show video (not a blank card). */
   const videoAsPrimary =
     Boolean(videoUrl && !videoError && (!imageUrl || thumbError));
-
-  useEffect(() => {
-    setThumbError(false);
-    setVideoError(false);
-  }, [imageUrl, videoUrl]);
-
-  useEffect(() => {
-    if (!videoAsPrimary || !videoRef.current || videoError) return;
-    videoRef.current.play().catch(() => {});
-  }, [videoAsPrimary, videoUrl, videoError]);
 
   function handlePlay() {
     if (onPlayRequest) {
@@ -52,17 +43,10 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
 
   function handleMouseEnter() {
     setHovered(true);
-    if (videoRef.current && videoUrl && !videoError) {
-      videoRef.current.play().catch(() => {});
-    }
   }
 
   function handleMouseLeave() {
     setHovered(false);
-    if (videoRef.current) {
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    }
   }
 
   return (
@@ -80,7 +64,7 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
             alt={game.title}
             loading="lazy"
             decoding="async"
-            onError={() => setThumbError(true)}
+            onError={() => setThumbFailedSrc(imageUrl)}
             className={`absolute inset-0 h-full w-full object-cover transition-all duration-500 ${
               hovered && videoUrl && !videoError && !videoAsPrimary
                 ? "pointer-events-none z-10 opacity-0 scale-105"
@@ -91,18 +75,13 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
 
         {videoUrl && !videoError ? (
           <video
-            ref={videoRef}
             src={videoUrl}
+            autoPlay
             muted
             loop
             playsInline
             preload={videoAsPrimary ? "auto" : "metadata"}
-            onError={() => setVideoError(true)}
-            onLoadedData={() => {
-              if (hovered || videoAsPrimary) {
-                videoRef.current?.play().catch(() => {});
-              }
-            }}
+            onError={() => setVideoFailedSrc(videoUrl)}
             className={`absolute inset-0 h-full w-full object-cover transition-all duration-500 pointer-events-none ${
               hovered || videoAsPrimary
                 ? "z-10 opacity-100 scale-100"

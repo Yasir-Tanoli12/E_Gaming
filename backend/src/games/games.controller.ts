@@ -22,6 +22,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
+import { getUploadsFilesystemRoot } from '../common/uploads-filesystem-root';
 @Controller('games')
 export class GamesController {
   constructor(private readonly gamesService: GamesService) {}
@@ -64,7 +65,7 @@ export class GamesController {
     FileInterceptor('file', {
       storage: diskStorage({
         destination: (_req, _file, cb) => {
-          const dir = join(process.cwd(), 'uploads', 'games');
+          const dir = join(getUploadsFilesystemRoot(), 'games');
           if (!existsSync(dir)) {
             mkdirSync(dir, { recursive: true });
           }

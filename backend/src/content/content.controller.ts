@@ -33,6 +33,7 @@ import { UpdateFaqDto } from './dto/update-faq.dto';
 import { UpdatePrivacyPolicyDto } from './dto/update-privacy-policy.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { getPublicApiOrigin } from '../common/get-public-api-origin';
+import { getUploadsFilesystemRoot } from '../common/uploads-filesystem-root';
 
 @Controller('content')
 export class ContentController {
@@ -75,7 +76,7 @@ export class ContentController {
     FileInterceptor('file', {
       storage: diskStorage({
         destination: (_req, _file, cb) => {
-          const dir = join(process.cwd(), 'uploads', 'branding');
+          const dir = join(getUploadsFilesystemRoot(), 'branding');
           if (!existsSync(dir)) {
             mkdirSync(dir, { recursive: true });
           }
@@ -117,7 +118,7 @@ export class ContentController {
     FileInterceptor('file', {
       storage: diskStorage({
         destination: (_req, _file, cb) => {
-          const dir = join(process.cwd(), 'uploads', 'lobby');
+          const dir = join(getUploadsFilesystemRoot(), 'lobby');
           if (!existsSync(dir)) {
             mkdirSync(dir, { recursive: true });
           }

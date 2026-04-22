@@ -1,5 +1,8 @@
 export const AUTH_EXPIRED_EVENT = "app:auth-expired";
 const REQUEST_TIMEOUT_MS = Number(process.env.NEXT_PUBLIC_API_TIMEOUT_MS ?? 15000);
+const FORM_REQUEST_TIMEOUT_MS = Number(
+  process.env.NEXT_PUBLIC_API_FORM_TIMEOUT_MS ?? 120000
+);
 const LOCAL_DEV_API_URL = "http://localhost:3001";
 
 function resolveApiBaseUrl(): string {
@@ -82,7 +85,11 @@ async function parsePayload(res: Response): Promise<unknown> {
   }
 }
 
-function getErrorMessage(payload: unknown, fallback: string): string {
+function getErrorMessage(payload: unknown, fallback: string, status?: number): string {
+  if (status === 413) {
+    return "Upload too large. Reduce file size or increase nginx client_max_body_size.";
+  }
+
   const sanitizeMessage = (message: string): string => {
     const trimmed = message.trim();
     if (trimmed.startsWith("<") || /<html|<body|<head|<center/i.test(trimmed)) {
@@ -124,7 +131,7 @@ async function handleResponse<T>(res: Response, path: string): Promise<T> {
       dispatchAuthExpired(path);
     }
     throw new ApiError(
-      getErrorMessage(data, `Request failed with status ${res.status}`),
+      getErrorMessage(data, `Request failed with status ${res.status}`, res.status),
       res.status,
       data
     );
@@ -167,7 +174,7 @@ export async function apiFormRequest<T>(
   formData: FormData
 ): Promise<T> {
   const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+  const timeout = setTimeout(() => controller.abort(), FORM_REQUEST_TIMEOUT_MS);
   try {
     const res = await fetch(`${getApiBaseUrl()}${path}`, {
       method,
