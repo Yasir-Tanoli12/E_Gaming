@@ -41,6 +41,12 @@ const ALLOWED_VIDEO_MIMES = new Set([
 const ALLOWED_IMAGE_EXTS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif']);
 const ALLOWED_VIDEO_EXTS = new Set(['.mp4', '.webm', '.ogg', '.mov']);
 
+type UploadedMediaFile = {
+  filename: string;
+  originalname: string;
+  size: number;
+};
+
 function isAllowedGameMedia(file: { mimetype: string; originalname: string }): boolean {
   const mime = (file.mimetype || '').toLowerCase().trim();
   const ext = extname(file.originalname || '').toLowerCase();
@@ -109,7 +115,7 @@ export class GamesController {
       limits: { fileSize: MAX_UPLOAD_FILE_BYTES },
     }),
   )
-  uploadMedia(@UploadedFile() file: Express.Multer.File | undefined) {
+  uploadMedia(@UploadedFile() file: UploadedMediaFile | undefined) {
     if (!file) {
       this.logger.warn(
         'upload-media: missing file (wrong field name, rejected type, or over size limit)',
@@ -145,3 +151,4 @@ export class GamesController {
     return this.gamesService.remove(id);
   }
 }
+

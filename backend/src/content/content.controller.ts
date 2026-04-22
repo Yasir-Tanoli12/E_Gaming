@@ -54,6 +54,12 @@ const ALLOWED_LOBBY_VIDEO_MIMES = new Set([
 ]);
 const ALLOWED_LOBBY_VIDEO_EXTS = new Set(['.mp4', '.webm', '.ogg', '.mov']);
 
+type UploadedMediaFile = {
+  filename: string;
+  originalname: string;
+  size: number;
+};
+
 function isAllowedLogo(file: { mimetype: string; originalname: string }): boolean {
   const mime = (file.mimetype || '').toLowerCase().trim();
   const ext = extname(file.originalname || '').toLowerCase();
@@ -164,7 +170,7 @@ export class ContentController {
     }),
   )
   async uploadLobbyVideo(
-    @UploadedFile() file: Express.Multer.File | undefined,
+    @UploadedFile() file: UploadedMediaFile | undefined,
     @Req() req: Request,
   ) {
     if (!file) {
@@ -292,3 +298,4 @@ export class ContentController {
   }
 
 }
+
