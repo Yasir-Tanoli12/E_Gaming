@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { gamesApi, type Game } from "@/lib/games-api";
 import { newsApi, type NewsPoster } from "@/lib/news-api";
@@ -28,6 +28,8 @@ export default function UserDashboardPage() {
   const [showCredentialOptions, setShowCredentialOptions] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const heroVideoRef = useRef<HTMLVideoElement | null>(null);
+  const [heroVideoBlocked, setHeroVideoBlocked] = useState(false);
 
   /** Open /dashboard#games (etc.) from other pages — scroll target after layout. */
   useEffect(() => {
@@ -133,6 +135,33 @@ export default function UserDashboardPage() {
     setShowCredentialOptions(false);
   }, []);
 
+  useEffect(() => {
+    setHeroVideoBlocked(false);
+    const video = heroVideoRef.current;
+    if (!video || !heroVideo) return;
+
+    const tryPlay = () => {
+      video.defaultMuted = true;
+      video.muted = true;
+      video.play().then(() => setHeroVideoBlocked(false)).catch(() => setHeroVideoBlocked(true));
+    };
+
+    tryPlay();
+    const onCanPlay = () => tryPlay();
+    const onVisibility = () => {
+      if (document.visibilityState === "visible") {
+        tryPlay();
+      }
+    };
+
+    video.addEventListener("canplay", onCanPlay);
+    document.addEventListener("visibilitychange", onVisibility);
+    return () => {
+      video.removeEventListener("canplay", onCanPlay);
+      document.removeEventListener("visibilitychange", onVisibility);
+    };
+  }, [heroVideo]);
+
   return (
     <div className="min-h-screen bg-[#FFFBF5] text-[#1a1a1a]">
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
@@ -164,14 +193,33 @@ export default function UserDashboardPage() {
             <div className="absolute -inset-[1px] -z-10 rounded-3xl bg-[conic-gradient(from_0deg,rgba(237,197,55,0.4),rgba(153,8,8,0.45),rgba(237,197,55,0.4))] blur-sm" />
             <div className="group relative h-full w-full overflow-hidden rounded-2xl border border-[#EDC537]/40 bg-white/95 shadow-lg">
               {heroVideo ? (
-                <video
-                  src={heroVideo}
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                />
+                <>
+                  <video
+                    ref={heroVideoRef}
+                    src={heroVideo}
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    preload="auto"
+                    className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                  />
+                  {heroVideoBlocked ? (
+                    <button
+                      type="button"
+                      className="absolute inset-0 z-20 flex items-center justify-center bg-black/25 text-sm font-semibold text-white backdrop-blur-[1px]"
+                      onClick={() => {
+                        const video = heroVideoRef.current;
+                        if (!video) return;
+                        video.defaultMuted = true;
+                        video.muted = true;
+                        video.play().then(() => setHeroVideoBlocked(false)).catch(() => {});
+                      }}
+                    >
+                      Tap to play lobby video
+                    </button>
+                  ) : null}
+                </>
               ) : (
                 <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_20%_20%,rgba(153,8,8,0.15),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(237,197,55,0.25),transparent_40%),linear-gradient(120deg,#FFF8E7,#FFFBF5)]">
                   <p className="text-sm text-zinc-500">Game preview will appear here</p>
