@@ -70,6 +70,12 @@ export class ApiError extends Error {
   }
 }
 
+export type UploadProgress = {
+  loaded: number;
+  total: number | null;
+  percent: number | null;
+};
+
 function toApiError(error: unknown): ApiError {
   if (error instanceof ApiError) return error;
   if (error instanceof Error && error.name === "AbortError") {
@@ -197,4 +203,72 @@ export async function apiFormRequest<T>(
   } finally {
     clearTimeout(timeout);
   }
+}
+
+export function apiFormRequestWithProgress<T>(
+  path: string,
+  method: "POST" | "PATCH" | "PUT",
+  formData: FormData,
+  onProgress?: (progress: UploadProgress) => void
+): Promise<T> {
+  if (typeof XMLHttpRequest === "undefined") {
+    return apiFormRequest<T>(path, method, formData);
+  }
+
+  return new Promise<T>((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    const url = `${getApiBaseUrl()}${path}`;
+
+    xhr.open(method, url, true);
+    xhr.withCredentials = true;
+    xhr.timeout = FORM_REQUEST_TIMEOUT_MS;
+
+    xhr.upload.onprogress = (event) => {
+      if (!onProgress) return;
+      const total = event.lengthComputable ? event.total : null;
+      const percent =
+        total && total > 0 ? Math.max(0, Math.min(100, Math.round((event.loaded * 100) / total))) : null;
+      onProgress({ loaded: event.loaded, total, percent });
+    };
+
+    xhr.onload = () => {
+      let payload: unknown = {};
+      try {
+        payload = xhr.responseText ? JSON.parse(xhr.responseText) : {};
+      } catch {
+        payload = { message: xhr.responseText || "" };
+      }
+
+      if (xhr.status >= 200 && xhr.status < 300) {
+        resolve(payload as T);
+        return;
+      }
+
+      if (xhr.status === 401 || xhr.status === 403) {
+        dispatchAuthExpired(path);
+      }
+      reject(
+        new ApiError(
+          getErrorMessage(payload, `Request failed with status ${xhr.status}`, xhr.status),
+          xhr.status,
+          payload,
+          xhr.status === 0
+        )
+      );
+    };
+
+    xhr.onerror = () => reject(new ApiError("Network request failed", 0, null, true));
+    xhr.onabort = () =>
+      reject(
+        new ApiError(
+          "The request timed out or was aborted. For large uploads, increase NEXT_PUBLIC_API_FORM_TIMEOUT_MS; for other API calls, increase NEXT_PUBLIC_API_TIMEOUT_MS.",
+          0,
+          null,
+          true
+        )
+      );
+    xhr.ontimeout = xhr.onabort;
+
+    xhr.send(formData);
+  });
 }

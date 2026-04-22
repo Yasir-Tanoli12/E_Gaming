@@ -28,6 +28,8 @@ export function AdminBrandingPanel() {
   const [loading, setLoading] = useState(true);
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingLobbyVideo, setUploadingLobbyVideo] = useState(false);
+  const [logoUploadPercent, setLogoUploadPercent] = useState<number | null>(null);
+  const [lobbyUploadPercent, setLobbyUploadPercent] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [logoUrl, setLogoUrl] = useState("");
   const [lobbyVideoUrl, setLobbyVideoUrl] = useState("");
@@ -61,14 +63,18 @@ export function AdminBrandingPanel() {
       return;
     }
     setUploadingLogo(true);
+    setLogoUploadPercent(0);
     setError("");
     try {
-      const res = await contentApi.uploadLogo(file);
+      const res = await contentApi.uploadLogo(file, (percent) => {
+        setLogoUploadPercent(percent);
+      });
       setLogoUrl(res.logoUrl ?? "");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to upload logo");
     } finally {
       setUploadingLogo(false);
+      setLogoUploadPercent(null);
     }
   }
 
@@ -99,9 +105,12 @@ export function AdminBrandingPanel() {
       return;
     }
     setUploadingLobbyVideo(true);
+    setLobbyUploadPercent(0);
     setError("");
     try {
-      const res = await contentApi.uploadLobbyVideo(file);
+      const res = await contentApi.uploadLobbyVideo(file, (percent) => {
+        setLobbyUploadPercent(percent);
+      });
       setLobbyVideoUrl(res.lobbyVideoUrl ?? "");
       // Do not call load() here: GET /content/admin can fail separately (502/HTML from nginx) and
       // would overwrite this success with a misleading "server unavailable" banner.
@@ -109,6 +118,7 @@ export function AdminBrandingPanel() {
       setError(err instanceof Error ? err.message : "Failed to upload lobby video");
     } finally {
       setUploadingLobbyVideo(false);
+      setLobbyUploadPercent(null);
     }
   }
 
@@ -161,7 +171,9 @@ export function AdminBrandingPanel() {
             className="w-full max-w-md cursor-pointer rounded-lg border border-white/10 bg-[#0c0c0f] px-3 py-2 text-sm text-zinc-200 file:mr-3 file:rounded-md file:border-0 file:bg-zinc-800 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-zinc-200"
           />
           {uploadingLogo && (
-            <p className="mt-1 text-xs text-amber-200/80">Uploading logo…</p>
+            <p className="mt-1 text-xs text-amber-200/80">
+              Uploading logo{logoUploadPercent !== null ? `… ${logoUploadPercent}%` : "…"}
+            </p>
           )}
           {logoPreview && (
             <div className="mt-3 inline-flex items-center gap-3 rounded-xl border border-cyan-400/25 bg-cyan-500/10 px-3 py-2">
@@ -186,7 +198,9 @@ export function AdminBrandingPanel() {
             className="w-full max-w-md cursor-pointer rounded-lg border border-white/10 bg-[#0c0c0f] px-3 py-2 text-sm text-zinc-200 file:mr-3 file:rounded-md file:border-0 file:bg-zinc-800 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-zinc-200"
           />
           {uploadingLobbyVideo && (
-            <p className="mt-1 text-xs text-amber-200/80">Uploading lobby video…</p>
+            <p className="mt-1 text-xs text-amber-200/80">
+              Uploading lobby video{lobbyUploadPercent !== null ? `… ${lobbyUploadPercent}%` : "…"}
+            </p>
           )}
           {lobbyPreview && (
             <div className="mt-3 inline-flex items-center gap-3 rounded-xl border border-fuchsia-400/25 bg-fuchsia-500/10 px-3 py-2">

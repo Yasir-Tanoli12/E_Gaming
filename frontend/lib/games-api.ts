@@ -1,4 +1,4 @@
-import { apiFormRequest, apiRequest } from "./api";
+import { apiFormRequestWithProgress, apiRequest } from "./api";
 
 export interface Game {
   id: string;
@@ -42,10 +42,15 @@ export const gamesApi = {
     });
   },
 
-  async uploadMedia(file: File): Promise<{ url: string }> {
+  async uploadMedia(file: File, onProgress?: (percent: number | null) => void): Promise<{ url: string }> {
     const formData = new FormData();
     formData.append("file", file);
-    return apiFormRequest<{ url: string }>("/games/upload-media", "POST", formData);
+    return apiFormRequestWithProgress<{ url: string }>(
+      "/games/upload-media",
+      "POST",
+      formData,
+      (p) => onProgress?.(p.percent)
+    );
   },
 
   create(body: CreateGameInput) {

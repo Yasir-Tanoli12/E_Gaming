@@ -1,4 +1,4 @@
-import { apiFormRequest, apiRequest } from "./api";
+import { apiFormRequest, apiFormRequestWithProgress, apiRequest } from "./api";
 
 export interface SiteContacts {
   facebook: string;
@@ -88,24 +88,35 @@ export const contentApi = {
 
     return publicContentInFlight;
   },
-  async uploadLobbyVideo(file: File): Promise<{ lobbyVideoUrl: string | null; updatedAt: string }> {
+  async uploadLobbyVideo(
+    file: File,
+    onProgress?: (percent: number | null) => void
+  ): Promise<{ lobbyVideoUrl: string | null; updatedAt: string }> {
     const formData = new FormData();
     formData.append("file", file);
-    const result = await apiFormRequest<{ lobbyVideoUrl: string | null; updatedAt: string }>(
+    const result = await apiFormRequestWithProgress<{
+      lobbyVideoUrl: string | null;
+      updatedAt: string;
+    }>(
       "/content/lobby-video",
       "POST",
-      formData
+      formData,
+      (p) => onProgress?.(p.percent)
     );
     clearPublicContentCache();
     return result;
   },
-  async uploadLogo(file: File): Promise<{ logoUrl: string | null; updatedAt: string }> {
+  async uploadLogo(
+    file: File,
+    onProgress?: (percent: number | null) => void
+  ): Promise<{ logoUrl: string | null; updatedAt: string }> {
     const formData = new FormData();
     formData.append("file", file);
-    const result = await apiFormRequest<{ logoUrl: string | null; updatedAt: string }>(
+    const result = await apiFormRequestWithProgress<{ logoUrl: string | null; updatedAt: string }>(
       "/content/logo",
       "POST",
-      formData
+      formData,
+      (p) => onProgress?.(p.percent)
     );
     clearPublicContentCache();
     return result;

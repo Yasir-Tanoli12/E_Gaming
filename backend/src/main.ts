@@ -17,6 +17,18 @@ const BODY_PARSER_LIMIT = '500mb';
 /** Allow large/slow uploads end-to-end (Node default requestTimeout is often 5 minutes). */
 const HTTP_UPLOAD_WINDOW_MS = 60 * 60 * 1000;
 
+function shouldCompressResponse(
+  req: express.Request,
+  res: express.Response,
+): boolean {
+  // Upload endpoints return tiny JSON responses; skipping compression saves CPU.
+  const contentType = req.headers['content-type'] ?? '';
+  if (typeof contentType === 'string' && contentType.includes('multipart/form-data')) {
+    return false;
+  }
+  return compression.filter(req, res);
+}
+
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: true,
@@ -40,7 +52,7 @@ async function bootstrap() {
   app.useGlobalFilters(new HttpExceptionFilter());
 
   app.use(cookieParser());
-  app.use(compression());
+  app.use(compression({ filter: shouldCompressResponse }));
   app.use(
     helmet({
       crossOriginResourcePolicy: { policy: 'cross-origin' },

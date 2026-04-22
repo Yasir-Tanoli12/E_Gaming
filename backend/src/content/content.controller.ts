@@ -21,7 +21,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage, memoryStorage } from 'multer';
 import type { Request, Response } from 'express';
 import { extname, join } from 'path';
-import { existsSync, mkdirSync } from 'fs';
+import { mkdirSync } from 'fs';
 import { ContentService } from './content.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
 import { CreateFaqDto } from './dto/create-faq.dto';
@@ -59,6 +59,11 @@ type UploadedMediaFile = {
   originalname: string;
   size: number;
 };
+
+const BRANDING_UPLOAD_DIR = join(getUploadsFilesystemRoot(), 'branding');
+const LOBBY_UPLOAD_DIR = join(getUploadsFilesystemRoot(), 'lobby');
+mkdirSync(BRANDING_UPLOAD_DIR, { recursive: true });
+mkdirSync(LOBBY_UPLOAD_DIR, { recursive: true });
 
 function isAllowedLogo(file: { mimetype: string; originalname: string }): boolean {
   const mime = (file.mimetype || '').toLowerCase().trim();
@@ -114,13 +119,7 @@ export class ContentController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: (_req, _file, cb) => {
-          const dir = join(getUploadsFilesystemRoot(), 'branding');
-          if (!existsSync(dir)) {
-            mkdirSync(dir, { recursive: true });
-          }
-          cb(null, dir);
-        },
+        destination: (_req, _file, cb) => cb(null, BRANDING_UPLOAD_DIR),
         filename: (_req, file, cb) => {
           const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
           cb(null, `${unique}${extname(file.originalname)}`);
@@ -151,13 +150,7 @@ export class ContentController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: (_req, _file, cb) => {
-          const dir = join(getUploadsFilesystemRoot(), 'lobby');
-          if (!existsSync(dir)) {
-            mkdirSync(dir, { recursive: true });
-          }
-          cb(null, dir);
-        },
+        destination: (_req, _file, cb) => cb(null, LOBBY_UPLOAD_DIR),
         filename: (_req, file, cb) => {
           const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
           cb(null, `${unique}${extname(file.originalname)}`);
@@ -166,7 +159,11 @@ export class ContentController {
       fileFilter: (_req, file, cb) => {
         cb(null, isAllowedLobbyVideo(file));
       },
-      limits: { fileSize: MAX_UPLOAD_FILE_BYTES },
+      limits: {
+        files: 1,
+        fields: 10,
+        fileSize: MAX_UPLOAD_FILE_BYTES,
+      },
     }),
   )
   async uploadLobbyVideo(

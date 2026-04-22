@@ -22,7 +22,7 @@ import { AdminAuthGuard } from '../admin/admin-auth.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname, join } from 'path';
-import { existsSync, mkdirSync } from 'fs';
+import { mkdirSync } from 'fs';
 import { getUploadsFilesystemRoot } from '../common/uploads-filesystem-root';
 import { MAX_UPLOAD_FILE_BYTES } from '../common/upload-limits';
 
@@ -46,6 +46,9 @@ type UploadedMediaFile = {
   originalname: string;
   size: number;
 };
+
+const GAMES_UPLOAD_DIR = join(getUploadsFilesystemRoot(), 'games');
+mkdirSync(GAMES_UPLOAD_DIR, { recursive: true });
 
 function isAllowedGameMedia(file: { mimetype: string; originalname: string }): boolean {
   const mime = (file.mimetype || '').toLowerCase().trim();
@@ -97,13 +100,7 @@ export class GamesController {
   @UseInterceptors(
     FileInterceptor('file', {
       storage: diskStorage({
-        destination: (_req, _file, cb) => {
-          const dir = join(getUploadsFilesystemRoot(), 'games');
-          if (!existsSync(dir)) {
-            mkdirSync(dir, { recursive: true });
-          }
-          cb(null, dir);
-        },
+        destination: (_req, _file, cb) => cb(null, GAMES_UPLOAD_DIR),
         filename: (_req, file, cb) => {
           const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
           cb(null, `${unique}${extname(file.originalname)}`);
@@ -112,7 +109,11 @@ export class GamesController {
       fileFilter: (_req, file, cb) => {
         cb(null, isAllowedGameMedia(file));
       },
-      limits: { fileSize: MAX_UPLOAD_FILE_BYTES },
+      limits: {
+        files: 1,
+        fields: 10,
+        fileSize: MAX_UPLOAD_FILE_BYTES,
+      },
     }),
   )
   uploadMedia(@UploadedFile() file: UploadedMediaFile | undefined) {

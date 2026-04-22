@@ -35,6 +35,7 @@ export default function AdminGamesPage() {
   const [submitting, setSubmitting] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [uploadTarget, setUploadTarget] = useState<"thumbnail" | "video" | null>(null);
+  const [uploadPercent, setUploadPercent] = useState<number | null>(null);
   const [thumbFileKey, setThumbFileKey] = useState(0);
   const [videoFileKey, setVideoFileKey] = useState(0);
   const [topIds, setTopIds] = useState<string[]>([]);
@@ -158,14 +159,18 @@ export default function AdminGamesPage() {
       return;
     }
     setUploadTarget("thumbnail");
+    setUploadPercent(0);
     setError("");
     try {
-      const { url } = await gamesApi.uploadMedia(file);
+      const { url } = await gamesApi.uploadMedia(file, (percent) => {
+        setUploadPercent(percent);
+      });
       setForm((prev) => ({ ...prev, thumbnailUrl: url }));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {
       setUploadTarget(null);
+      setUploadPercent(null);
     }
   }
 
@@ -196,14 +201,18 @@ export default function AdminGamesPage() {
       return;
     }
     setUploadTarget("video");
+    setUploadPercent(0);
     setError("");
     try {
-      const { url } = await gamesApi.uploadMedia(file);
+      const { url } = await gamesApi.uploadMedia(file, (percent) => {
+        setUploadPercent(percent);
+      });
       setForm((prev) => ({ ...prev, videoUrl: url }));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {
       setUploadTarget(null);
+      setUploadPercent(null);
     }
   }
 
@@ -290,7 +299,9 @@ export default function AdminGamesPage() {
                 className={fileInputClass}
               />
               {uploadTarget === "thumbnail" && (
-                <p className="mt-2 text-xs text-amber-200/80">Uploading thumbnail…</p>
+                <p className="mt-2 text-xs text-amber-200/80">
+                  Uploading thumbnail{uploadPercent !== null ? `… ${uploadPercent}%` : "…"}
+                </p>
               )}
               {form.thumbnailUrl ? (
                 <div className="mt-3 flex flex-wrap items-start gap-3">
@@ -327,7 +338,9 @@ export default function AdminGamesPage() {
                 className={fileInputClass}
               />
               {uploadTarget === "video" && (
-                <p className="mt-2 text-xs text-amber-200/80">Uploading video…</p>
+                <p className="mt-2 text-xs text-amber-200/80">
+                  Uploading video{uploadPercent !== null ? `… ${uploadPercent}%` : "…"}
+                </p>
               )}
               {form.videoUrl ? (
                 <div className="mt-3 flex flex-wrap items-start gap-3">
