@@ -2,7 +2,7 @@
  * Decorative right panel for About / Privacy split layouts.
  * Bright “popping” palette to match the rest of the site.
  */
-export function LegalSplitVisual({ variant }: { variant: "about" | "privacy" }) {
+export function LegalSplitVisual({ variant }: { variant: "about" | "privacy" | "contact" }) {
   const orbAccent = variant === "privacy" ? "opacity-95" : "opacity-100";
   return (
     <div

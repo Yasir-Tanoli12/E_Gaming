@@ -7,6 +7,7 @@ import { mailtoHref } from "@/lib/contact-links";
 import { PublicNavbar } from "@/components/PublicNavbar";
 import { SocialContactIcons } from "@/components/SocialContactIcons";
 import { Button } from "@/components/ui/Button";
+import { LegalSplitVisual } from "@/components/legal/LegalSplitVisual";
 
 export default function ContactUsPage() {
   const [contacts, setContacts] = useState<SiteContacts | null>(null);
@@ -75,38 +76,47 @@ export default function ContactUsPage() {
         err instanceof ApiError
           ? err.message
           : err instanceof Error
-          ? err.message
-          : "Failed to send message";
+            ? err.message
+            : "Failed to send message";
       setError(message);
     } finally {
       setSubmitting(false);
     }
   }
 
+  const inputClass =
+    "w-full rounded-xl border-2 border-[#161015]/25 bg-[#E9DFE5] px-4 py-3 text-sm text-[#161015] outline-none transition placeholder:text-[#161015]/45 focus:border-[#EB523F] focus:ring-2 focus:ring-[#AAE847]/35";
+
   return (
-    <div className="min-h-screen w-full min-w-0 max-w-full overflow-x-clip bg-[#E9DFE5] text-[#161015]">
+    <div className="relative flex min-h-screen flex-col overflow-x-clip bg-[#E9DFE5] text-[#161015]">
+      <div className="pointer-events-none fixed inset-0 -z-0 overflow-hidden">
+        <div className="absolute -left-20 top-24 h-80 w-80 rounded-full bg-[#EB523F]/22 blur-[100px]" />
+        <div className="absolute right-0 top-28 h-96 w-96 rounded-full bg-[#EA3699]/20 blur-[110px]" />
+        <div className="absolute bottom-12 left-1/3 h-72 w-72 rounded-full bg-[#AAE847]/28 blur-[90px]" />
+      </div>
+
       <PublicNavbar />
-      <section className="relative min-h-[calc(100vh-82px)] w-full min-w-0 max-w-full overflow-x-clip py-12 ps-[max(1rem,env(safe-area-inset-left))] pe-[max(1rem,env(safe-area-inset-right))]">
-        <div className="pointer-events-none absolute inset-0 min-w-0">
-          <div className="absolute left-8 top-8 h-56 w-56 rounded-full bg-[#EB523F]/22 blur-3xl" />
-          <div className="absolute right-12 top-20 h-64 w-64 rounded-full bg-[#EA3699]/20 blur-3xl" />
-          <div className="absolute bottom-6 left-1/3 h-52 w-52 rounded-full bg-[#AAE847]/18 blur-3xl" />
-        </div>
+      <main className="relative z-10 flex min-h-0 w-full min-w-0 flex-1 flex-col lg:flex-row">
+        {/* Left — matches About / Privacy content column */}
+        <div className="sw-legal-animate-left order-1 flex w-full flex-col border-b-[3px] border-[#EB523F]/50 bg-[#EEEDEE]/95 px-[max(1.25rem,env(safe-area-inset-left))] py-10 pe-[max(1.25rem,env(safe-area-inset-right))] shadow-[inset_0_0_0_2px_rgba(234,54,153,0.15)] backdrop-blur-sm lg:order-none lg:w-[40%] lg:max-w-[40%] lg:border-b-0 lg:border-r-[3px] lg:border-[#EA3699]/45 lg:py-14 lg:ps-10 lg:pe-8">
+          <p className="text-[0.65rem] font-bold uppercase tracking-[0.35em] text-[#EB523F]">Support</p>
+          <h1 className="mt-3 text-4xl font-black leading-tight tracking-tight md:text-5xl">
+            <span className="text-[#161015]">Contact </span>
+            <span className="bg-gradient-to-r from-[#EB523F] via-[#EA3699] to-[#AAE847] bg-clip-text text-transparent">
+              Us
+            </span>
+          </h1>
+          <p className="mt-4 max-w-xl text-sm font-medium leading-relaxed text-[#161015]/80 md:text-base">
+            Need support, credentials, or partnership details? Reach out and our team will respond.
+          </p>
 
-        <div className="relative mx-auto grid w-full min-w-0 max-w-7xl grid-cols-1 gap-8 lg:grid-cols-2">
-          <div className="min-w-0 max-w-full rounded-3xl border-[3px] border-[#161015] bg-[#EEEDEE] p-5 shadow-[8px_10px_0_#161015] sm:p-7">
-            <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#EA3699]">Contact</p>
-            <h1 className="sw-text-wobble mt-2 text-4xl font-black text-[#161015] md:text-5xl">Contact Us</h1>
-            <p className="mt-4 text-sm text-zinc-600">
-              Need support, credentials, or partnership details? Reach out and our team will respond.
-            </p>
-
-            <div className="mt-6 space-y-3 rounded-2xl border-2 border-[#EB523F]/40 bg-[#E9DFE5] p-4">
-              <p className="text-sm font-bold text-[#EB523F]">Direct channels</p>
+          <div className="mt-8 max-h-none space-y-8 overflow-visible lg:max-h-[calc(100svh-6rem)] lg:overflow-y-auto lg:pr-1">
+            <div className="rounded-r-xl border-l-4 border-[#AAE847] bg-[#E9DFE5]/60 py-3 pl-5 shadow-[4px_0_0_rgba(235,82,63,0.15)]">
+              <p className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[#EA3699]">Direct channels</p>
               {loading ? (
-                <p className="text-sm text-zinc-500">Loading contacts…</p>
+                <p className="mt-2 text-sm text-[#161015]/55">Loading contacts…</p>
               ) : (
-                <>
+                <div className="mt-3">
                   {contacts?.email?.trim() ? (
                     <a
                       href={mailtoHref(contacts.email)}
@@ -115,66 +125,82 @@ export default function ContactUsPage() {
                       {contacts.email}
                     </a>
                   ) : null}
-                  <SocialContactIcons contacts={contacts} size="lg" gapClass="gap-3" includeEmailIcon />
-                </>
+                  <div className="mt-3">
+                    <SocialContactIcons contacts={contacts} size="lg" gapClass="gap-3" includeEmailIcon />
+                  </div>
+                </div>
               )}
             </div>
+
+            <form
+              noValidate
+              onSubmit={handleSubmit}
+              className="rounded-r-xl border-l-4 border-[#EB523F] bg-[#E9DFE5]/60 p-5 shadow-[4px_0_0_rgba(170,232,71,0.25)] sm:p-6"
+            >
+              <p className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[#EB523F]">Send a message</p>
+              <h2 className="mt-2 text-xl font-black text-[#161015] md:text-2xl">
+                We are here to <span className="text-[#EA3699]">help</span>
+              </h2>
+              <p className="mt-1 text-sm font-medium text-[#161015]/75">
+                Your message is stored in our support inbox.
+              </p>
+
+              <div className="mt-5 space-y-4">
+                <input
+                  value={form.name}
+                  onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
+                  placeholder="Your name"
+                  className={inputClass}
+                  required
+                />
+                <input
+                  type="email"
+                  value={form.email}
+                  onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
+                  placeholder="Your email"
+                  className={inputClass}
+                  required
+                />
+                <input
+                  value={form.subject}
+                  onChange={(e) => setForm((p) => ({ ...p, subject: e.target.value }))}
+                  placeholder="Subject (optional)"
+                  className={inputClass}
+                />
+                <textarea
+                  value={form.message}
+                  onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))}
+                  placeholder="Type your message..."
+                  rows={6}
+                  className={inputClass}
+                  required
+                />
+              </div>
+
+              {error ? (
+                <p className="mt-4 rounded-xl border-[3px] border-[#EB523F] bg-[#EB523F]/10 px-4 py-3 text-sm font-medium text-[#161015]">
+                  {error}
+                </p>
+              ) : null}
+              {success ? (
+                <p className="mt-4 rounded-xl border-[3px] border-[#AAE847] bg-[#AAE847]/15 px-4 py-3 text-sm font-semibold text-[#161015]">
+                  {success}
+                </p>
+              ) : null}
+
+              <div className="mt-6">
+                <Button type="submit" loading={submitting}>
+                  Send Message
+                </Button>
+              </div>
+            </form>
           </div>
-
-          <form
-            noValidate
-            onSubmit={handleSubmit}
-            className="min-w-0 max-w-full rounded-3xl border-[3px] border-[#161015] bg-[#EEEDEE] p-5 shadow-[8px_10px_0_#161015,0_0_0_2px_#AAE847] sm:p-7"
-          >
-            <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#EB523F]">Send Us a Message</p>
-            <h2 className="sw-text-wobble mt-2 text-2xl font-black text-[#161015]">We are here to help</h2>
-            <p className="mt-2 text-sm text-zinc-600">
-              Fill in the form and your message will be stored in our support inbox.
-            </p>
-
-            <div className="mt-5 space-y-4">
-              <input
-                value={form.name}
-                onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
-                placeholder="Your name"
-                className="w-full rounded-xl border-2 border-[#161015]/25 bg-[#E9DFE5] px-4 py-3 text-sm outline-none focus:border-[#EB523F]"
-                required
-              />
-              <input
-                type="email"
-                value={form.email}
-                onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
-                placeholder="Your email"
-                className="w-full rounded-xl border-2 border-[#161015]/25 bg-[#E9DFE5] px-4 py-3 text-sm outline-none focus:border-[#EB523F]"
-                required
-              />
-              <input
-                value={form.subject}
-                onChange={(e) => setForm((p) => ({ ...p, subject: e.target.value }))}
-                placeholder="Subject (optional)"
-                className="w-full rounded-xl border-2 border-[#161015]/25 bg-[#E9DFE5] px-4 py-3 text-sm outline-none focus:border-[#EB523F]"
-              />
-              <textarea
-                value={form.message}
-                onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))}
-                placeholder="Type your message..."
-                rows={6}
-                className="w-full rounded-xl border-2 border-[#161015]/25 bg-[#E9DFE5] px-4 py-3 text-sm outline-none focus:border-[#EB523F]"
-                required
-              />
-            </div>
-
-            {error ? <p className="mt-3 text-sm text-red-600">{error}</p> : null}
-            {success ? <p className="mt-3 text-sm text-emerald-700">{success}</p> : null}
-
-            <div className="mt-5">
-              <Button type="submit" loading={submitting}>
-                Send Message
-              </Button>
-            </div>
-          </form>
         </div>
-      </section>
+
+        <div className="sw-legal-animate-right order-2 min-h-[min(40vh,320px)] w-full flex-1 lg:order-none lg:w-[60%] lg:min-h-[calc(100svh-5.25rem)]">
+          <LegalSplitVisual variant="contact" />
+        </div>
+      </main>
     </div>
   );
 }
