@@ -102,13 +102,13 @@ export class GamesController {
       fileFilter: (_req, file, cb) => {
         cb(null, isAllowedGameMedia(file));
       },
-      limits: { fileSize: 100 * 1024 * 1024 },
+      limits: { fileSize: 300 * 1024 * 1024 },
     }),
   )
   uploadMedia(@UploadedFile() file: { filename: string } | undefined) {
     if (!file) {
       throw new BadRequestException(
-        'No file uploaded. Use image (.jpg/.png/.webp/.gif) or video (.mp4/.webm/.ogg/.mov), max 100MB.',
+        'No file uploaded. Use image (.jpg/.png/.webp/.gif) or video (.mp4/.webm/.ogg/.mov), max 300MB.',
       );
     }
     // Store relative paths so DB rows work with any public API host (see frontend resolveUploadMediaUrl).

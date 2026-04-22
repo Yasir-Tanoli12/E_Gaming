@@ -156,7 +156,7 @@ export class ContentController {
       fileFilter: (_req, file, cb) => {
         cb(null, isAllowedLobbyVideo(file));
       },
-      limits: { fileSize: 100 * 1024 * 1024 },
+      limits: { fileSize: 300 * 1024 * 1024 },
     }),
   )
   async uploadLobbyVideo(
@@ -165,7 +165,7 @@ export class ContentController {
   ) {
     if (!file) {
       throw new BadRequestException(
-        'Only video files are allowed (.mp4/.webm/.ogg/.mov), max 100MB.',
+        'Only video files are allowed (.mp4/.webm/.ogg/.mov), max 300MB.',
       );
     }
     const origin = getPublicApiOrigin(req);
