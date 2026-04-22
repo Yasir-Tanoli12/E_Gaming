@@ -1,7 +1,8 @@
 export const AUTH_EXPIRED_EVENT = "app:auth-expired";
 const REQUEST_TIMEOUT_MS = Number(process.env.NEXT_PUBLIC_API_TIMEOUT_MS ?? 15000);
+/** Large video uploads over slow links can exceed 2 minutes; override via env if needed. */
 const FORM_REQUEST_TIMEOUT_MS = Number(
-  process.env.NEXT_PUBLIC_API_FORM_TIMEOUT_MS ?? 120000
+  process.env.NEXT_PUBLIC_API_FORM_TIMEOUT_MS ?? 1_800_000
 );
 const LOCAL_DEV_API_URL = "http://localhost:3001";
 
@@ -71,6 +72,14 @@ export class ApiError extends Error {
 
 function toApiError(error: unknown): ApiError {
   if (error instanceof ApiError) return error;
+  if (error instanceof Error && error.name === "AbortError") {
+    return new ApiError(
+      "The request timed out or was aborted. For large uploads, increase NEXT_PUBLIC_API_FORM_TIMEOUT_MS; for other API calls, increase NEXT_PUBLIC_API_TIMEOUT_MS.",
+      0,
+      null,
+      true
+    );
+  }
   const message = error instanceof Error ? error.message : "Network request failed";
   return new ApiError(message, 0, null, true);
 }

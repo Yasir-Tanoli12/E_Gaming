@@ -3,6 +3,7 @@ import { Logger, ValidationPipe } from '@nestjs/common';
 import helmet from 'helmet';
 import compression from 'compression';
 import cookieParser from 'cookie-parser';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import { AppModule } from './app.module';
 import { HttpExceptionFilter } from './common/http-exception.filter';
 import * as express from 'express';
@@ -12,14 +13,21 @@ import {
   getUploadsFilesystemRoot,
 } from './common/uploads-filesystem-root';
 
+const BODY_PARSER_LIMIT = '500mb';
+/** Allow large/slow uploads end-to-end (Node default requestTimeout is often 5 minutes). */
+const HTTP_UPLOAD_WINDOW_MS = 60 * 60 * 1000;
+
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule, {
+  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
     bufferLogs: true,
     logger:
       process.env.NODE_ENV === 'production'
         ? ['error', 'warn', 'log']
         : ['error', 'warn', 'log', 'debug', 'verbose'],
   });
+
+  app.useBodyParser('json', { limit: BODY_PARSER_LIMIT });
+  app.useBodyParser('urlencoded', { limit: BODY_PARSER_LIMIT, extended: true });
 
   const config = app.get(ConfigService);
   const trustProxy = config.get<boolean>('TRUST_PROXY');
@@ -64,9 +72,16 @@ async function bootstrap() {
   const port = process.env.PORT || 3001;
   await app.listen(port);
 
+  const httpServer = app.getHttpServer();
+  httpServer.requestTimeout = HTTP_UPLOAD_WINDOW_MS;
+  httpServer.headersTimeout = HTTP_UPLOAD_WINDOW_MS + 120_000;
+
   const logger = new Logger('Bootstrap');
   logger.log(`Listening on port ${port} (NODE_ENV=${nodeEnv ?? 'undefined'})`);
   logger.log(`Serving static files from ${uploadsRoot}`);
+  logger.log(
+    `HTTP server timeouts: requestTimeout=${httpServer.requestTimeout}ms headersTimeout=${httpServer.headersTimeout}ms`,
+  );
 }
 
 bootstrap();

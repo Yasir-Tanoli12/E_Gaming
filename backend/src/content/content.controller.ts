@@ -5,6 +5,7 @@ import {
   Delete,
   Get,
   Header,
+  Logger,
   Param,
   Patch,
   Post,
@@ -34,6 +35,7 @@ import { UpdatePrivacyPolicyDto } from './dto/update-privacy-policy.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { getPublicApiOrigin } from '../common/get-public-api-origin';
 import { getUploadsFilesystemRoot } from '../common/uploads-filesystem-root';
+import { MAX_UPLOAD_FILE_BYTES } from '../common/upload-limits';
 
 const ALLOWED_LOGO_MIMES = new Set([
   'image/jpeg',
@@ -66,6 +68,8 @@ function isAllowedLobbyVideo(file: { mimetype: string; originalname: string }): 
 
 @Controller('content')
 export class ContentController {
+  private readonly logger = new Logger(ContentController.name);
+
   constructor(private readonly contentService: ContentService) {}
 
   @Public()
@@ -156,18 +160,24 @@ export class ContentController {
       fileFilter: (_req, file, cb) => {
         cb(null, isAllowedLobbyVideo(file));
       },
-      limits: { fileSize: 300 * 1024 * 1024 },
+      limits: { fileSize: MAX_UPLOAD_FILE_BYTES },
     }),
   )
   async uploadLobbyVideo(
-    @UploadedFile() file: { filename: string } | undefined,
+    @UploadedFile() file: Express.Multer.File | undefined,
     @Req() req: Request,
   ) {
     if (!file) {
+      this.logger.warn(
+        'lobby-video: missing file (wrong field name, rejected type, or over size limit)',
+      );
       throw new BadRequestException(
-        'Only video files are allowed (.mp4/.webm/.ogg/.mov), max 300MB.',
+        'Only video files are allowed (.mp4/.webm/.ogg/.mov), max 500MB.',
       );
     }
+    this.logger.log(
+      `lobby-video ok: original=${file.originalname} bytes=${file.size} stored=${file.filename}`,
+    );
     const origin = getPublicApiOrigin(req);
     const videoUrl = `${origin}/uploads/lobby/${file.filename}`;
     return this.contentService.updateLobbyVideo(videoUrl);

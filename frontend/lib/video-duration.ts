@@ -5,7 +5,8 @@ export async function getVideoDurationSeconds(file: File): Promise<number> {
   return new Promise((resolve, reject) => {
     const objectUrl = URL.createObjectURL(file);
     const video = document.createElement("video");
-    const timeoutMs = 45000;
+    /** Long / high-bitrate files can take longer to expose duration metadata. */
+    const timeoutMs = 180000;
     let timeout: ReturnType<typeof setTimeout> | null = null;
     let resolved = false;
 

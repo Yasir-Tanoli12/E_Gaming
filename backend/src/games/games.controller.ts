@@ -11,6 +11,7 @@ import {
   UploadedFile,
   BadRequestException,
   Header,
+  Logger,
 } from '@nestjs/common';
 import { GamesService } from './games.service';
 import { CreateGameDto } from './dto/create-game.dto';
@@ -23,6 +24,7 @@ import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
 import { getUploadsFilesystemRoot } from '../common/uploads-filesystem-root';
+import { MAX_UPLOAD_FILE_BYTES } from '../common/upload-limits';
 
 const ALLOWED_IMAGE_MIMES = new Set([
   'image/jpeg',
@@ -48,6 +50,8 @@ function isAllowedGameMedia(file: { mimetype: string; originalname: string }): b
 }
 @Controller('games')
 export class GamesController {
+  private readonly logger = new Logger(GamesController.name);
+
   constructor(private readonly gamesService: GamesService) {}
 
   @Public()
@@ -102,15 +106,21 @@ export class GamesController {
       fileFilter: (_req, file, cb) => {
         cb(null, isAllowedGameMedia(file));
       },
-      limits: { fileSize: 300 * 1024 * 1024 },
+      limits: { fileSize: MAX_UPLOAD_FILE_BYTES },
     }),
   )
-  uploadMedia(@UploadedFile() file: { filename: string } | undefined) {
+  uploadMedia(@UploadedFile() file: Express.Multer.File | undefined) {
     if (!file) {
+      this.logger.warn(
+        'upload-media: missing file (wrong field name, rejected type, or over size limit)',
+      );
       throw new BadRequestException(
-        'No file uploaded. Use image (.jpg/.png/.webp/.gif) or video (.mp4/.webm/.ogg/.mov), max 300MB.',
+        'No file uploaded. Use image (.jpg/.png/.webp/.gif) or video (.mp4/.webm/.ogg/.mov), max 500MB.',
       );
     }
+    this.logger.log(
+      `upload-media ok: original=${file.originalname} bytes=${file.size} stored=${file.filename}`,
+    );
     // Store relative paths so DB rows work with any public API host (see frontend resolveUploadMediaUrl).
     return {
       url: `/uploads/games/${file.filename}`,

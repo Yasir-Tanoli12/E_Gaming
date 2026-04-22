@@ -17,7 +17,7 @@ function formatLoadError(err: unknown): string {
   return err instanceof Error ? err.message : "Failed to load branding";
 }
 
-const MAX_LOBBY_VIDEO_BYTES = 300 * 1024 * 1024;
+const MAX_LOBBY_VIDEO_BYTES = 500 * 1024 * 1024;
 const MAX_LOBBY_VIDEO_SECONDS = 35;
 const VIDEO_EXT_RE = /\.(mp4|webm|ogg|mov)$/i;
 
@@ -81,7 +81,7 @@ export function AdminBrandingPanel() {
       return;
     }
     if (file.size > MAX_LOBBY_VIDEO_BYTES) {
-      setError("Lobby video is too large (max 300MB).");
+      setError("Lobby video is too large (max 500MB).");
       return;
     }
     try {
