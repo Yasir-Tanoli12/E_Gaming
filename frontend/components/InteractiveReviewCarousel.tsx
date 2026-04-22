@@ -35,12 +35,15 @@ function buildStack(reviews: ReviewItem[]): { item: ReviewItem; key: string }[] 
   return out;
 }
 
+type DragState = { pointerId: number; startX: number; startBias: number };
+
 export function InteractiveReviewCarousel({ reviews }: { reviews: ReviewItem[] }) {
   const stack = useMemo(() => buildStack(reviews), [reviews]);
   const wrapRef = useRef<HTMLDivElement>(null);
   const targetBias = useRef(0);
   const smoothBias = useRef(0);
   const rafRef = useRef(0);
+  const dragRef = useRef<DragState | null>(null);
   const [bias, setBias] = useState(0);
   const [hovered, setHovered] = useState<number | null>(null);
 
@@ -69,23 +72,75 @@ export function InteractiveReviewCarousel({ reviews }: { reviews: ReviewItem[] }
     }
   }, [runSmooth]);
 
+  const applyBias = useCallback((value: number, snapSmooth = false) => {
+    const v = Math.max(-1, Math.min(1, value));
+    targetBias.current = v;
+    if (snapSmooth) {
+      smoothBias.current = v;
+      setBias(v);
+    } else {
+      kickRaf();
+    }
+  }, [kickRaf]);
+
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== "touch" && e.pointerType !== "pen") return;
+    dragRef.current = {
+      pointerId: e.pointerId,
+      startX: e.clientX,
+      startBias: targetBias.current,
+    };
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      /* capture unsupported */
+    }
+  };
+
   const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
     const el = wrapRef.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
-    const x = (e.clientX - r.left) / Math.max(r.width, 1);
-    targetBias.current = Math.max(-1, Math.min(1, (x - 0.5) * 2));
-    kickRaf();
+    const w = Math.max(r.width, 1);
+
+    const drag = dragRef.current;
+    if (drag && drag.pointerId === e.pointerId) {
+      const dx = e.clientX - drag.startX;
+      const next = drag.startBias + (dx / w) * 2.85;
+      applyBias(next, true);
+      return;
+    }
+
+    if (e.pointerType === "mouse") {
+      const x = (e.clientX - r.left) / w;
+      targetBias.current = Math.max(-1, Math.min(1, (x - 0.5) * 2));
+      kickRaf();
+    }
   };
 
   const onPointerEnter = () => {
     kickRaf();
   };
 
-  const onPointerLeave = () => {
+  const onPointerLeave = (e: React.PointerEvent<HTMLDivElement>) => {
     setHovered(null);
-    targetBias.current = 0;
-    kickRaf();
+    if (e.pointerType === "mouse") {
+      targetBias.current = 0;
+      kickRaf();
+    }
+  };
+
+  const endDrag = (e: React.PointerEvent<HTMLDivElement>) => {
+    const drag = dragRef.current;
+    if (drag && drag.pointerId === e.pointerId) {
+      dragRef.current = null;
+      try {
+        e.currentTarget.releasePointerCapture(e.pointerId);
+      } catch {
+        /* */
+      }
+    }
+    setHovered(null);
   };
 
   const n = stack.length;
@@ -95,25 +150,26 @@ export function InteractiveReviewCarousel({ reviews }: { reviews: ReviewItem[] }
   return (
     <div
       ref={wrapRef}
-      className="relative isolate min-h-[min(520px,78vw)] w-full px-2 sm:min-h-[580px] sm:px-4"
+      className="relative isolate min-h-[min(480px,70vw)] w-full touch-none px-2 sm:min-h-[580px] sm:touch-auto sm:px-4"
       style={{ perspective: "1400px", perspectiveOrigin: "50% 42%" }}
+      onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerEnter={onPointerEnter}
       onPointerLeave={onPointerLeave}
-      onPointerCancel={onPointerLeave}
+      onPointerUp={endDrag}
+      onPointerCancel={endDrag}
     >
-      <p className="pointer-events-none absolute left-1/2 top-2 z-[200] -translate-x-1/2 text-center text-[10px] font-bold uppercase tracking-[0.35em] text-[#EB523F]">
+      <p className="pointer-events-none absolute left-1/2 top-2 z-[200] hidden -translate-x-1/2 text-center text-[10px] font-bold uppercase tracking-[0.35em] text-[#EB523F] lg:block">
         Move cursor — stack reacts
       </p>
 
       <div
-        className="relative mx-auto flex h-[min(520px,78vw)] w-full max-w-[90rem] items-center justify-center sm:h-[580px]"
+        className="relative mx-auto flex h-[min(480px,70vw)] w-full max-w-[90rem] items-center justify-center sm:h-[580px]"
         style={{ transformStyle: "preserve-3d" }}
       >
         {stack.map(({ item, key }, i) => {
           const d = i - centerFloat;
           const abs = Math.abs(d);
-          /** Wider spread + shallower Z so left/right end cards stay readable */
           const spread = 118;
           const tx = d * spread + bias * 22;
           const tz = -abs * 12;
