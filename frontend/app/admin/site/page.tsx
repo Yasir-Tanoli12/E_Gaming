@@ -78,7 +78,7 @@ export default function AdminSitePage() {
   return (
     <div className="space-y-8 text-white">
       <div>
-        <h1 className="text-2xl font-black sm:text-3xl">Site</h1>
+        <h1 className="text-2xl font-black sm:text-3xl">About</h1>
         <p className="mt-1 text-sm text-zinc-400">
           Manage About Us page and 18+ popup content.
         </p>
