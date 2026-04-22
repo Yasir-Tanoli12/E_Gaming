@@ -51,11 +51,11 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
 
   return (
     <div
-      className="group relative overflow-hidden rounded-3xl border border-[#EDC537]/30 bg-[#0f0808] shadow-[0_0_0_1px_rgba(237,197,55,0.15),0_20px_45px_rgba(153,8,8,0.2)] transition-all duration-500 hover:-translate-y-1 hover:shadow-[0_0_0_1px_rgba(237,197,55,0.45),0_25px_55px_rgba(153,8,8,0.28)]"
+      className="group relative overflow-hidden rounded-3xl border-[3px] border-[#161015] bg-[#161015] shadow-[6px_8px_0_#EB523F,0_0_0_2px_#EA3699] transition-transform duration-300 hover:-translate-y-1 hover:shadow-[8px_12px_0_#AAE847,0_0_0_3px_#EB523F]"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_top_right,rgba(153,8,8,0.3),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(237,197,55,0.25),transparent_45%)] opacity-70" />
+      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_top_right,rgba(235,82,63,0.35),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(234,54,153,0.28),transparent_45%)] opacity-80" />
       <div className="relative aspect-video w-full overflow-hidden bg-[#0c1025]">
         {imageUrl && !thumbError ? (
           // Stack above hidden video; on hover fade out so hover video (higher z) shows.
@@ -92,7 +92,7 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
 
         {(!imageUrl || thumbError) && (!videoUrl || videoError) ? (
           <div className="absolute inset-0 flex h-full w-full items-center justify-center bg-gradient-to-br from-[#1a0a0a] to-[#0f0808]">
-            <span className="text-4xl font-black text-[#EDC537]/70">
+            <span className="text-4xl font-black text-[#AAE847]/80">
               {game.title.charAt(0)}
             </span>
           </div>
@@ -107,7 +107,7 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
       >
         <button
           type="button"
-          className="flex h-16 w-16 items-center justify-center rounded-full border border-white/50 bg-gradient-to-r from-[#990808] to-[#EDC537] shadow-[0_0_35px_rgba(237,197,55,0.5)] transition-all duration-300 hover:scale-110"
+          className="flex h-16 w-16 items-center justify-center rounded-full border-[3px] border-[#161015] bg-gradient-to-r from-[#EB523F] to-[#EA3699] shadow-[4px_4px_0_#161015] transition-transform duration-200 hover:scale-110"
           aria-label={`Play ${game.title}`}
         >
           <svg
@@ -123,18 +123,18 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
       <div className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-[#0a0808] via-[#0a0808]/70 to-transparent p-4">
         <h3 className="font-bold tracking-wide text-white drop-shadow-lg">{game.title}</h3>
         {game.description && (
-          <p className="mt-1 line-clamp-2 text-sm text-[#fef3c7]/85">
+          <p className="mt-1 line-clamp-2 text-sm text-[#EEEDEE]/90">
             {game.description}
           </p>
         )}
       </div>
 
       {isTop ? (
-        <div className="absolute right-3 top-3 z-30 rounded-full border border-[#EDC537]/70 bg-[#EDC537]/25 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#1a0a0a] shadow-[0_0_18px_rgba(237,197,55,0.45)]">
+        <div className="absolute right-3 top-3 z-30 rounded-full border-2 border-[#161015] bg-[#AAE847] px-2 py-1 text-[10px] font-black uppercase tracking-wider text-[#161015] shadow-[2px_2px_0_#161015]">
           TOP
         </div>
       ) : (
-        <div className="absolute right-3 top-3 z-30 rounded-full border border-[#EDC537]/50 bg-[#140808]/90 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#EDC537]">
+        <div className="absolute right-3 top-3 z-30 rounded-full border-2 border-[#EA3699]/70 bg-[#161015]/95 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#EEEDEE]">
           Hot
         </div>
       )}

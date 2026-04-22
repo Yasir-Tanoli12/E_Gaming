@@ -9,6 +9,7 @@ import { GameCard } from "@/components/GameCard";
 import { Button } from "@/components/ui/Button";
 import { PublicNavbar } from "@/components/PublicNavbar";
 import { SocialContactIcons } from "@/components/SocialContactIcons";
+import { InteractiveReviewCarousel } from "@/components/InteractiveReviewCarousel";
 
 /** Once the user accepts the 18+ notice, do not show it again on this browser. */
 const AGE_WARNING_ACK_KEY = "dashboard_age_warning_acknowledged";
@@ -108,10 +109,6 @@ export default function UserDashboardPage() {
       .find((u) => !!u) ??
     null;
   const reviewItems = content?.reviews ?? [];
-  const movingReviewItems = useMemo(
-    () => (reviewItems.length > 0 ? [...reviewItems, ...reviewItems] : []),
-    [reviewItems]
-  );
   const ageWarning = content?.ageWarning ?? {
     title: "18+ Content Notice",
     message:
@@ -154,25 +151,25 @@ export default function UserDashboardPage() {
   }, [heroVideo]);
 
   return (
-    <div className="min-h-screen bg-[#FFFBF5] text-[#1a1a1a]">
+    <div className="min-h-screen bg-[#E9DFE5] text-[#161015]">
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -left-24 top-20 h-80 w-80 animate-float rounded-full bg-[#990808]/12 blur-[100px]" />
-        <div className="absolute right-0 top-40 h-96 w-96 animate-float-delayed rounded-full bg-[#EDC537]/25 blur-[110px]" />
+        <div className="absolute -left-24 top-20 h-80 w-80 animate-float rounded-full bg-[#EB523F]/18 blur-[100px]" />
+        <div className="absolute right-0 top-40 h-96 w-96 animate-float-delayed rounded-full bg-[#EA3699]/22 blur-[110px]" />
       </div>
 
       <PublicNavbar />
 
       <section
         id="home"
-        className="relative flex min-h-[calc(100vh-82px)] scroll-mt-24 items-center overflow-hidden border-b border-[#EDC537]/20 bg-gradient-to-r from-[#990808]/25 via-[#E85D04]/20 to-[#EDC537]/25 px-4 py-10"
+        className="relative flex min-h-[calc(100vh-82px)] scroll-mt-24 items-center overflow-hidden border-b border-[#EB523F]/25 bg-gradient-to-r from-[#EB523F]/20 via-[#EA3699]/18 to-[#AAE847]/25 px-4 py-10"
       >
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-8 top-8 h-40 w-40 rounded-full bg-[#990808]/25 blur-3xl" />
-          <div className="absolute bottom-10 right-10 h-52 w-52 animate-pulse rounded-full bg-[#EDC537]/20 blur-3xl" />
+          <div className="absolute left-8 top-8 h-40 w-40 rounded-full bg-[#EB523F]/30 blur-3xl" />
+          <div className="absolute bottom-10 right-10 h-52 w-52 animate-pulse rounded-full bg-[#AAE847]/25 blur-3xl" />
         </div>
         <div className="mx-auto grid w-full max-w-7xl items-center gap-10 md:grid-cols-2">
           <div className="animate-fade-in">
-            <h1 className="text-5xl font-black leading-[0.95] md:text-7xl">
+            <h1 className="sw-text-wobble text-5xl font-black leading-[0.95] text-[#161015] md:text-7xl">
               PLAY. WIN. DOMINATE.
             </h1>
             <p className="mt-6 max-w-xl text-lg text-zinc-600">
@@ -180,9 +177,9 @@ export default function UserDashboardPage() {
               get access from our support team. Click any game card to play or buy credentials.
             </p>
           </div>
-          <div className="relative h-[420px] animate-fade-in animation-delay-200 rounded-3xl border border-[#EDC537]/40 bg-gradient-to-br from-[#990808]/25 to-[#EDC537]/20 p-3 shadow-[0_0_45px_rgba(237,197,55,0.3)] md:h-[500px]">
-            <div className="absolute -inset-[1px] -z-10 rounded-3xl bg-[conic-gradient(from_0deg,rgba(237,197,55,0.4),rgba(153,8,8,0.45),rgba(237,197,55,0.4))] blur-sm" />
-            <div className="group relative h-full w-full overflow-hidden rounded-2xl border border-[#EDC537]/40 bg-white/95 shadow-lg">
+          <div className="relative h-[420px] animate-fade-in animation-delay-200 rounded-3xl border-[3px] border-[#161015] bg-gradient-to-br from-[#EB523F]/25 to-[#AAE847]/20 p-3 shadow-[8px_10px_0_#161015,0_0_0_3px_#EA3699] md:h-[500px]">
+            <div className="absolute -inset-[1px] -z-10 rounded-3xl bg-[conic-gradient(from_0deg,rgba(234,54,153,0.45),rgba(235,82,63,0.5),rgba(170,232,71,0.45))] blur-sm" />
+            <div className="group relative h-full w-full overflow-hidden rounded-2xl border-[3px] border-[#161015] bg-[#EEEDEE]/95 shadow-lg">
               {heroVideo ? (
                 <>
                   <video
@@ -212,17 +209,17 @@ export default function UserDashboardPage() {
                   ) : null}
                 </>
               ) : (
-                <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_20%_20%,rgba(153,8,8,0.15),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(237,197,55,0.25),transparent_40%),linear-gradient(120deg,#FFF8E7,#FFFBF5)]">
+                <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_20%_20%,rgba(235,82,63,0.18),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(170,232,71,0.28),transparent_40%),linear-gradient(120deg,#EEEDEE,#E9DFE5)]">
                   <p className="text-sm text-zinc-500">Game preview will appear here</p>
                 </div>
               )}
               <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(transparent_48%,rgba(5,8,20,0.25)_50%,transparent_52%)] bg-[length:100%_6px] opacity-30" />
-              <div className="pointer-events-none absolute left-4 top-4 flex items-center gap-2 rounded-full border border-[#EDC537]/50 bg-[#EDC537]/30 px-3 py-1 text-xs text-zinc-800">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-[#EDC537]" />
+              <div className="pointer-events-none absolute left-4 top-4 flex items-center gap-2 rounded-full border-[2px] border-[#161015] bg-[#AAE847]/90 px-3 py-1 text-xs font-bold text-[#161015]">
+                <span className="h-2 w-2 animate-pulse rounded-full bg-[#EB523F]" />
                 LIVE LOBBY
               </div>
-              <div className="pointer-events-none absolute bottom-4 left-4 rounded-lg bg-white/90 px-4 py-2 shadow-lg backdrop-blur">
-                <p className="text-xs uppercase tracking-[0.22em] text-[#EDC537]">Game Arena</p>
+              <div className="pointer-events-none absolute bottom-4 left-4 rounded-lg border-2 border-[#161015] bg-[#EEEDEE] px-4 py-2 shadow-[4px_4px_0_#161015]">
+                <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#EB523F]">Game Arena</p>
                 <p className="mt-1 text-sm text-zinc-600">Browse games, get credentials, or play now</p>
               </div>
             </div>
@@ -265,7 +262,7 @@ export default function UserDashboardPage() {
 
         {showNews && newsPoster && (
           <div className="fixed inset-0 z-[70] flex items-center justify-center bg-white/90 backdrop-blur-sm p-4">
-            <div className="w-full max-w-3xl overflow-hidden rounded-2xl border border-[#EDC537]/50 bg-white shadow-[0_0_60px_rgba(237,197,55,0.2)]">
+            <div className="w-full max-w-3xl overflow-hidden rounded-2xl border-[3px] border-[#161015] bg-[#EEEDEE] shadow-[6px_8px_0_#161015,0_0_0_3px_#EA3699]">
               <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-3">
                 <h3 className="font-semibold text-zinc-800">{newsPoster.title ?? "Latest News"}</h3>
                 <button
@@ -283,10 +280,10 @@ export default function UserDashboardPage() {
 
         {selectedGame && (
           <div className="fixed inset-0 z-[80] flex items-center justify-center bg-white/95 p-4 backdrop-blur-sm">
-            <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-[#EDC537]/50 bg-white p-6 shadow-[0_0_70px_rgba(237,197,55,0.2)] md:p-8">
-              <div className="pointer-events-none absolute -left-16 top-4 h-48 w-48 rounded-full bg-[#990808]/25 blur-[80px]" />
-              <div className="pointer-events-none absolute -right-12 bottom-2 h-56 w-56 rounded-full bg-[#EDC537]/20 blur-[90px]" />
-              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(237,197,55,0.12),transparent_45%)]" />
+            <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl border-[3px] border-[#161015] bg-[#EEEDEE] p-6 shadow-[8px_10px_0_#161015,0_0_0_3px_#AAE847] md:p-8">
+              <div className="pointer-events-none absolute -left-16 top-4 h-48 w-48 rounded-full bg-[#EB523F]/25 blur-[80px]" />
+              <div className="pointer-events-none absolute -right-12 bottom-2 h-56 w-56 rounded-full bg-[#EA3699]/22 blur-[90px]" />
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(170,232,71,0.2),transparent_45%)]" />
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-800">
@@ -366,16 +363,16 @@ export default function UserDashboardPage() {
 
         {loading ? (
           <div className="flex justify-center py-24">
-            <div className="h-12 w-12 animate-spin rounded-full border-2 border-[#EDC537] border-t-transparent" />
+            <div className="h-12 w-12 animate-spin rounded-full border-2 border-[#EB523F] border-t-transparent" />
           </div>
         ) : error ? (
           <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-6 py-4 text-red-400">
             {error}
           </div>
         ) : games.length === 0 ? (
-          <div className="rounded-2xl border border-[#EDC537]/20 bg-[#140808]/70 p-16 text-center">
-            <p className="text-[#fef3c7]/90">No games available yet.</p>
-            <p className="mt-2 text-sm text-[#fef3c7]/70">
+          <div className="rounded-2xl border-[3px] border-[#161015] bg-[#161015]/90 p-16 text-center shadow-[6px_8px_0_#EB523F]">
+            <p className="text-[#EEEDEE]/95">No games available yet.</p>
+            <p className="mt-2 text-sm text-[#EEEDEE]/75">
               Admins can add games from the admin dashboard.
             </p>
           </div>
@@ -397,33 +394,21 @@ export default function UserDashboardPage() {
               ))}
             </div>
 
-            <section id="reviews">
-              <div className="mb-4 flex items-center justify-between">
-                <h2 className="text-2xl font-black">Reviews</h2>
-                <span className="text-xs text-[#7a5a16]">What players are saying</span>
+            <section id="reviews" className="rounded-3xl border-[3px] border-[#161015] bg-[#EEEDEE] px-4 py-10 shadow-[8px_10px_0_#161015] sm:px-8">
+              <div className="mb-2 flex flex-col gap-1 sm:mb-4 sm:flex-row sm:items-end sm:justify-between">
+                <h2 className="sw-text-wobble text-3xl font-black text-[#161015] md:text-4xl">
+                  Player hype
+                </h2>
+                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#EA3699]">
+                  What players are saying
+                </span>
               </div>
               {reviewItems.length === 0 ? (
-                <div className="rounded-xl border border-zinc-700/50 bg-zinc-900/30 p-5 text-sm text-zinc-400">
+                <div className="rounded-xl border-[3px] border-dashed border-[#EB523F]/60 bg-[#E9DFE5] p-6 text-sm font-semibold text-[#161015]">
                   No reviews added yet.
                 </div>
               ) : (
-                <div className="qa-marquee-shell">
-                  <div className="qa-marquee-glow" />
-                  <div className="qa-marquee-track">
-                    {movingReviewItems.map((item, index) => (
-                      <article
-                        key={`${item.id}-${index}`}
-                        className="qa-marquee-card border border-[#EDC537]/40 bg-[linear-gradient(145deg,#ffffff,#fff8df_55%,#fff3c4)] shadow-[inset_0_0_0_1px_rgba(237,197,55,0.35),0_10px_24px_rgba(153,8,8,0.08)]"
-                      >
-                        <p className="text-sm font-bold tracking-wide text-[#7a0b0b]">
-                          {item.reviewer}
-                        </p>
-                        <p className="mt-2 text-sm italic text-[#3d2a0f]">{item.message}</p>
-                        <p className="mt-2 text-xs font-semibold text-[#9a7000]">Rating: {item.rating}/5</p>
-                      </article>
-                    ))}
-                  </div>
-                </div>
+                <InteractiveReviewCarousel reviews={reviewItems} />
               )}
             </section>
 

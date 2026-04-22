@@ -84,25 +84,25 @@ export default function ContactUsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#FFFBF5] text-[#1a1a1a]">
+    <div className="min-h-screen bg-[#E9DFE5] text-[#161015]">
       <PublicNavbar />
       <section className="relative min-h-[calc(100vh-82px)] overflow-hidden px-4 py-12">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-8 top-8 h-56 w-56 rounded-full bg-[#990808]/20 blur-3xl" />
-          <div className="absolute right-12 top-20 h-64 w-64 rounded-full bg-[#EDC537]/25 blur-3xl" />
-          <div className="absolute bottom-6 left-1/3 h-52 w-52 rounded-full bg-[#E85D04]/15 blur-3xl" />
+          <div className="absolute left-8 top-8 h-56 w-56 rounded-full bg-[#EB523F]/22 blur-3xl" />
+          <div className="absolute right-12 top-20 h-64 w-64 rounded-full bg-[#EA3699]/20 blur-3xl" />
+          <div className="absolute bottom-6 left-1/3 h-52 w-52 rounded-full bg-[#AAE847]/18 blur-3xl" />
         </div>
 
         <div className="relative mx-auto grid max-w-7xl gap-8 lg:grid-cols-2">
-          <div className="rounded-3xl border border-[#EDC537]/30 bg-white/90 p-7 shadow-[0_16px_40px_rgba(153,8,8,0.08)]">
-            <p className="text-xs uppercase tracking-[0.22em] text-[#9a7000]">Contact</p>
-            <h1 className="mt-2 text-4xl font-black text-[#7a0b0b] md:text-5xl">Contact Us</h1>
+          <div className="rounded-3xl border-[3px] border-[#161015] bg-[#EEEDEE] p-7 shadow-[8px_10px_0_#161015]">
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#EA3699]">Contact</p>
+            <h1 className="sw-text-wobble mt-2 text-4xl font-black text-[#161015] md:text-5xl">Contact Us</h1>
             <p className="mt-4 text-sm text-zinc-600">
               Need support, credentials, or partnership details? Reach out and our team will respond.
             </p>
 
-            <div className="mt-6 space-y-3 rounded-2xl border border-[#EDC537]/25 bg-[#fff8df]/60 p-4">
-              <p className="text-sm font-semibold text-[#7a0b0b]">Direct channels</p>
+            <div className="mt-6 space-y-3 rounded-2xl border-2 border-[#EB523F]/40 bg-[#E9DFE5] p-4">
+              <p className="text-sm font-bold text-[#EB523F]">Direct channels</p>
               {loading ? (
                 <p className="text-sm text-zinc-500">Loading contacts…</p>
               ) : (
@@ -110,7 +110,7 @@ export default function ContactUsPage() {
                   {contacts?.email?.trim() ? (
                     <a
                       href={mailtoHref(contacts.email)}
-                      className="block text-sm text-[#7a0b0b] underline underline-offset-2 hover:text-[#990808]"
+                      className="block text-sm font-semibold text-[#161015] underline underline-offset-2 hover:text-[#EB523F]"
                     >
                       {contacts.email}
                     </a>
@@ -124,10 +124,10 @@ export default function ContactUsPage() {
           <form
             noValidate
             onSubmit={handleSubmit}
-            className="rounded-3xl border border-[#EDC537]/30 bg-white p-7 shadow-[0_16px_40px_rgba(153,8,8,0.08)]"
+            className="rounded-3xl border-[3px] border-[#161015] bg-[#EEEDEE] p-7 shadow-[8px_10px_0_#161015,0_0_0_2px_#AAE847]"
           >
-            <p className="text-xs uppercase tracking-[0.22em] text-[#9a7000]">Send Us a Message</p>
-            <h2 className="mt-2 text-2xl font-black text-[#7a0b0b]">We are here to help</h2>
+            <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#EB523F]">Send Us a Message</p>
+            <h2 className="sw-text-wobble mt-2 text-2xl font-black text-[#161015]">We are here to help</h2>
             <p className="mt-2 text-sm text-zinc-600">
               Fill in the form and your message will be stored in our support inbox.
             </p>
@@ -137,7 +137,7 @@ export default function ContactUsPage() {
                 value={form.name}
                 onChange={(e) => setForm((p) => ({ ...p, name: e.target.value }))}
                 placeholder="Your name"
-                className="w-full rounded-xl border border-[#EDC537]/30 bg-white px-4 py-3 text-sm outline-none focus:border-[#EDC537]"
+                className="w-full rounded-xl border-2 border-[#161015]/25 bg-[#E9DFE5] px-4 py-3 text-sm outline-none focus:border-[#EB523F]"
                 required
               />
               <input
@@ -145,21 +145,21 @@ export default function ContactUsPage() {
                 value={form.email}
                 onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
                 placeholder="Your email"
-                className="w-full rounded-xl border border-[#EDC537]/30 bg-white px-4 py-3 text-sm outline-none focus:border-[#EDC537]"
+                className="w-full rounded-xl border-2 border-[#161015]/25 bg-[#E9DFE5] px-4 py-3 text-sm outline-none focus:border-[#EB523F]"
                 required
               />
               <input
                 value={form.subject}
                 onChange={(e) => setForm((p) => ({ ...p, subject: e.target.value }))}
                 placeholder="Subject (optional)"
-                className="w-full rounded-xl border border-[#EDC537]/30 bg-white px-4 py-3 text-sm outline-none focus:border-[#EDC537]"
+                className="w-full rounded-xl border-2 border-[#161015]/25 bg-[#E9DFE5] px-4 py-3 text-sm outline-none focus:border-[#EB523F]"
               />
               <textarea
                 value={form.message}
                 onChange={(e) => setForm((p) => ({ ...p, message: e.target.value }))}
                 placeholder="Type your message..."
                 rows={6}
-                className="w-full rounded-xl border border-[#EDC537]/30 bg-white px-4 py-3 text-sm outline-none focus:border-[#EDC537]"
+                className="w-full rounded-xl border-2 border-[#161015]/25 bg-[#E9DFE5] px-4 py-3 text-sm outline-none focus:border-[#EB523F]"
                 required
               />
             </div>

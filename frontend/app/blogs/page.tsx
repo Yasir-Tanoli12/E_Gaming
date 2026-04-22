@@ -58,10 +58,10 @@ export default function BlogsPage() {
               <img
                 src={logoUrl}
                 alt="SWEEPSTOWN logo"
-                className="h-12 w-12 rounded-full object-cover ring-1 ring-[#EDC537]/50 shadow-[0_0_24px_rgba(237,197,55,0.35)]"
+                className="h-12 w-12 rounded-full object-cover ring-1 ring-[#AAE847]/60 shadow-[0_0_24px_rgba(237,197,55,0.35)]"
               />
             ) : (
-              <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#990808] to-[#EDC537] text-sm font-black text-white shadow-[0_0_24px_rgba(237,197,55,0.35)]">
+              <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#EB523F] to-[#EA3699] text-sm font-black text-white shadow-[0_0_24px_rgba(237,197,55,0.35)]">
                 ST
               </span>
             )}
@@ -77,7 +77,7 @@ export default function BlogsPage() {
 
         {loading ? (
           <div className="flex justify-center py-24">
-            <div className="h-12 w-12 animate-spin rounded-full border-2 border-[#EDC537] border-t-transparent" />
+            <div className="h-12 w-12 animate-spin rounded-full border-2 border-[#EB523F] border-t-transparent" />
           </div>
         ) : error ? (
           <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-6 py-4 text-red-400">
@@ -133,7 +133,7 @@ export default function BlogsPage() {
                           className="blog-thumb-image h-full w-full object-cover"
                         />
                       ) : (
-                        <div className="h-full w-full bg-[linear-gradient(135deg,#990808,#EDC537)] opacity-70" />
+                        <div className="h-full w-full bg-[linear-gradient(135deg,#EB523F,#EA3699)] opacity-70" />
                       )}
                     </div>
                     <div className="min-w-0">

@@ -71,26 +71,26 @@ export function PublicNavbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b border-[#EDC537]/20 bg-[#0f0808]/90 backdrop-blur-xl">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#EDC537]/70 to-transparent" />
+      <header className="sticky top-0 z-50 border-b-[3px] border-[#161015] bg-[#161015]/95 backdrop-blur-xl">
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#EB523F] via-[#EA3699] to-[#AAE847]" />
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4">
           <Link
             href="/dashboard"
-            className="group relative flex items-center gap-3 text-xl font-black tracking-wide text-white"
+            className="group relative flex items-center gap-3 text-xl font-black tracking-wide text-[#EEEDEE]"
           >
-            <span className="absolute -inset-2 -z-10 rounded-xl bg-gradient-to-r from-[#990808]/30 to-[#EDC537]/30 opacity-0 blur-xl transition duration-500 group-hover:opacity-100" />
+            <span className="absolute -inset-2 -z-10 rounded-xl bg-gradient-to-r from-[#EB523F]/40 to-[#EA3699]/35 opacity-0 blur-xl transition duration-500 group-hover:opacity-100" />
             {logoUrl ? (
               <img
                 src={logoUrl}
                 alt="SWEEPSTOWN logo"
-                className="h-10 w-10 rounded-full object-cover ring-1 ring-[#EDC537]/50 shadow-[0_0_24px_rgba(237,197,55,0.35)] transition-transform duration-300 group-hover:scale-105"
+                className="h-10 w-10 rounded-full border-2 border-[#AAE847] object-cover shadow-[3px_3px_0_#161015] transition-transform duration-300 group-hover:scale-105"
               />
             ) : (
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#990808] to-[#EDC537] text-sm font-black shadow-[0_0_24px_rgba(237,197,55,0.35)]">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#161015] bg-gradient-to-br from-[#EB523F] to-[#EA3699] text-sm font-black text-[#EEEDEE] shadow-[3px_3px_0_#161015]">
                 ST
               </span>
             )}
-            <span className="inline-block transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-105">
+            <span className="sw-text-wobble inline-block transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-105">
               SWEEPSTOWN
             </span>
           </Link>
@@ -102,17 +102,17 @@ export function PublicNavbar() {
                 <Link
                   key={item.label}
                   href={item.href}
-                  className={`group relative overflow-hidden rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 ${
+                  className={`group relative overflow-hidden rounded-full px-4 py-2 text-sm font-bold transition-transform duration-200 ${
                     active
-                      ? "bg-gradient-to-r from-[#990808] via-[#E85D04] to-[#EDC537] text-white shadow-[0_0_28px_rgba(237,197,55,0.4)]"
-                      : "text-[#fef3c7]/85 hover:-translate-y-0.5 hover:scale-[1.03] hover:text-white"
+                      ? "border-2 border-[#161015] bg-gradient-to-r from-[#EB523F] via-[#EA3699] to-[#AAE847] text-[#161015] shadow-[4px_4px_0_#161015]"
+                      : "text-[#EEEDEE]/90 hover:-translate-y-0.5 hover:scale-[1.03] hover:text-[#AAE847]"
                   }`}
                 >
                   {!active && (
-                    <span className="absolute inset-0 -z-10 bg-gradient-to-r from-[#990808]/0 via-[#EDC537]/25 to-[#990808]/0 opacity-0 transition duration-300 group-hover:opacity-100" />
+                    <span className="absolute inset-0 -z-10 bg-gradient-to-r from-[#EB523F]/0 via-[#EA3699]/25 to-[#EB523F]/0 opacity-0 transition duration-300 group-hover:opacity-100" />
                   )}
                   {!active && (
-                    <span className="absolute bottom-0 left-1/2 h-px w-0 -translate-x-1/2 bg-gradient-to-r from-[#990808] to-[#EDC537] transition-all duration-300 group-hover:w-3/4" />
+                    <span className="absolute bottom-0 left-1/2 h-0.5 w-0 -translate-x-1/2 bg-gradient-to-r from-[#EB523F] to-[#AAE847] transition-all duration-300 group-hover:w-3/4" />
                   )}
                   {item.label}
                 </Link>
@@ -131,7 +131,7 @@ export function PublicNavbar() {
             type="button"
             onClick={() => setMobileNavOpen(true)}
             aria-label="Open menu"
-            className="flex h-10 w-10 items-center justify-center rounded-xl border border-[#EDC537]/40 bg-[#990808]/20 text-[#fef3c7] shadow-[0_0_18px_rgba(237,197,55,0.3)] transition hover:bg-[#990808]/30 lg:hidden"
+            className="flex h-10 w-10 items-center justify-center rounded-xl border-2 border-[#AAE847]/60 bg-[#EB523F]/25 text-[#EEEDEE] shadow-[3px_3px_0_#161015] transition hover:bg-[#EB523F]/40 lg:hidden"
           >
             <svg
               viewBox="0 0 24 24"
@@ -161,9 +161,9 @@ export function PublicNavbar() {
           onClick={() => setMobileNavOpen(false)}
         />
         <div
-          className={`absolute right-0 top-0 flex h-full w-[min(320px,85vw)] flex-col border-l border-[#EDC537]/30 bg-[#0f0808]/98 shadow-[0_0_60px_rgba(237,197,55,0.2)] transition-transform duration-300 ease-out ${mobileNavOpen ? "translate-x-0" : "translate-x-full"}`}
+          className={`absolute right-0 top-0 flex h-full w-[min(320px,85vw)] flex-col border-l-[3px] border-[#161015] bg-[#161015]/98 shadow-[6px_0_0_#EB523F] transition-transform duration-300 ease-out ${mobileNavOpen ? "translate-x-0" : "translate-x-full"}`}
         >
-          <div className="flex items-center justify-between border-b border-[#EDC537]/20 px-4 py-4">
+          <div className="flex items-center justify-between border-b-2 border-[#EB523F]/40 px-4 py-4">
             <span className="text-lg font-bold text-white">Menu</span>
             <button
               type="button"
@@ -184,14 +184,14 @@ export function PublicNavbar() {
                   key={item.label}
                   href={item.href}
                   onClick={() => setMobileNavOpen(false)}
-                  className={`rounded-xl px-4 py-3 text-base font-medium transition ${active ? "bg-gradient-to-r from-[#990808]/50 to-[#EDC537]/40 text-white" : "text-[#fef3c7]/90 hover:bg-[#EDC537]/15"}`}
+                  className={`rounded-xl px-4 py-3 text-base font-semibold transition ${active ? "border border-[#AAE847]/50 bg-gradient-to-r from-[#EB523F]/35 to-[#EA3699]/35 text-[#EEEDEE]" : "text-[#EEEDEE]/90 hover:bg-[#EB523F]/15"}`}
                 >
                   {item.label}
                 </Link>
               );
             })}
           </nav>
-          <div className="border-t border-[#EDC537]/20 p-4">
+          <div className="border-t-2 border-[#EB523F]/30 p-4">
             <div className="flex justify-center">
               <SocialContactIcons contacts={contacts} size="lg" gapClass="gap-3" />
             </div>

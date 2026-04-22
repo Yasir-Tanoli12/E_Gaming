@@ -63,17 +63,17 @@ export default function GamesPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#FFFBF5] text-[#1a1a1a]">
+    <div className="min-h-screen bg-[#E9DFE5] text-[#161015]">
       <PublicNavbar />
 
-      <section className="relative overflow-hidden border-b border-[#EDC537]/20 bg-gradient-to-r from-[#990808]/25 via-[#E85D04]/20 to-[#EDC537]/25 px-4 py-12">
+      <section className="relative overflow-hidden border-b-[3px] border-[#161015] bg-gradient-to-r from-[#EB523F]/22 via-[#EA3699]/18 to-[#AAE847]/22 px-4 py-12">
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-8 top-8 h-40 w-40 rounded-full bg-[#990808]/25 blur-3xl" />
-          <div className="absolute bottom-10 right-10 h-52 w-52 rounded-full bg-[#EDC537]/20 blur-3xl" />
+          <div className="absolute left-8 top-8 h-40 w-40 rounded-full bg-[#EB523F]/28 blur-3xl" />
+          <div className="absolute bottom-10 right-10 h-52 w-52 rounded-full bg-[#AAE847]/25 blur-3xl" />
         </div>
         <div className="relative mx-auto max-w-7xl">
-          <p className="text-xs uppercase tracking-[0.2em] text-[#7a5a16]">All Games</p>
-          <h1 className="mt-2 text-4xl font-black md:text-5xl">Game Library</h1>
+          <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#EB523F]">All Games</p>
+          <h1 className="sw-text-wobble mt-2 text-4xl font-black text-[#161015] md:text-5xl">Game Library</h1>
           <p className="mt-3 max-w-2xl text-sm text-zinc-600">
             Browse every game in one place. Top picks are highlighted first.
           </p>
@@ -83,9 +83,9 @@ export default function GamesPage() {
       <main className="mx-auto max-w-7xl px-4 py-12">
         {selectedGame && (
           <div className="fixed inset-0 z-[80] flex items-center justify-center bg-white/95 p-4 backdrop-blur-sm">
-            <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl border border-[#EDC537]/50 bg-white p-6 shadow-[0_0_70px_rgba(237,197,55,0.2)] md:p-8">
-              <div className="pointer-events-none absolute -left-16 top-4 h-48 w-48 rounded-full bg-[#990808]/25 blur-[80px]" />
-              <div className="pointer-events-none absolute -right-12 bottom-2 h-56 w-56 rounded-full bg-[#EDC537]/20 blur-[90px]" />
+            <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl border-[3px] border-[#161015] bg-[#EEEDEE] p-6 shadow-[8px_10px_0_#161015,0_0_0_3px_#AAE847] md:p-8">
+              <div className="pointer-events-none absolute -left-16 top-4 h-48 w-48 rounded-full bg-[#EB523F]/25 blur-[80px]" />
+              <div className="pointer-events-none absolute -right-12 bottom-2 h-56 w-56 rounded-full bg-[#EA3699]/22 blur-[90px]" />
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-800">
@@ -148,14 +148,14 @@ export default function GamesPage() {
 
         {loading ? (
           <div className="flex justify-center py-20">
-            <div className="h-10 w-10 animate-spin rounded-full border-2 border-[#EDC537] border-t-transparent" />
+            <div className="h-10 w-10 animate-spin rounded-full border-2 border-[#EB523F] border-t-transparent" />
           </div>
         ) : error ? (
           <div className="rounded-xl border border-red-500/30 bg-red-500/10 px-6 py-4 text-red-400">
             {error}
           </div>
         ) : orderedGames.length === 0 ? (
-          <div className="rounded-xl border border-[#EDC537]/20 bg-[#140808]/70 p-8 text-center text-[#fef3c7]/85">
+          <div className="rounded-xl border-[3px] border-[#161015] bg-[#161015]/92 p-8 text-center text-[#EEEDEE]/90 shadow-[6px_8px_0_#EB523F]">
             No games available yet.
           </div>
         ) : (

@@ -4,20 +4,20 @@
 /* Manual dark mode for /admin and /login (wrap root with class `dark`) */
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Bright theme: cream backgrounds, red #990808, yellow #EDC537 */
+/* Brand: #EB523F red, #EA3699 pink, #E9DFE5 bg, #AAE847 accent, #EEEDEE neutral */
 :root {
-  --background: #FFFBF5;
-  --foreground: #1a1a1a;
-  --color-primary: #990808;
-  --color-primary-light: #c41e1e;
-  --color-accent: #EDC537;
-  --color-accent-muted: #f5d76e;
-  --color-secondary: #7DD3FC;
-  --color-orange: #E85D04;
-  --color-bg-bright: #FFFBF5;
-  --color-bg-card: #ffffff;
-  --color-text-on-dark: #1a0a0a;
-  --color-text-on-yellow: #1a0a0a;
+  --background: #e9dfe5;
+  --foreground: #161015;
+  --color-primary: #eb523f;
+  --color-primary-light: #ff6b52;
+  --color-accent: #aae847;
+  --color-accent-muted: #c4f570;
+  --color-secondary: #ea3699;
+  --color-orange: #ea3699;
+  --color-bg-bright: #e9dfe5;
+  --color-bg-card: #eeedee;
+  --color-text-on-dark: #eeedee;
+  --color-text-on-yellow: #161015;
 }
 
 @theme inline {
@@ -31,6 +31,39 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Energetic heading wobble — transform only */
+@keyframes sw-wobble {
+  0% {
+    transform: rotate(-1.2deg) translateY(0) skewX(-0.8deg);
+  }
+  20% {
+    transform: rotate(1.4deg) translateY(-2px) skewX(0.6deg);
+  }
+  45% {
+    transform: rotate(-1deg) translateY(1px) skewX(-0.4deg);
+  }
+  70% {
+    transform: rotate(1.1deg) translateY(-1px) skewX(0.5deg);
+  }
+  100% {
+    transform: rotate(-1.2deg) translateY(0) skewX(-0.8deg);
+  }
+}
+
+.sw-text-wobble {
+  display: inline-block;
+  transform-origin: 50% 60%;
+  animation: sw-wobble 2.4s ease-in-out infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sw-text-wobble {
+    animation: none;
+    transform: none;
+  }
 }
 
 @keyframes fade-in {
@@ -391,13 +424,13 @@ body {
   color: #1a1a1a;
 }
 .auth-card input {
-  background: #ffffff;
-  border-color: rgb(237 197 55 / 0.5);
-  color: #1a1a1a;
+  background: #eeedee;
+  border-color: rgb(22 16 21 / 0.35);
+  color: #161015;
 }
 .auth-card input::placeholder {
-  color: rgb(100 80 60);
+  color: rgb(80 70 85);
 }
 .auth-card input:focus {
-  border-color: rgb(237 197 55);
+  border-color: #eb523f;
 }
