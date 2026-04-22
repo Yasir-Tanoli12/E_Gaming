@@ -12,10 +12,10 @@ const SHADOW_HOVER =
 function PersonIcon() {
   return (
     <div
-      className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border-[3px] border-[#EB523F] bg-gradient-to-br from-[#EA3699] to-[#EB523F] shadow-[4px_4px_0_#161015]"
+      className="flex h-[4.25rem] w-[4.25rem] shrink-0 items-center justify-center rounded-full border-[3px] border-[#EB523F] bg-gradient-to-br from-[#EA3699] to-[#EB523F] shadow-[4px_4px_0_#161015] sm:h-[4.5rem] sm:w-[4.5rem]"
       aria-hidden
     >
-      <svg className="h-7 w-7 text-[#EEEDEE]" fill="currentColor" viewBox="0 0 24 24">
+      <svg className="h-8 w-8 text-[#EEEDEE] sm:h-9 sm:w-9" fill="currentColor" viewBox="0 0 24 24">
         <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
       </svg>
     </div>
@@ -95,8 +95,8 @@ export function InteractiveReviewCarousel({ reviews }: { reviews: ReviewItem[] }
   return (
     <div
       ref={wrapRef}
-      className="relative isolate min-h-[min(440px,72vw)] w-full sm:min-h-[460px]"
-      style={{ perspective: "1200px", perspectiveOrigin: "50% 45%" }}
+      className="relative isolate min-h-[min(520px,78vw)] w-full px-2 sm:min-h-[580px] sm:px-4"
+      style={{ perspective: "1400px", perspectiveOrigin: "50% 42%" }}
       onPointerMove={onPointerMove}
       onPointerEnter={onPointerEnter}
       onPointerLeave={onPointerLeave}
@@ -107,26 +107,27 @@ export function InteractiveReviewCarousel({ reviews }: { reviews: ReviewItem[] }
       </p>
 
       <div
-        className="relative mx-auto flex h-[min(440px,72vw)] w-full max-w-5xl items-center justify-center sm:h-[460px]"
+        className="relative mx-auto flex h-[min(520px,78vw)] w-full max-w-[90rem] items-center justify-center sm:h-[580px]"
         style={{ transformStyle: "preserve-3d" }}
       >
         {stack.map(({ item, key }, i) => {
           const d = i - centerFloat;
           const abs = Math.abs(d);
-          const spread = 76;
-          const tx = d * spread + bias * 36;
-          const tz = -abs * 28;
-          const rotY = d * -7 + bias * -8;
-          const rotX = bias * -5 + d * 1.2;
+          /** Wider spread + shallower Z so left/right end cards stay readable */
+          const spread = 118;
+          const tx = d * spread + bias * 22;
+          const tz = -abs * 12;
+          const rotY = d * -4 + bias * -5;
+          const rotX = bias * -3 + d * 0.8;
           const isHover = hovered === i;
-          const scaleBase = 1.05 - Math.min(abs, 2.8) * 0.07;
+          const scaleBase = 1.08 - Math.min(abs, 3.2) * 0.042;
           const scale = isHover ? Math.max(scaleBase, 1.12) + 0.1 : scaleBase;
-          const z = 80 - Math.round(abs * 14) + (isHover ? 25 : 0);
+          const z = 100 - Math.round(abs * 11) + (isHover ? 28 : 0);
 
           return (
             <article
               key={key}
-              className="absolute w-[min(100%,320px)] will-change-transform"
+              className="absolute w-[min(100%,400px)] will-change-transform sm:w-[min(100%,440px)]"
               style={{
                 zIndex: z,
                 transform: `translateX(${tx}px) translateZ(${tz}px) rotateY(${rotY}deg) rotateX(${rotX}deg) scale(${scale})`,
@@ -138,20 +139,20 @@ export function InteractiveReviewCarousel({ reviews }: { reviews: ReviewItem[] }
               onPointerLeave={() => setHovered((h) => (h === i ? null : h))}
             >
               <div
-                className="flex gap-4 rounded-2xl border-[3px] border-[#161015] bg-[#EEEDEE] p-5"
+                className="flex gap-5 rounded-2xl border-[3px] border-[#161015] bg-[#EEEDEE] p-6 sm:gap-6 sm:p-7"
                 style={{
                   boxShadow: "inset 0 0 0 2px #EA3699",
                 }}
               >
                 <PersonIcon />
                 <div className="min-w-0 flex-1">
-                  <p className="text-base font-black uppercase tracking-wide text-[#EB523F]">
+                  <p className="text-lg font-black uppercase tracking-wide text-[#EB523F] sm:text-xl">
                     {item.reviewer}
                   </p>
-                  <p className="mt-2 line-clamp-4 text-sm font-semibold leading-snug text-[#161015]">
+                  <p className="mt-2 line-clamp-4 text-base font-semibold leading-snug text-[#161015] sm:text-[1.05rem]">
                     {item.message}
                   </p>
-                  <p className="mt-3 text-lg font-black tracking-widest text-[#AAE847]">
+                  <p className="mt-3 text-xl font-black tracking-widest text-[#AAE847] sm:text-2xl">
                     {"★".repeat(Math.min(5, Math.max(1, Math.round(item.rating))))}
                     <span className="ml-2 align-middle text-xs font-bold text-[#EA3699]">
                       {item.rating}/5

@@ -394,7 +394,10 @@ export default function UserDashboardPage() {
               ))}
             </div>
 
-            <section id="reviews" className="rounded-3xl border-[3px] border-[#161015] bg-[#EEEDEE] px-4 py-10 shadow-[8px_10px_0_#161015] sm:px-8">
+            <section
+              id="reviews"
+              className="overflow-visible rounded-3xl border-[3px] border-[#161015] bg-[#EEEDEE] px-2 py-10 shadow-[8px_10px_0_#161015] sm:px-6 sm:py-12"
+            >
               <div className="mb-2 flex flex-col gap-1 sm:mb-4 sm:flex-row sm:items-end sm:justify-between">
                 <h2 className="sw-text-wobble text-3xl font-black text-[#161015] md:text-4xl">
                   Player hype
