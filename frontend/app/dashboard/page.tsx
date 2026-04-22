@@ -392,13 +392,13 @@ export default function UserDashboardPage() {
 
             <section
               id="reviews"
-              className="overflow-visible rounded-3xl border-[3px] border-[#161015] bg-[#EEEDEE] px-2 py-10 shadow-[8px_10px_0_#161015] sm:px-6 sm:py-12"
+              className="overflow-visible rounded-3xl border-[3px] border-[#161015] bg-[radial-gradient(ellipse_85%_55%_at_15%_0%,rgba(235,82,63,0.16),transparent_55%),radial-gradient(ellipse_70%_50%_at_92%_100%,rgba(234,54,153,0.14),transparent_50%),linear-gradient(165deg,#D9D0D6_0%,#E9DFE5_48%,#E0D5DC_100%)] px-2 py-6 shadow-[8px_10px_0_#161015] sm:px-5 sm:py-8"
             >
-              <div className="mb-2 flex flex-col gap-1 sm:mb-4 sm:flex-row sm:items-end sm:justify-between">
-                <h2 className="sw-text-wobble text-3xl font-black text-[#161015] md:text-4xl">
+              <div className="mb-1 flex flex-col gap-0.5 sm:mb-3 sm:flex-row sm:items-end sm:justify-between">
+                <h2 className="sw-text-wobble text-2xl font-black text-[#161015] md:text-3xl">
                   Player hype
                 </h2>
-                <span className="text-xs font-bold uppercase tracking-[0.2em] text-[#EA3699]">
+                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#EA3699] sm:text-xs">
                   What players are saying
                 </span>
               </div>

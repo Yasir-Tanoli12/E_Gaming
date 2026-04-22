@@ -150,8 +150,8 @@ export function InteractiveReviewCarousel({ reviews }: { reviews: ReviewItem[] }
   return (
     <div
       ref={wrapRef}
-      className="relative isolate min-h-[min(480px,70vw)] w-full touch-none px-2 sm:min-h-[580px] sm:touch-auto sm:px-4"
-      style={{ perspective: "1400px", perspectiveOrigin: "50% 42%" }}
+      className="relative isolate min-h-[min(320px,52vw)] w-full touch-none px-1 sm:min-h-[400px] sm:touch-auto sm:px-3"
+      style={{ perspective: "1400px", perspectiveOrigin: "50% 45%" }}
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerEnter={onPointerEnter}
@@ -159,12 +159,8 @@ export function InteractiveReviewCarousel({ reviews }: { reviews: ReviewItem[] }
       onPointerUp={endDrag}
       onPointerCancel={endDrag}
     >
-      <p className="pointer-events-none absolute left-1/2 top-2 z-[200] hidden -translate-x-1/2 text-center text-[10px] font-bold uppercase tracking-[0.35em] text-[#EB523F] lg:block">
-        Move cursor — stack reacts
-      </p>
-
       <div
-        className="relative mx-auto flex h-[min(480px,70vw)] w-full max-w-[90rem] items-center justify-center sm:h-[580px]"
+        className="relative mx-auto flex h-[min(320px,52vw)] w-full max-w-[90rem] items-center justify-center sm:h-[400px]"
         style={{ transformStyle: "preserve-3d" }}
       >
         {stack.map(({ item, key }, i) => {
@@ -195,7 +191,7 @@ export function InteractiveReviewCarousel({ reviews }: { reviews: ReviewItem[] }
               onPointerLeave={() => setHovered((h) => (h === i ? null : h))}
             >
               <div
-                className="flex gap-5 rounded-2xl border-[3px] border-[#161015] bg-[#EEEDEE] p-6 sm:gap-6 sm:p-7"
+                className="flex gap-4 rounded-2xl border-[3px] border-[#161015] bg-[#E4DDE3] p-5 sm:gap-5 sm:p-6"
                 style={{
                   boxShadow: "inset 0 0 0 2px #EA3699",
                 }}
