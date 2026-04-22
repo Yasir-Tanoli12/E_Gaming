@@ -25,7 +25,14 @@ function isNavItemActive(item: NavItem, pathname: string): boolean {
   return item.matchPath(pathname);
 }
 
-export function PublicNavbar() {
+export type PublicNavbarVariant = "default" | "overlay";
+
+type PublicNavbarProps = {
+  /** `overlay`: semi-transparent bar for use over full-bleed hero video (dashboard). */
+  variant?: PublicNavbarVariant;
+};
+
+export function PublicNavbar({ variant = "default" }: PublicNavbarProps) {
   const pathname = usePathname();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [contacts, setContacts] = useState<SiteContacts | null>(null);
@@ -69,10 +76,17 @@ export function PublicNavbar() {
 
   const logoUrl = contacts?.logoUrl ?? "";
 
+  const headerSurface =
+    variant === "overlay"
+      ? "border-b border-[#EA3699]/30 bg-gradient-to-b from-[#161015]/78 via-[#1f0a14]/65 to-[#161015]/50 backdrop-blur-xl"
+      : "border-b-[3px] border-[#161015] bg-[#161015]/95 backdrop-blur-xl";
+
   return (
     <>
-      <header className="sticky top-0 z-50 w-full min-w-0 border-b-[3px] border-[#161015] bg-[#161015]/95 backdrop-blur-xl">
-        <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#EB523F] via-[#EA3699] to-[#AAE847]" />
+      <header className={`sticky top-0 z-50 w-full min-w-0 ${headerSurface}`}>
+        <div
+          className={`pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#EB523F] via-[#EA3699] to-[#AAE847] ${variant === "overlay" ? "opacity-90" : ""}`}
+        />
         <div className="mx-auto flex w-full min-w-0 max-w-7xl items-center justify-between gap-3 py-4 ps-[max(1rem,env(safe-area-inset-left))] pe-[max(1rem,env(safe-area-inset-right))] sm:gap-4">
           <Link
             href="/dashboard"

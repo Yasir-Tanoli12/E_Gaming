@@ -157,72 +157,65 @@ export default function UserDashboardPage() {
         <div className="absolute right-0 top-40 h-96 w-96 animate-float-delayed rounded-full bg-[#EA3699]/22 blur-[110px]" />
       </div>
 
-      <PublicNavbar />
-
       <section
         id="home"
-        className="relative flex w-full min-w-0 max-w-full scroll-mt-24 flex-col justify-center overflow-x-clip border-b border-[#EB523F]/25 bg-gradient-to-b from-[#E9DFE5] via-[#EB523F]/12 to-[#AAE847]/20 py-10 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-[max(2.5rem,env(safe-area-inset-top))] sm:bg-gradient-to-r sm:from-[#EB523F]/20 sm:via-[#EA3699]/18 sm:to-[#AAE847]/25 md:min-h-[calc(100vh-82px)] md:flex-row md:items-center"
+        className="relative isolate flex min-h-[100dvh] w-full min-w-0 max-w-full scroll-mt-24 flex-col overflow-x-hidden border-b border-[#EB523F]/30"
       >
-        <div className="pointer-events-none absolute inset-0 min-w-0">
-          <div className="absolute left-4 top-8 h-40 w-40 rounded-full bg-[#EB523F]/30 blur-3xl sm:left-8" />
-          <div className="absolute bottom-10 right-4 h-52 w-52 animate-pulse rounded-full bg-[#AAE847]/25 blur-3xl sm:right-10" />
+        {/* Full-bleed lobby video (fills entire hero, including behind navbar) */}
+        <div className="absolute inset-0 z-0 min-h-full w-full bg-[#161015]">
+          {heroVideo ? (
+            <video
+              ref={heroVideoRef}
+              src={heroVideo}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+          ) : (
+            <div className="absolute inset-0 flex items-center justify-center bg-[radial-gradient(circle_at_20%_20%,rgba(235,82,63,0.35),transparent_45%),radial-gradient(circle_at_80%_80%,rgba(170,232,71,0.32),transparent_45%),linear-gradient(145deg,#1a0a12,#161015,#2a0f1c)]">
+              <p className="text-sm text-[#EEEDEE]/70">Game preview will appear here</p>
+            </div>
+          )}
+          <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(transparent_48%,rgba(5,8,20,0.2)_50%,transparent_52%)] bg-[length:100%_6px] opacity-25" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#161015]/90 via-[#161015]/45 to-[#161015]/25" />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#161015]/75 via-transparent to-[#EB523F]/15" />
+          {heroVideo && heroVideoBlocked ? (
+            <button
+              type="button"
+              className="absolute inset-0 z-20 flex items-center justify-center bg-black/40 text-sm font-semibold text-white backdrop-blur-[2px]"
+              onClick={() => {
+                const video = heroVideoRef.current;
+                if (!video) return;
+                video.defaultMuted = true;
+                video.muted = true;
+                video.play().then(() => setHeroVideoBlocked(false)).catch(() => {});
+              }}
+            >
+              Tap to play lobby video
+            </button>
+          ) : null}
         </div>
-        <div className="relative z-[1] mx-auto grid w-full min-w-0 max-w-7xl grid-cols-1 items-center gap-8 md:grid-cols-2 md:gap-10">
-          <div className="min-w-0 max-w-full animate-fade-in">
-            <h1 className="sw-text-wobble break-words text-4xl font-black leading-[0.95] text-[#161015] sm:text-5xl md:text-7xl">
+
+        <div className="relative z-50 shrink-0">
+          <PublicNavbar variant="overlay" />
+        </div>
+
+        <div className="relative z-[1] mx-auto flex w-full min-w-0 max-w-7xl flex-1 flex-col justify-end px-[max(1rem,env(safe-area-inset-left))] pb-12 pt-2 pr-[max(1rem,env(safe-area-inset-right))] min-h-0 sm:justify-center sm:pb-20 sm:pt-4">
+          <div className="mb-4 inline-flex items-center gap-2 self-start rounded-full border-2 border-[#161015] bg-[#AAE847]/90 px-3 py-1 text-xs font-bold text-[#161015] shadow-[3px_3px_0_#161015]">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-[#EB523F]" />
+            LIVE LOBBY
+          </div>
+          <div className="min-w-0 max-w-full animate-fade-in sm:max-w-2xl lg:max-w-3xl">
+            <h1 className="sw-text-wobble break-words text-4xl font-black leading-[0.95] text-[#EEEDEE] drop-shadow-[0_2px_24px_rgba(0,0,0,0.65)] sm:text-5xl md:text-7xl">
               PLAY. WIN. DOMINATE.
             </h1>
-            <p className="mt-6 max-w-xl text-base text-zinc-600 sm:text-lg">
+            <p className="mt-6 max-w-xl text-base text-[#EEEDEE]/85 drop-shadow-[0_1px_12px_rgba(0,0,0,0.5)] sm:text-lg">
               Browse our curated games. Play instantly with your credentials or
               get access from our support team. Click any game card to play or buy credentials.
             </p>
-          </div>
-          <div className="relative h-[min(420px,62vh)] w-full min-w-0 max-w-full animate-fade-in animation-delay-200 rounded-3xl border-[3px] border-[#161015] bg-gradient-to-br from-[#EB523F]/25 to-[#AAE847]/20 p-2 shadow-[8px_10px_0_#161015,0_0_0_3px_#EA3699] sm:p-3 md:h-[500px] md:min-h-[420px]">
-            <div className="absolute -inset-[1px] -z-10 rounded-3xl bg-[conic-gradient(from_0deg,rgba(234,54,153,0.45),rgba(235,82,63,0.5),rgba(170,232,71,0.45))] blur-sm" />
-            <div className="group relative h-full w-full overflow-hidden rounded-2xl border-[3px] border-[#161015] bg-[#EEEDEE]/95 shadow-lg">
-              {heroVideo ? (
-                <>
-                  <video
-                    ref={heroVideoRef}
-                    src={heroVideo}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    preload="auto"
-                    className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
-                  />
-                  {heroVideoBlocked ? (
-                    <button
-                      type="button"
-                      className="absolute inset-0 z-20 flex items-center justify-center bg-black/25 text-sm font-semibold text-white backdrop-blur-[1px]"
-                      onClick={() => {
-                        const video = heroVideoRef.current;
-                        if (!video) return;
-                        video.defaultMuted = true;
-                        video.muted = true;
-                        video.play().then(() => setHeroVideoBlocked(false)).catch(() => {});
-                      }}
-                    >
-                      Tap to play lobby video
-                    </button>
-                  ) : null}
-                </>
-              ) : (
-                <div className="flex h-full items-center justify-center bg-[radial-gradient(circle_at_20%_20%,rgba(235,82,63,0.18),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(170,232,71,0.28),transparent_40%),linear-gradient(120deg,#EEEDEE,#E9DFE5)]">
-                  <p className="text-sm text-zinc-500">Game preview will appear here</p>
-                </div>
-              )}
-              <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(transparent_48%,rgba(5,8,20,0.25)_50%,transparent_52%)] bg-[length:100%_6px] opacity-30" />
-              <div className="pointer-events-none absolute left-4 top-4 flex items-center gap-2 rounded-full border-[2px] border-[#161015] bg-[#AAE847]/90 px-3 py-1 text-xs font-bold text-[#161015]">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-[#EB523F]" />
-                LIVE LOBBY
-              </div>
-              <div className="pointer-events-none absolute bottom-4 left-4 rounded-lg border-2 border-[#161015] bg-[#EEEDEE] px-4 py-2 shadow-[4px_4px_0_#161015]">
-                <p className="text-xs font-bold uppercase tracking-[0.22em] text-[#EB523F]">Game Arena</p>
-                <p className="mt-1 text-sm text-zinc-600">Browse games, get credentials, or play now</p>
-              </div>
-            </div>
           </div>
         </div>
       </section>
