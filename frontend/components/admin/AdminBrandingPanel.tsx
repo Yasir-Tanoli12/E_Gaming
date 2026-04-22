@@ -180,7 +180,7 @@ export function AdminBrandingPanel() {
               <img
                 src={logoPreview}
                 alt="Site logo preview"
-                className="h-10 w-10 rounded-lg object-cover ring-1 ring-cyan-400/30"
+                className="h-10 w-10 rounded-full object-cover ring-1 ring-cyan-400/30"
               />
               <p className="text-xs text-cyan-100/85">Logo is active site-wide</p>
             </div>

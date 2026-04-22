@@ -6,11 +6,21 @@ export function whatsappHref(whatsapp: string): string {
   return `https://wa.me/${w.replace(/\D/g, "")}`;
 }
 
+/** Normalize admin-entered support email (plain address or mailto:). */
+export function normalizeSupportEmail(raw: string): string {
+  let value = raw.trim();
+  if (!value) return "";
+  if (value.toLowerCase().startsWith("mailto:")) {
+    value = value.slice("mailto:".length);
+  }
+  // Admins sometimes paste values with spaces/newlines.
+  return value.replace(/\s+/g, "");
+}
+
 /** Build mailto href from a plain address or existing mailto: string. */
 export function mailtoHref(email: string): string {
-  const e = email.trim();
+  const e = normalizeSupportEmail(email);
   if (!e) return "";
-  if (e.toLowerCase().startsWith("mailto:")) return e;
   return `mailto:${e}`;
 }
 

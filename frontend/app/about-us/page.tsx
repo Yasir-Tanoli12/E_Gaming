@@ -44,10 +44,10 @@ export default function AboutUsPage() {
               <img
                 src={logoUrl}
                 alt="SWEEPSTOWN logo"
-                className="h-12 w-12 rounded-xl object-cover ring-1 ring-[#EDC537]/50 shadow-[0_0_24px_rgba(237,197,55,0.35)]"
+                className="h-12 w-12 rounded-full object-cover ring-1 ring-[#EDC537]/50 shadow-[0_0_24px_rgba(237,197,55,0.35)]"
               />
             ) : (
-              <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-[#990808] to-[#EDC537] text-sm font-black text-white shadow-[0_0_24px_rgba(237,197,55,0.35)]">
+              <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#990808] to-[#EDC537] text-sm font-black text-white shadow-[0_0_24px_rgba(237,197,55,0.35)]">
                 ST
               </span>
             )}

@@ -104,10 +104,10 @@ export default function AdminLayout({
                 <img
                   src={logoUrl}
                   alt=""
-                  className="h-9 w-9 shrink-0 rounded-lg object-cover ring-1 ring-white/10"
+                  className="h-9 w-9 shrink-0 rounded-full object-cover ring-1 ring-white/10"
                 />
               ) : (
-                <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-zinc-700 to-zinc-900 text-xs font-semibold tracking-tight text-zinc-200 ring-1 ring-white/10">
+                <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-zinc-700 to-zinc-900 text-xs font-semibold tracking-tight text-zinc-200 ring-1 ring-white/10">
                   ST
                 </span>
               )}

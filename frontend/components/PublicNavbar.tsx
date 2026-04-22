@@ -162,10 +162,10 @@ export function PublicNavbar() {
               <img
                 src={logoUrl}
                 alt="SWEEPSTOWN logo"
-                className="h-10 w-10 rounded-xl object-cover ring-1 ring-[#EDC537]/50 shadow-[0_0_24px_rgba(237,197,55,0.35)] transition-transform duration-300 group-hover:scale-105"
+                className="h-10 w-10 rounded-full object-cover ring-1 ring-[#EDC537]/50 shadow-[0_0_24px_rgba(237,197,55,0.35)] transition-transform duration-300 group-hover:scale-105"
               />
             ) : (
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#990808] to-[#EDC537] text-sm font-black shadow-[0_0_24px_rgba(237,197,55,0.35)]">
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-[#990808] to-[#EDC537] text-sm font-black shadow-[0_0_24px_rgba(237,197,55,0.35)]">
                 ST
               </span>
             )}

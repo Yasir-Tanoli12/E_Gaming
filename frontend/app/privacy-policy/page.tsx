@@ -41,10 +41,10 @@ export default function PrivacyPolicyPage() {
                 <img
                   src={logoUrl}
                   alt="SWEEPSTOWN logo"
-                  className="h-11 w-11 rounded-xl object-cover ring-1 ring-[#EDC537]/50 shadow-[0_0_22px_rgba(237,197,55,0.3)]"
+                  className="h-11 w-11 rounded-full object-cover ring-1 ring-[#EDC537]/50 shadow-[0_0_22px_rgba(237,197,55,0.3)]"
                 />
               ) : (
-                <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-[#990808] to-[#EDC537] text-xs font-black text-white shadow-[0_0_20px_rgba(237,197,55,0.35)]">
+                <span className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-[#990808] to-[#EDC537] text-xs font-black text-white shadow-[0_0_20px_rgba(237,197,55,0.35)]">
                   ST
                 </span>
               )}

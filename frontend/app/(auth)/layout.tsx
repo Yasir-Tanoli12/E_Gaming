@@ -34,10 +34,10 @@ export default function AuthLayout({
             <img
               src={logoUrl}
               alt="SWEEPSTOWN logo"
-              className="h-16 w-16 rounded-2xl object-cover ring-1 ring-cyan-300/50 shadow-[0_0_32px_rgba(34,211,238,0.35)]"
+              className="h-16 w-16 rounded-full object-cover ring-1 ring-cyan-300/50 shadow-[0_0_32px_rgba(34,211,238,0.35)]"
             />
           ) : (
-            <span className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-fuchsia-500 to-cyan-400 text-lg font-black text-white shadow-[0_0_32px_rgba(217,70,239,0.35)]">
+            <span className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-fuchsia-500 to-cyan-400 text-lg font-black text-white shadow-[0_0_32px_rgba(217,70,239,0.35)]">
               ST
             </span>
           )}

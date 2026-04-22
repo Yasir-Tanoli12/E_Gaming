@@ -49,6 +49,15 @@ export class ContentService {
   );
   private bootstrapDone = false;
 
+  private normalizeSupportEmail(value: string): string {
+    let email = value.trim();
+    if (!email) return '';
+    if (email.toLowerCase().startsWith('mailto:')) {
+      email = email.slice('mailto:'.length);
+    }
+    return email.replace(/\s+/g, '');
+  }
+
   private async bootstrapFromLegacyFile() {
     if (this.bootstrapDone) return;
     this.bootstrapDone = true;
@@ -448,10 +457,13 @@ export class ContentService {
 
   async updateContacts(dto: UpdateContactsDto) {
     await this.bootstrapFromLegacyFile();
+    const normalizedEmail =
+      dto.email !== undefined ? this.normalizeSupportEmail(dto.email) : undefined;
     const result = await this.prisma.contact.update({
       where: { id: 'default' },
       data: {
         ...dto,
+        ...(normalizedEmail !== undefined ? { email: normalizedEmail } : {}),
         ...(dto.telegram !== undefined
           ? { telegram: dto.telegram.trim() ? dto.telegram.trim() : null }
           : {}),
