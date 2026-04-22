@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from "react";
 import { ApiError } from "@/lib/api";
 import { contentApi } from "@/lib/content-api";
 import { resolveUploadMediaUrl } from "@/lib/media-url";
+import { getVideoDurationSeconds } from "@/lib/video-duration";
 
 function formatLoadError(err: unknown): string {
   if (err instanceof ApiError) {
@@ -17,6 +18,7 @@ function formatLoadError(err: unknown): string {
 }
 
 const MAX_LOBBY_VIDEO_BYTES = 100 * 1024 * 1024;
+const MAX_LOBBY_VIDEO_SECONDS = 35;
 const VIDEO_EXT_RE = /\.(mp4|webm|ogg|mov)$/i;
 
 /**
@@ -80,6 +82,20 @@ export function AdminBrandingPanel() {
     }
     if (file.size > MAX_LOBBY_VIDEO_BYTES) {
       setError("Lobby video is too large (max 100MB).");
+      return;
+    }
+    try {
+      const seconds = await getVideoDurationSeconds(file);
+      if (seconds > MAX_LOBBY_VIDEO_SECONDS) {
+        setError(
+          `Lobby video is too long (${Math.ceil(seconds)}s). Maximum allowed is ${MAX_LOBBY_VIDEO_SECONDS}s.`
+        );
+        return;
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Could not validate lobby video duration."
+      );
       return;
     }
     setUploadingLobbyVideo(true);

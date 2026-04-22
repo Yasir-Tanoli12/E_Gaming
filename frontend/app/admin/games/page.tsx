@@ -8,10 +8,12 @@ import {
   type CreateGameInput,
 } from "@/lib/games-api";
 import { resolveUploadMediaUrl } from "@/lib/media-url";
+import { getVideoDurationSeconds } from "@/lib/video-duration";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
 const MAX_GAME_MEDIA_BYTES = 100 * 1024 * 1024;
+const MAX_VIDEO_DURATION_SECONDS = 35;
 const IMAGE_EXT_RE = /\.(jpe?g|png|webp|gif)$/i;
 const VIDEO_EXT_RE = /\.(mp4|webm|ogg|mov)$/i;
 
@@ -177,6 +179,20 @@ export default function AdminGamesPage() {
     }
     if (file.size > MAX_GAME_MEDIA_BYTES) {
       setError("Hover video is too large (max 100MB).");
+      return;
+    }
+    try {
+      const seconds = await getVideoDurationSeconds(file);
+      if (seconds > MAX_VIDEO_DURATION_SECONDS) {
+        setError(
+          `Hover video is too long (${Math.ceil(seconds)}s). Maximum allowed is ${MAX_VIDEO_DURATION_SECONDS}s.`
+        );
+        return;
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Could not validate hover video duration."
+      );
       return;
     }
     setUploadTarget("video");
