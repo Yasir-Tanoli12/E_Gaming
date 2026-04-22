@@ -1,8 +1,20 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { ApiError } from "@/lib/api";
 import { contentApi } from "@/lib/content-api";
 import { resolveUploadMediaUrl } from "@/lib/media-url";
+
+function formatLoadError(err: unknown): string {
+  if (err instanceof ApiError) {
+    if (err.isNetworkError || err.status >= 500) {
+      const code = err.status > 0 ? `HTTP ${err.status}` : "network error";
+      return `Could not load branding (${code}). Check that NEXT_PUBLIC_API_URL points at your API and nginx proxies /content to NestJS.`;
+    }
+    return err.message;
+  }
+  return err instanceof Error ? err.message : "Failed to load branding";
+}
 
 /**
  * Brand logo + lobby hero video uploads (moved from Contacts to main admin dashboard).
@@ -15,17 +27,21 @@ export function AdminBrandingPanel() {
   const [logoUrl, setLogoUrl] = useState("");
   const [lobbyVideoUrl, setLobbyVideoUrl] = useState("");
 
-  const load = useCallback(async () => {
-    setLoading(true);
+  const load = useCallback(async (opts?: { silent?: boolean }) => {
+    if (!opts?.silent) {
+      setLoading(true);
+    }
     setError("");
     try {
       const data = await contentApi.getAdmin();
       setLogoUrl(data.contacts.logoUrl ?? "");
       setLobbyVideoUrl(data.contacts.lobbyVideoUrl ?? "");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load branding");
+      setError(formatLoadError(err));
     } finally {
-      setLoading(false);
+      if (!opts?.silent) {
+        setLoading(false);
+      }
     }
   }, []);
 
@@ -62,7 +78,8 @@ export function AdminBrandingPanel() {
     try {
       const res = await contentApi.uploadLobbyVideo(file);
       setLobbyVideoUrl(res.lobbyVideoUrl ?? "");
-      await load();
+      // Do not call load() here: GET /content/admin can fail separately (502/HTML from nginx) and
+      // would overwrite this success with a misleading "server unavailable" banner.
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to upload lobby video");
     } finally {
@@ -98,7 +115,14 @@ export function AdminBrandingPanel() {
           role="alert"
           className="rounded-lg border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-300/95"
         >
-          {error}
+          <p>{error}</p>
+          <button
+            type="button"
+            onClick={() => void load()}
+            className="mt-2 text-xs font-medium text-amber-300 underline hover:text-amber-200"
+          >
+            Retry
+          </button>
         </div>
       )}
 
