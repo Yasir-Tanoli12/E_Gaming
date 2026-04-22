@@ -29,6 +29,21 @@ export default function UserDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  /** Open /dashboard#games (etc.) from other pages — scroll target after layout. */
+  useEffect(() => {
+    const run = () => {
+      const raw = typeof window !== "undefined" ? window.location.hash : "";
+      const id = raw.startsWith("#") ? decodeURIComponent(raw.slice(1)) : "";
+      if (!id) return;
+      requestAnimationFrame(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    };
+    run();
+    window.addEventListener("hashchange", run);
+    return () => window.removeEventListener("hashchange", run);
+  }, []);
+
   useEffect(() => {
     async function load() {
       try {
@@ -129,7 +144,7 @@ export default function UserDashboardPage() {
 
       <section
         id="home"
-        className="relative flex min-h-[calc(100vh-82px)] items-center overflow-hidden border-b border-[#EDC537]/20 bg-gradient-to-r from-[#990808]/25 via-[#E85D04]/20 to-[#EDC537]/25 px-4 py-10"
+        className="relative flex min-h-[calc(100vh-82px)] scroll-mt-24 items-center overflow-hidden border-b border-[#EDC537]/20 bg-gradient-to-r from-[#990808]/25 via-[#E85D04]/20 to-[#EDC537]/25 px-4 py-10"
       >
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-8 top-8 h-40 w-40 rounded-full bg-[#990808]/25 blur-3xl" />
@@ -176,7 +191,7 @@ export default function UserDashboardPage() {
         </div>
       </section>
 
-      <main id="games" className="relative z-10 mx-auto max-w-7xl px-4 py-12">
+      <main id="games" className="relative z-10 mx-auto max-w-7xl scroll-mt-24 px-4 py-12">
         {showAgeWarning && ageWarningReady && (
           <div className="fixed inset-0 z-[90] flex items-center justify-center bg-white/90 backdrop-blur-sm p-4">
             <div className="w-full max-w-xl rounded-2xl border border-amber-400/50 bg-white p-6 text-center shadow-[0_0_60px_rgba(251,191,36,0.25)]">
@@ -377,7 +392,10 @@ export default function UserDashboardPage() {
         )}
       </main>
 
-      <footer className="relative mt-8 border-t border-[#EDC537]/20 bg-[#0f0808]">
+      <footer
+        id="support"
+        className="relative mt-8 scroll-mt-24 border-t border-[#EDC537]/20 bg-[#0f0808]"
+      >
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           <div className="absolute left-1/4 top-0 h-40 w-40 animate-orbit rounded-full bg-[#990808]/25 blur-3xl" />
           <div className="absolute right-1/4 bottom-0 h-44 w-44 animate-orbit-reverse rounded-full bg-[#EDC537]/20 blur-3xl" />
@@ -436,7 +454,7 @@ export default function UserDashboardPage() {
               </div>
             </div>
 
-            <div id="support">
+            <div>
               <p className="text-xs uppercase tracking-[0.2em] text-[#EDC537]">Contact</p>
               <div className="mt-3 space-y-2 text-sm text-[#fef3c7]/80">
                 {contacts?.email?.trim() ? (
