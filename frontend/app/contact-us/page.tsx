@@ -47,7 +47,15 @@ export default function ContactUsPage() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (!canSubmit) {
-      setError("Please fill name, valid email, and message correctly.");
+      const parts: string[] = [];
+      if (form.name.trim().length < 2) parts.push("name (at least 2 characters)");
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+        parts.push("a valid email (e.g. name@domain.com)");
+      }
+      if (form.message.trim().length < 5) {
+        parts.push("message (at least 5 characters)");
+      }
+      setError(`Please fix: ${parts.join(", ")}.`);
       return;
     }
     setSubmitting(true);
@@ -114,6 +122,7 @@ export default function ContactUsPage() {
           </div>
 
           <form
+            noValidate
             onSubmit={handleSubmit}
             className="rounded-3xl border border-[#EDC537]/30 bg-white p-7 shadow-[0_16px_40px_rgba(153,8,8,0.08)]"
           >
@@ -159,7 +168,7 @@ export default function ContactUsPage() {
             {success ? <p className="mt-3 text-sm text-emerald-700">{success}</p> : null}
 
             <div className="mt-5">
-              <Button type="submit" loading={submitting} disabled={!canSubmit}>
+              <Button type="submit" loading={submitting}>
                 Send Message
               </Button>
             </div>
