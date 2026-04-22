@@ -23,6 +23,29 @@ import { diskStorage } from 'multer';
 import { extname, join } from 'path';
 import { existsSync, mkdirSync } from 'fs';
 import { getUploadsFilesystemRoot } from '../common/uploads-filesystem-root';
+
+const ALLOWED_IMAGE_MIMES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+]);
+const ALLOWED_VIDEO_MIMES = new Set([
+  'video/mp4',
+  'video/webm',
+  'video/ogg',
+  'video/quicktime',
+]);
+const ALLOWED_IMAGE_EXTS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif']);
+const ALLOWED_VIDEO_EXTS = new Set(['.mp4', '.webm', '.ogg', '.mov']);
+
+function isAllowedGameMedia(file: { mimetype: string; originalname: string }): boolean {
+  const mime = (file.mimetype || '').toLowerCase().trim();
+  const ext = extname(file.originalname || '').toLowerCase();
+  if (ALLOWED_IMAGE_MIMES.has(mime) || ALLOWED_VIDEO_MIMES.has(mime)) return true;
+  // Some clients send unknown/octet-stream for otherwise valid files; trust extension fallback.
+  return ALLOWED_IMAGE_EXTS.has(ext) || ALLOWED_VIDEO_EXTS.has(ext);
+}
 @Controller('games')
 export class GamesController {
   constructor(private readonly gamesService: GamesService) {}
@@ -77,23 +100,16 @@ export class GamesController {
         },
       }),
       fileFilter: (_req, file, cb) => {
-        const allowed = [
-          'video/mp4',
-          'video/webm',
-          'video/ogg',
-          'image/jpeg',
-          'image/png',
-          'image/webp',
-          'image/gif',
-        ];
-        cb(null, allowed.includes(file.mimetype));
+        cb(null, isAllowedGameMedia(file));
       },
       limits: { fileSize: 100 * 1024 * 1024 },
     }),
   )
   uploadMedia(@UploadedFile() file: { filename: string } | undefined) {
     if (!file) {
-      throw new BadRequestException('No file uploaded');
+      throw new BadRequestException(
+        'No file uploaded. Use image (.jpg/.png/.webp/.gif) or video (.mp4/.webm/.ogg/.mov), max 100MB.',
+      );
     }
     // Store relative paths so DB rows work with any public API host (see frontend resolveUploadMediaUrl).
     return {

@@ -16,6 +16,9 @@ function formatLoadError(err: unknown): string {
   return err instanceof Error ? err.message : "Failed to load branding";
 }
 
+const MAX_LOBBY_VIDEO_BYTES = 100 * 1024 * 1024;
+const VIDEO_EXT_RE = /\.(mp4|webm|ogg|mov)$/i;
+
 /**
  * Brand logo + lobby hero video uploads (moved from Contacts to main admin dashboard).
  */
@@ -69,8 +72,14 @@ export function AdminBrandingPanel() {
 
   async function uploadLobbyVideo(file: File | null) {
     if (!file) return;
-    if (!file.type.startsWith("video/")) {
-      setError("Only video files (MP4, WebM, OGG) are allowed for lobby.");
+    const hasVideoMime = file.type.toLowerCase().startsWith("video/");
+    const hasVideoExt = VIDEO_EXT_RE.test(file.name);
+    if (!hasVideoMime && !hasVideoExt) {
+      setError("Only video files are allowed for lobby (.mp4/.webm/.ogg/.mov).");
+      return;
+    }
+    if (file.size > MAX_LOBBY_VIDEO_BYTES) {
+      setError("Lobby video is too large (max 100MB).");
       return;
     }
     setUploadingLobbyVideo(true);

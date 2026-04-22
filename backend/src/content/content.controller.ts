@@ -35,6 +35,35 @@ import { UpdateReviewDto } from './dto/update-review.dto';
 import { getPublicApiOrigin } from '../common/get-public-api-origin';
 import { getUploadsFilesystemRoot } from '../common/uploads-filesystem-root';
 
+const ALLOWED_LOGO_MIMES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/webp',
+  'image/gif',
+  'image/svg+xml',
+]);
+const ALLOWED_LOGO_EXTS = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.svg']);
+
+const ALLOWED_LOBBY_VIDEO_MIMES = new Set([
+  'video/mp4',
+  'video/webm',
+  'video/ogg',
+  'video/quicktime',
+]);
+const ALLOWED_LOBBY_VIDEO_EXTS = new Set(['.mp4', '.webm', '.ogg', '.mov']);
+
+function isAllowedLogo(file: { mimetype: string; originalname: string }): boolean {
+  const mime = (file.mimetype || '').toLowerCase().trim();
+  const ext = extname(file.originalname || '').toLowerCase();
+  return ALLOWED_LOGO_MIMES.has(mime) || ALLOWED_LOGO_EXTS.has(ext);
+}
+
+function isAllowedLobbyVideo(file: { mimetype: string; originalname: string }): boolean {
+  const mime = (file.mimetype || '').toLowerCase().trim();
+  const ext = extname(file.originalname || '').toLowerCase();
+  return ALLOWED_LOBBY_VIDEO_MIMES.has(mime) || ALLOWED_LOBBY_VIDEO_EXTS.has(ext);
+}
+
 @Controller('content')
 export class ContentController {
   constructor(private readonly contentService: ContentService) {}
@@ -88,14 +117,7 @@ export class ContentController {
         },
       }),
       fileFilter: (_req, file, cb) => {
-        const allowed = [
-          'image/jpeg',
-          'image/png',
-          'image/webp',
-          'image/gif',
-          'image/svg+xml',
-        ];
-        cb(null, allowed.includes(file.mimetype));
+        cb(null, isAllowedLogo(file));
       },
       limits: { fileSize: 10 * 1024 * 1024 },
     }),
@@ -105,7 +127,9 @@ export class ContentController {
     @Req() req: Request,
   ) {
     if (!file) {
-      throw new BadRequestException('Only image files are allowed');
+      throw new BadRequestException(
+        'Only image files are allowed (.jpg/.png/.webp/.gif/.svg), max 10MB.',
+      );
     }
     const origin = getPublicApiOrigin(req);
     const logoUrl = `${origin}/uploads/branding/${file.filename}`;
@@ -130,12 +154,7 @@ export class ContentController {
         },
       }),
       fileFilter: (_req, file, cb) => {
-        const allowed = [
-          'video/mp4',
-          'video/webm',
-          'video/ogg',
-        ];
-        cb(null, allowed.includes(file.mimetype));
+        cb(null, isAllowedLobbyVideo(file));
       },
       limits: { fileSize: 100 * 1024 * 1024 },
     }),
@@ -145,7 +164,9 @@ export class ContentController {
     @Req() req: Request,
   ) {
     if (!file) {
-      throw new BadRequestException('Only video files (MP4, WebM, OGG) are allowed');
+      throw new BadRequestException(
+        'Only video files are allowed (.mp4/.webm/.ogg/.mov), max 100MB.',
+      );
     }
     const origin = getPublicApiOrigin(req);
     const videoUrl = `${origin}/uploads/lobby/${file.filename}`;

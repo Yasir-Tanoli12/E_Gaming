@@ -11,6 +11,10 @@ import { resolveUploadMediaUrl } from "@/lib/media-url";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
+const MAX_GAME_MEDIA_BYTES = 100 * 1024 * 1024;
+const IMAGE_EXT_RE = /\.(jpe?g|png|webp|gif)$/i;
+const VIDEO_EXT_RE = /\.(mp4|webm|ogg|mov)$/i;
+
 export default function AdminGamesPage() {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
@@ -141,6 +145,16 @@ export default function AdminGamesPage() {
 
   async function handleThumbnailUpload(file: File | null) {
     if (!file) return;
+    const hasImageMime = file.type.toLowerCase().startsWith("image/");
+    const hasImageExt = IMAGE_EXT_RE.test(file.name);
+    if (!hasImageMime && !hasImageExt) {
+      setError("Thumbnail must be an image file (.jpg/.png/.webp/.gif).");
+      return;
+    }
+    if (file.size > MAX_GAME_MEDIA_BYTES) {
+      setError("Thumbnail is too large (max 100MB).");
+      return;
+    }
     setUploadTarget("thumbnail");
     setError("");
     try {
@@ -155,6 +169,16 @@ export default function AdminGamesPage() {
 
   async function handleVideoUpload(file: File | null) {
     if (!file) return;
+    const hasVideoMime = file.type.toLowerCase().startsWith("video/");
+    const hasVideoExt = VIDEO_EXT_RE.test(file.name);
+    if (!hasVideoMime && !hasVideoExt) {
+      setError("Hover video must be .mp4/.webm/.ogg/.mov.");
+      return;
+    }
+    if (file.size > MAX_GAME_MEDIA_BYTES) {
+      setError("Hover video is too large (max 100MB).");
+      return;
+    }
     setUploadTarget("video");
     setError("");
     try {
