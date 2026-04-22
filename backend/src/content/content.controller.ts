@@ -24,6 +24,7 @@ import { extname, join } from 'path';
 import { mkdirSync } from 'fs';
 import { ContentService } from './content.service';
 import { CreateBlogDto } from './dto/create-blog.dto';
+import { CreateContactMessageDto } from './dto/create-contact-message.dto';
 import { CreateFaqDto } from './dto/create-faq.dto';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateAboutUsDto } from './dto/update-about-us.dto';
@@ -91,6 +92,12 @@ export class ContentController {
   }
 
   @Public()
+  @Post('contact-messages')
+  createContactMessage(@Body() dto: CreateContactMessageDto) {
+    return this.contentService.createContactMessage(dto);
+  }
+
+  @Public()
   @Get('documents/:key')
   async getPolicyDocument(
     @Param('key') key: string,
@@ -112,6 +119,12 @@ export class ContentController {
   @Get('admin')
   getAdminContent() {
     return this.contentService.getAdminContent();
+  }
+
+  @UseGuards(AdminAuthGuard)
+  @Get('contact-messages')
+  listContactMessages() {
+    return this.contentService.listContactMessages();
   }
 
   @UseGuards(AdminAuthGuard)

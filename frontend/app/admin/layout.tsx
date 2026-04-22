@@ -14,6 +14,7 @@ const ADMIN_NAV = [
   { label: "Contacts", href: "/admin/contacts" },
   { label: "Blogs", href: "/admin/blogs" },
   { label: "Reviews", href: "/admin/reviews" },
+  { label: "Messages", href: "/admin/messages" },
   { label: "About", href: "/admin/site" },
   { label: "Guidelines", href: "/admin/guidelines" },
 ];

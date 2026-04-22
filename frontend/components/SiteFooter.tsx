@@ -81,7 +81,7 @@ export function SiteFooter() {
           <div>
             <p className="text-xs uppercase tracking-[0.2em] text-[#EDC537]">Quick Links</p>
             <div className="mt-3 space-y-2 text-sm">
-              <Link href="/dashboard#games" className="block text-[#fef3c7]/80 transition hover:text-white">
+              <Link href="/games" className="block text-[#fef3c7]/80 transition hover:text-white">
                 Games
               </Link>
               <Link href="/about-us" className="block text-[#fef3c7]/80 transition hover:text-white">
@@ -92,6 +92,9 @@ export function SiteFooter() {
               </Link>
               <Link href="/privacy-policy" className="block text-[#fef3c7]/80 transition hover:text-white">
                 Guidelines
+              </Link>
+              <Link href="/contact-us" className="block text-[#fef3c7]/80 transition hover:text-white">
+                Contact Us
               </Link>
             </div>
           </div>

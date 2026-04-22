@@ -57,6 +57,15 @@ export interface SiteContent {
   socialResponsibilityPdfUrl?: string | null;
 }
 
+export interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  subject?: string | null;
+  message: string;
+  createdAt: string;
+}
+
 const PUBLIC_CONTENT_TTL_MS = 60_000;
 let publicContentCache: { value: SiteContent; expiresAt: number } | null = null;
 let publicContentInFlight: Promise<SiteContent> | null = null;
@@ -136,6 +145,20 @@ export const contentApi = {
     }>(`/content/documents/${key}`, "POST", formData);
     clearPublicContentCache();
     return result;
+  },
+  submitContactMessage(body: {
+    name: string;
+    email: string;
+    subject?: string;
+    message: string;
+  }) {
+    return apiRequest<ContactMessage>("/content/contact-messages", {
+      method: "POST",
+      body: JSON.stringify(body),
+    });
+  },
+  listContactMessages() {
+    return apiRequest<ContactMessage[]>("/content/contact-messages");
   },
   getPublic() {
     return this.getPublicCached();

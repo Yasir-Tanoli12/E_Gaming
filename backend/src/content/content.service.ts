@@ -13,6 +13,7 @@ const PUBLIC_REVIEWS_LIMIT = 20;
 const ADMIN_LIST_LIMIT = 200;
 import { PolicyDocumentKey } from '@prisma/client';
 import { CreateBlogDto } from './dto/create-blog.dto';
+import { CreateContactMessageDto } from './dto/create-contact-message.dto';
 import { CreateFaqDto } from './dto/create-faq.dto';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateAboutUsDto } from './dto/update-about-us.dto';
@@ -56,6 +57,10 @@ export class ContentService {
       email = email.slice('mailto:'.length);
     }
     return email.replace(/\s+/g, '');
+  }
+
+  private normalizeContactMessageText(value: string): string {
+    return value.trim().replace(/\s+/g, ' ');
   }
 
   private async bootstrapFromLegacyFile() {
@@ -471,6 +476,46 @@ export class ContentService {
     });
     await this.invalidatePublicCache();
     return result;
+  }
+
+  async createContactMessage(dto: CreateContactMessageDto) {
+    await this.bootstrapFromLegacyFile();
+    const name = this.normalizeContactMessageText(dto.name);
+    const email = this.normalizeSupportEmail(dto.email);
+    const subject = dto.subject ? this.normalizeContactMessageText(dto.subject) : null;
+    const message = dto.message.trim();
+    return this.prisma.contactMessage.create({
+      data: {
+        name,
+        email,
+        subject,
+        message,
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        subject: true,
+        message: true,
+        createdAt: true,
+      },
+    });
+  }
+
+  async listContactMessages() {
+    await this.bootstrapFromLegacyFile();
+    return this.prisma.contactMessage.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: ADMIN_LIST_LIMIT,
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        subject: true,
+        message: true,
+        createdAt: true,
+      },
+    });
   }
 
   async updateLogo(logoUrl: string) {

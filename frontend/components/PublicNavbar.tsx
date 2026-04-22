@@ -1,71 +1,28 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { contentApi, type SiteContacts } from "@/lib/content-api";
 import { SocialContactIcons } from "@/components/SocialContactIcons";
 
-type DashboardScrollSection = "home" | "games" | "support";
-
 type NavItem =
-  | {
-      label: string;
-      href: string;
-      dashboardScrollSpy: DashboardScrollSection;
-    }
-  | {
-      label: string;
-      href: string;
-      matchPath: (p: string) => boolean;
-    };
+  {
+    label: string;
+    href: string;
+    matchPath: (p: string) => boolean;
+  };
 
 const NAV_ITEMS: NavItem[] = [
-  { label: "HOME", href: "/dashboard#home", dashboardScrollSpy: "home" },
-  { label: "GAMES", href: "/dashboard#games", dashboardScrollSpy: "games" },
+  { label: "HOME", href: "/dashboard", matchPath: (p) => p === "/dashboard" },
+  { label: "GAMES", href: "/games", matchPath: (p) => p === "/games" },
   { label: "ABOUT US", href: "/about-us", matchPath: (p) => p === "/about-us" },
   { label: "BLOGS", href: "/blogs", matchPath: (p) => p === "/blogs" },
   { label: "GUIDELINES", href: "/privacy-policy", matchPath: (p) => p === "/privacy-policy" },
-  { label: "CONTACT US", href: "/dashboard#support", dashboardScrollSpy: "support" },
+  { label: "CONTACT US", href: "/contact-us", matchPath: (p) => p === "/contact-us" },
 ];
-
-function computeDashboardScrollSection(): DashboardScrollSection {
-  const home = document.getElementById("home");
-  const games = document.getElementById("games");
-  const support = document.getElementById("support");
-  if (!home || !games || !support) return "home";
-
-  const top = (el: HTMLElement) => el.getBoundingClientRect().top + window.scrollY;
-  const headerOffset = 96;
-  const y = window.scrollY + headerOffset;
-  const gTop = top(games);
-  const sTop = top(support);
-
-  const nearBottom =
-    window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 48;
-  if (nearBottom) return "support";
-
-  if (y >= sTop - 100) return "support";
-  if (y >= gTop - 56) return "games";
-  return "home";
-}
-
-function isNavItemActive(
-  item: NavItem,
-  pathname: string,
-  dashboardSection: DashboardScrollSection
-): boolean {
-  if ("dashboardScrollSpy" in item) {
-    return pathname === "/dashboard" && dashboardSection === item.dashboardScrollSpy;
-  }
+function isNavItemActive(item: NavItem, pathname: string): boolean {
   return item.matchPath(pathname);
-}
-
-function scrollToDashboardSection(id: string) {
-  document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
-  if (typeof window !== "undefined") {
-    window.history.replaceState(null, "", `#${id}`);
-  }
 }
 
 export function PublicNavbar() {
@@ -73,7 +30,6 @@ export function PublicNavbar() {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [contacts, setContacts] = useState<SiteContacts | null>(null);
   const [contactsError, setContactsError] = useState("");
-  const [dashboardSection, setDashboardSection] = useState<DashboardScrollSection>("home");
 
   useEffect(() => {
     let active = true;
@@ -96,29 +52,6 @@ export function PublicNavbar() {
   }, []);
 
   useEffect(() => {
-    if (pathname !== "/dashboard") return;
-
-    let raf = 0;
-    const tick = () => {
-      raf = 0;
-      setDashboardSection(computeDashboardScrollSection());
-    };
-
-    const onScrollOrResize = () => {
-      if (!raf) raf = window.requestAnimationFrame(tick);
-    };
-
-    tick();
-    window.addEventListener("scroll", onScrollOrResize, { passive: true });
-    window.addEventListener("resize", onScrollOrResize, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", onScrollOrResize);
-      window.removeEventListener("resize", onScrollOrResize);
-      if (raf) window.cancelAnimationFrame(raf);
-    };
-  }, [pathname]);
-
-  useEffect(() => {
     if (mobileNavOpen) document.body.style.overflow = "hidden";
     else document.body.style.overflow = "";
     return () => {
@@ -134,17 +67,6 @@ export function PublicNavbar() {
     return () => window.removeEventListener("keydown", onKeyDown);
   }, []);
 
-  const handleDashboardNavClick = useCallback(
-    (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
-      if (pathname !== "/dashboard") return;
-      const hash = href.includes("#") ? href.split("#")[1] : "";
-      if (!hash) return;
-      e.preventDefault();
-      scrollToDashboardSection(hash);
-    },
-    [pathname]
-  );
-
   const logoUrl = contacts?.logoUrl ?? "";
 
   return (
@@ -153,8 +75,7 @@ export function PublicNavbar() {
         <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#EDC537]/70 to-transparent" />
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4">
           <Link
-            href="/dashboard#home"
-            onClick={(e) => handleDashboardNavClick(e, "/dashboard#home")}
+            href="/dashboard"
             className="group relative flex items-center gap-3 text-xl font-black tracking-wide text-white"
           >
             <span className="absolute -inset-2 -z-10 rounded-xl bg-gradient-to-r from-[#990808]/30 to-[#EDC537]/30 opacity-0 blur-xl transition duration-500 group-hover:opacity-100" />
@@ -176,12 +97,11 @@ export function PublicNavbar() {
 
           <nav className="hidden items-center gap-2 lg:flex">
             {NAV_ITEMS.map((item) => {
-              const active = isNavItemActive(item, pathname, dashboardSection);
+              const active = isNavItemActive(item, pathname);
               return (
                 <Link
                   key={item.label}
                   href={item.href}
-                  onClick={(e) => handleDashboardNavClick(e, item.href)}
                   className={`group relative overflow-hidden rounded-full px-4 py-2 text-sm font-medium transition-all duration-300 ${
                     active
                       ? "bg-gradient-to-r from-[#990808] via-[#E85D04] to-[#EDC537] text-white shadow-[0_0_28px_rgba(237,197,55,0.4)]"
@@ -258,15 +178,12 @@ export function PublicNavbar() {
           </div>
           <nav className="flex flex-1 flex-col gap-1 p-4">
             {NAV_ITEMS.map((item) => {
-              const active = isNavItemActive(item, pathname, dashboardSection);
+              const active = isNavItemActive(item, pathname);
               return (
                 <Link
                   key={item.label}
                   href={item.href}
-                  onClick={(e) => {
-                    handleDashboardNavClick(e, item.href);
-                    setMobileNavOpen(false);
-                  }}
+                  onClick={() => setMobileNavOpen(false)}
                   className={`rounded-xl px-4 py-3 text-base font-medium transition ${active ? "bg-gradient-to-r from-[#990808]/50 to-[#EDC537]/40 text-white" : "text-[#fef3c7]/90 hover:bg-[#EDC537]/15"}`}
                 >
                   {item.label}

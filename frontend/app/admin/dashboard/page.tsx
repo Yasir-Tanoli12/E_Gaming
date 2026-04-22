@@ -117,11 +117,18 @@ export default function AdminDashboardPage() {
             directory below to adjust access for accounts that already exist.
           </p>
         </div>
-        <Link href="/admin/games" className="shrink-0">
-          <Button variant="secondary" className="w-full sm:w-auto">
-            Games &amp; lobby
-          </Button>
-        </Link>
+        <div className="flex shrink-0 flex-wrap gap-2">
+          <Link href="/admin/messages">
+            <Button variant="secondary" className="w-full sm:w-auto">
+              Contact messages
+            </Button>
+          </Link>
+          <Link href="/admin/games">
+            <Button variant="secondary" className="w-full sm:w-auto">
+              Games &amp; lobby
+            </Button>
+          </Link>
+        </div>
       </div>
 
       <AdminBrandingPanel />
