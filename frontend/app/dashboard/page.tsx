@@ -151,7 +151,7 @@ export default function UserDashboardPage() {
   }, [heroVideo]);
 
   return (
-    <div className="min-h-screen bg-[#E9DFE5] text-[#161015]">
+    <div className="relative min-h-screen w-full min-w-0 max-w-full overflow-x-clip bg-[#E9DFE5] text-[#161015]">
       <div className="pointer-events-none fixed inset-0 overflow-hidden">
         <div className="absolute -left-24 top-20 h-80 w-80 animate-float rounded-full bg-[#EB523F]/18 blur-[100px]" />
         <div className="absolute right-0 top-40 h-96 w-96 animate-float-delayed rounded-full bg-[#EA3699]/22 blur-[110px]" />
@@ -161,23 +161,23 @@ export default function UserDashboardPage() {
 
       <section
         id="home"
-        className="relative flex min-h-[calc(100vh-82px)] scroll-mt-24 items-center overflow-hidden border-b border-[#EB523F]/25 bg-gradient-to-r from-[#EB523F]/20 via-[#EA3699]/18 to-[#AAE847]/25 px-4 py-10"
+        className="relative flex w-full min-w-0 max-w-full scroll-mt-24 flex-col justify-center overflow-x-clip border-b border-[#EB523F]/25 bg-gradient-to-b from-[#E9DFE5] via-[#EB523F]/12 to-[#AAE847]/20 py-10 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-[max(2.5rem,env(safe-area-inset-top))] sm:bg-gradient-to-r sm:from-[#EB523F]/20 sm:via-[#EA3699]/18 sm:to-[#AAE847]/25 md:min-h-[calc(100vh-82px)] md:flex-row md:items-center"
       >
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-8 top-8 h-40 w-40 rounded-full bg-[#EB523F]/30 blur-3xl" />
-          <div className="absolute bottom-10 right-10 h-52 w-52 animate-pulse rounded-full bg-[#AAE847]/25 blur-3xl" />
+        <div className="pointer-events-none absolute inset-0 min-w-0">
+          <div className="absolute left-4 top-8 h-40 w-40 rounded-full bg-[#EB523F]/30 blur-3xl sm:left-8" />
+          <div className="absolute bottom-10 right-4 h-52 w-52 animate-pulse rounded-full bg-[#AAE847]/25 blur-3xl sm:right-10" />
         </div>
-        <div className="mx-auto grid w-full max-w-7xl items-center gap-10 md:grid-cols-2">
-          <div className="animate-fade-in">
-            <h1 className="sw-text-wobble text-5xl font-black leading-[0.95] text-[#161015] md:text-7xl">
+        <div className="relative z-[1] mx-auto grid w-full min-w-0 max-w-7xl grid-cols-1 items-center gap-8 md:grid-cols-2 md:gap-10">
+          <div className="min-w-0 max-w-full animate-fade-in">
+            <h1 className="sw-text-wobble break-words text-4xl font-black leading-[0.95] text-[#161015] sm:text-5xl md:text-7xl">
               PLAY. WIN. DOMINATE.
             </h1>
-            <p className="mt-6 max-w-xl text-lg text-zinc-600">
+            <p className="mt-6 max-w-xl text-base text-zinc-600 sm:text-lg">
               Browse our curated games. Play instantly with your credentials or
               get access from our support team. Click any game card to play or buy credentials.
             </p>
           </div>
-          <div className="relative h-[420px] animate-fade-in animation-delay-200 rounded-3xl border-[3px] border-[#161015] bg-gradient-to-br from-[#EB523F]/25 to-[#AAE847]/20 p-3 shadow-[8px_10px_0_#161015,0_0_0_3px_#EA3699] md:h-[500px]">
+          <div className="relative h-[min(420px,62vh)] w-full min-w-0 max-w-full animate-fade-in animation-delay-200 rounded-3xl border-[3px] border-[#161015] bg-gradient-to-br from-[#EB523F]/25 to-[#AAE847]/20 p-2 shadow-[8px_10px_0_#161015,0_0_0_3px_#EA3699] sm:p-3 md:h-[500px] md:min-h-[420px]">
             <div className="absolute -inset-[1px] -z-10 rounded-3xl bg-[conic-gradient(from_0deg,rgba(234,54,153,0.45),rgba(235,82,63,0.5),rgba(170,232,71,0.45))] blur-sm" />
             <div className="group relative h-full w-full overflow-hidden rounded-2xl border-[3px] border-[#161015] bg-[#EEEDEE]/95 shadow-lg">
               {heroVideo ? (
@@ -227,7 +227,10 @@ export default function UserDashboardPage() {
         </div>
       </section>
 
-      <main id="games" className="relative z-10 mx-auto max-w-7xl scroll-mt-24 px-4 py-12">
+      <main
+        id="games"
+        className="relative z-10 mx-auto w-full min-w-0 max-w-7xl scroll-mt-24 px-[max(1rem,env(safe-area-inset-left))] py-12 pr-[max(1rem,env(safe-area-inset-right))]"
+      >
         {showAgeWarning && ageWarningReady && (
           <div className="fixed inset-0 z-[90] flex items-center justify-center bg-white/90 backdrop-blur-sm p-4">
             <div className="w-full max-w-xl rounded-2xl border border-amber-400/50 bg-white p-6 text-center shadow-[0_0_60px_rgba(251,191,36,0.25)]">
@@ -377,12 +380,12 @@ export default function UserDashboardPage() {
             </p>
           </div>
         ) : (
-          <div className="space-y-12">
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="min-w-0 space-y-12">
+            <div className="grid min-w-0 grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {orderedGames.map((game, i) => (
                 <div
                   key={game.id}
-                  className="animate-fade-in"
+                  className="min-w-0 max-w-full animate-fade-in"
                   style={{ animationDelay: `${i * 80}ms` }}
                 >
                   <GameCard

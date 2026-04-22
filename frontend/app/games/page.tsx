@@ -63,15 +63,15 @@ export default function GamesPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#E9DFE5] text-[#161015]">
+    <div className="min-h-screen w-full min-w-0 max-w-full overflow-x-clip bg-[#E9DFE5] text-[#161015]">
       <PublicNavbar />
 
-      <section className="relative overflow-hidden border-b-[3px] border-[#161015] bg-gradient-to-r from-[#EB523F]/22 via-[#EA3699]/18 to-[#AAE847]/22 px-4 py-12">
-        <div className="pointer-events-none absolute inset-0">
+      <section className="relative w-full min-w-0 max-w-full overflow-x-clip border-b-[3px] border-[#161015] bg-gradient-to-r from-[#EB523F]/22 via-[#EA3699]/18 to-[#AAE847]/22 py-12 ps-[max(1rem,env(safe-area-inset-left))] pe-[max(1rem,env(safe-area-inset-right))]">
+        <div className="pointer-events-none absolute inset-0 min-w-0">
           <div className="absolute left-8 top-8 h-40 w-40 rounded-full bg-[#EB523F]/28 blur-3xl" />
           <div className="absolute bottom-10 right-10 h-52 w-52 rounded-full bg-[#AAE847]/25 blur-3xl" />
         </div>
-        <div className="relative mx-auto max-w-7xl">
+        <div className="relative mx-auto w-full min-w-0 max-w-7xl">
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#EB523F]">All Games</p>
           <h1 className="sw-text-wobble mt-2 text-4xl font-black text-[#161015] md:text-5xl">Game Library</h1>
           <p className="mt-3 max-w-2xl text-sm text-zinc-600">
@@ -80,7 +80,7 @@ export default function GamesPage() {
         </div>
       </section>
 
-      <main className="mx-auto max-w-7xl px-4 py-12">
+      <main className="mx-auto w-full min-w-0 max-w-7xl px-[max(1rem,env(safe-area-inset-left))] py-12 pe-[max(1rem,env(safe-area-inset-right))]">
         {selectedGame && (
           <div className="fixed inset-0 z-[80] flex items-center justify-center bg-white/95 p-4 backdrop-blur-sm">
             <div className="relative w-full max-w-2xl overflow-hidden rounded-3xl border-[3px] border-[#161015] bg-[#EEEDEE] p-6 shadow-[8px_10px_0_#161015,0_0_0_3px_#AAE847] md:p-8">

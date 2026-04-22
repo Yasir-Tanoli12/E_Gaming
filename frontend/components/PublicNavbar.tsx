@@ -71,9 +71,9 @@ export function PublicNavbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 border-b-[3px] border-[#161015] bg-[#161015]/95 backdrop-blur-xl">
+      <header className="sticky top-0 z-50 w-full min-w-0 border-b-[3px] border-[#161015] bg-[#161015]/95 backdrop-blur-xl">
         <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[#EB523F] via-[#EA3699] to-[#AAE847]" />
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4">
+        <div className="mx-auto flex w-full min-w-0 max-w-7xl items-center justify-between gap-3 py-4 ps-[max(1rem,env(safe-area-inset-left))] pe-[max(1rem,env(safe-area-inset-right))] sm:gap-4">
           <Link
             href="/dashboard"
             className="group relative flex items-center gap-3 text-xl font-black tracking-wide text-[#EEEDEE]"

@@ -44,14 +44,14 @@ export function SiteFooter() {
   return (
     <footer
       id="support"
-      className="relative mt-8 scroll-mt-24 border-t-[3px] border-[#161015] bg-[#161015]"
+      className="relative mt-8 w-full min-w-0 max-w-full scroll-mt-24 border-t-[3px] border-[#161015] bg-[#161015]"
     >
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute left-1/4 top-0 h-40 w-40 animate-orbit rounded-full bg-[#EB523F]/28 blur-3xl" />
         <div className="absolute right-1/4 bottom-0 h-44 w-44 animate-orbit-reverse rounded-full bg-[#EA3699]/22 blur-3xl" />
       </div>
-      <div className="relative mx-auto max-w-7xl px-4 py-12">
-        <div className="grid gap-8 md:grid-cols-4">
+      <div className="relative mx-auto w-full min-w-0 max-w-7xl px-[max(1rem,env(safe-area-inset-left))] py-12 pe-[max(1rem,env(safe-area-inset-right))]">
+        <div className="grid min-w-0 gap-8 md:grid-cols-4">
           <div>
             <div className="flex items-center gap-3">
               {logoUrl ? (

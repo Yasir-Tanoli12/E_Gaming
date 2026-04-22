@@ -27,7 +27,13 @@
   --font-mono: var(--font-geist-mono);
 }
 
+html {
+  width: 100%;
+}
+
 body {
+  width: 100%;
+  min-width: 0;
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
@@ -52,8 +58,11 @@ body {
   }
 }
 
+/* Block + full width: inline-block here shrinks grid/flex columns on narrow viewports */
 .sw-text-wobble {
-  display: inline-block;
+  display: block;
+  width: 100%;
+  max-width: 100%;
   transform-origin: 50% 60%;
   animation: sw-wobble 2.4s ease-in-out infinite;
   will-change: transform;
@@ -64,6 +73,58 @@ body {
     animation: none;
     transform: none;
   }
+}
+
+/* Legal split pages — sharp slide-in (transform only, minimal opacity) */
+@keyframes sw-legal-in-left {
+  from {
+    transform: translate3d(-36px, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes sw-legal-in-right {
+  from {
+    transform: translate3d(36px, 0, 0);
+  }
+  to {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.sw-legal-animate-left {
+  animation: sw-legal-in-left 0.48s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.sw-legal-animate-right {
+  animation: sw-legal-in-right 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sw-legal-animate-left,
+  .sw-legal-animate-right {
+    animation: none;
+    transform: none;
+  }
+}
+
+.sw-accent-glow {
+  color: #aae847;
+  text-shadow:
+    0 0 14px rgba(170, 232, 71, 0.5),
+    0 0 28px rgba(235, 82, 63, 0.25);
+}
+
+.sw-accent-glow-pink {
+  color: #ea3699;
+  text-shadow: 0 0 18px rgba(234, 54, 153, 0.45);
+}
+
+.sw-accent-glow-red {
+  color: #eb523f;
+  text-shadow: 0 0 20px rgba(235, 82, 63, 0.42);
 }
 
 @keyframes fade-in {
