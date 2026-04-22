@@ -13,6 +13,9 @@ import { PublicNavbar } from "@/components/PublicNavbar";
 import { SocialContactIcons } from "@/components/SocialContactIcons";
 import { mailtoHref } from "@/lib/contact-links";
 
+/** Once the user accepts the 18+ notice, do not show it again on this browser. */
+const AGE_WARNING_ACK_KEY = "dashboard_age_warning_acknowledged";
+
 export default function UserDashboardPage() {
   const [games, setGames] = useState<Game[]>([]);
   const [topGames, setTopGames] = useState<Game[]>([]);
@@ -33,7 +36,10 @@ export default function UserDashboardPage() {
         const publicContent = await contentApi.getPublicCached();
         setContent(publicContent);
         setAgeWarningReady(true);
-        setShowAgeWarning(true);
+        const alreadyAcknowledged =
+          typeof window !== "undefined" &&
+          localStorage.getItem(AGE_WARNING_ACK_KEY) === "1";
+        setShowAgeWarning(!alreadyAcknowledged);
 
         // Fetch independent dashboard resources in parallel for faster first interactive state.
         const [data, top, poster] = await Promise.all([
@@ -51,7 +57,10 @@ export default function UserDashboardPage() {
         }
       } catch (err) {
         setAgeWarningReady(true);
-        setShowAgeWarning(true);
+        const alreadyAcknowledged =
+          typeof window !== "undefined" &&
+          localStorage.getItem(AGE_WARNING_ACK_KEY) === "1";
+        setShowAgeWarning(!alreadyAcknowledged);
         setError(err instanceof Error ? err.message : "Failed to load games");
       } finally {
         setLoading(false);
@@ -185,7 +194,16 @@ export default function UserDashboardPage() {
                 {ageWarning.message}
               </p>
               <div className="mt-5 flex items-center justify-center gap-3">
-                <Button onClick={() => setShowAgeWarning(false)}>
+                <Button
+                  onClick={() => {
+                    try {
+                      localStorage.setItem(AGE_WARNING_ACK_KEY, "1");
+                    } catch {
+                      /* private mode / quota */
+                    }
+                    setShowAgeWarning(false);
+                  }}
+                >
                   {ageWarning.enterButtonLabel}
                 </Button>
                 <a
