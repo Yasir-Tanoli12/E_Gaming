@@ -71,7 +71,7 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(153,8,8,0.3),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(237,197,55,0.25),transparent_45%)] opacity-70" />
+      <div className="absolute inset-0 z-0 bg-[radial-gradient(circle_at_top_right,rgba(153,8,8,0.3),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(237,197,55,0.25),transparent_45%)] opacity-70" />
       <div className="relative aspect-video w-full overflow-hidden bg-[#0c1025]">
         {imageUrl && !thumbError ? (
           // Stack above hidden video; on hover fade out so hover video (higher z) shows.
@@ -105,8 +105,8 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
             }}
             className={`absolute inset-0 h-full w-full object-cover transition-all duration-500 pointer-events-none ${
               hovered || videoAsPrimary
-                ? "z-30 opacity-100 scale-100"
-                : "z-10 opacity-0 scale-105"
+                ? "z-10 opacity-100 scale-100"
+                : "z-0 opacity-0 scale-105"
             }`}
           />
         ) : null}
@@ -121,7 +121,7 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
       </div>
 
       <div
-        className={`absolute inset-0 flex items-center justify-center bg-gradient-to-t from-[#0a0808]/95 via-[#140808]/50 to-transparent transition-opacity duration-300 ${
+        className={`absolute inset-0 z-30 flex items-center justify-center bg-gradient-to-t from-[#0a0808]/95 via-[#140808]/50 to-transparent transition-opacity duration-300 ${
           hovered ? "opacity-100" : "opacity-0"
         }`}
         onClick={handlePlay}
@@ -141,7 +141,7 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
         </button>
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#0a0808] via-[#0a0808]/70 to-transparent p-4">
+      <div className="absolute bottom-0 left-0 right-0 z-20 bg-gradient-to-t from-[#0a0808] via-[#0a0808]/70 to-transparent p-4">
         <h3 className="font-bold tracking-wide text-white drop-shadow-lg">{game.title}</h3>
         {game.description && (
           <p className="mt-1 line-clamp-2 text-sm text-[#fef3c7]/85">
@@ -151,11 +151,11 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
       </div>
 
       {isTop ? (
-        <div className="absolute right-3 top-3 rounded-full border border-[#EDC537]/70 bg-[#EDC537]/25 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#1a0a0a] shadow-[0_0_18px_rgba(237,197,55,0.45)]">
+        <div className="absolute right-3 top-3 z-30 rounded-full border border-[#EDC537]/70 bg-[#EDC537]/25 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#1a0a0a] shadow-[0_0_18px_rgba(237,197,55,0.45)]">
           TOP
         </div>
       ) : (
-        <div className="absolute right-3 top-3 rounded-full border border-[#EDC537]/50 bg-[#140808]/90 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#EDC537]">
+        <div className="absolute right-3 top-3 z-30 rounded-full border border-[#EDC537]/50 bg-[#140808]/90 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-[#EDC537]">
           Hot
         </div>
       )}
