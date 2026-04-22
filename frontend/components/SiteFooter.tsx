@@ -2,20 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { contentApi } from "@/lib/content-api";
+import { contentApi, type SiteContacts } from "@/lib/content-api";
 import { getApiBaseUrl } from "@/lib/api";
 import { SocialContactIcons } from "@/components/SocialContactIcons";
 import { mailtoHref } from "@/lib/contact-links";
 
 export function SiteFooter() {
   const [logoUrl, setLogoUrl] = useState("");
-  const [contacts, setContacts] = useState<{
-    facebook?: string;
-    whatsapp?: string;
-    instagram?: string;
-    telegram?: string;
-    email?: string;
-  } | null>(null);
+  const [contacts, setContacts] = useState<SiteContacts | null>(null);
 
   useEffect(() => {
     let active = true;
