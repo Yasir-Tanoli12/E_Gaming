@@ -1,0 +1,158 @@
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import { contentApi } from "@/lib/content-api";
+import { resolveUploadMediaUrl } from "@/lib/media-url";
+
+/**
+ * Brand logo + lobby hero video uploads (moved from Contacts to main admin dashboard).
+ */
+export function AdminBrandingPanel() {
+  const [loading, setLoading] = useState(true);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
+  const [uploadingLobbyVideo, setUploadingLobbyVideo] = useState(false);
+  const [error, setError] = useState("");
+  const [logoUrl, setLogoUrl] = useState("");
+  const [lobbyVideoUrl, setLobbyVideoUrl] = useState("");
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const data = await contentApi.getAdmin();
+      setLogoUrl(data.contacts.logoUrl ?? "");
+      setLobbyVideoUrl(data.contacts.lobbyVideoUrl ?? "");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load branding");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  async function uploadLogo(file: File | null) {
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setError("Only image files are allowed for logo.");
+      return;
+    }
+    setUploadingLogo(true);
+    setError("");
+    try {
+      const res = await contentApi.uploadLogo(file);
+      setLogoUrl(res.logoUrl ?? "");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to upload logo");
+    } finally {
+      setUploadingLogo(false);
+    }
+  }
+
+  async function uploadLobbyVideo(file: File | null) {
+    if (!file) return;
+    if (!file.type.startsWith("video/")) {
+      setError("Only video files (MP4, WebM, OGG) are allowed for lobby.");
+      return;
+    }
+    setUploadingLobbyVideo(true);
+    setError("");
+    try {
+      const res = await contentApi.uploadLobbyVideo(file);
+      setLobbyVideoUrl(res.lobbyVideoUrl ?? "");
+      await load();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to upload lobby video");
+    } finally {
+      setUploadingLobbyVideo(false);
+    }
+  }
+
+  const logoPreview = resolveUploadMediaUrl(logoUrl);
+  const lobbyPreview = resolveUploadMediaUrl(lobbyVideoUrl);
+
+  if (loading) {
+    return (
+      <section className="flex min-h-[140px] items-center justify-center rounded-xl border border-white/[0.08] bg-white/[0.02] p-6">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-amber-500/30 border-t-amber-400/80" />
+      </section>
+    );
+  }
+
+  return (
+    <section className="space-y-5 rounded-xl border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
+      <div>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+          Branding
+        </p>
+        <h2 className="mt-1 text-lg font-semibold text-white">Logo &amp; lobby video</h2>
+        <p className="mt-1 text-xs text-zinc-400">
+          Shown in the public navbar, footer, and the hero section on the user dashboard.
+        </p>
+      </div>
+
+      {error && (
+        <div
+          role="alert"
+          className="rounded-lg border border-red-500/20 bg-red-500/5 px-4 py-3 text-sm text-red-300/95"
+        >
+          {error}
+        </div>
+      )}
+
+      <div className="grid gap-8 lg:grid-cols-2">
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-zinc-200">Brand logo</label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) => void uploadLogo(e.target.files?.[0] ?? null)}
+            className="w-full max-w-md cursor-pointer rounded-lg border border-white/10 bg-[#0c0c0f] px-3 py-2 text-sm text-zinc-200 file:mr-3 file:rounded-md file:border-0 file:bg-zinc-800 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-zinc-200"
+          />
+          {uploadingLogo && (
+            <p className="mt-1 text-xs text-amber-200/80">Uploading logo…</p>
+          )}
+          {logoPreview && (
+            <div className="mt-3 inline-flex items-center gap-3 rounded-xl border border-cyan-400/25 bg-cyan-500/10 px-3 py-2">
+              <img
+                src={logoPreview}
+                alt="Site logo preview"
+                className="h-10 w-10 rounded-lg object-cover ring-1 ring-cyan-400/30"
+              />
+              <p className="text-xs text-cyan-100/85">Logo is active site-wide</p>
+            </div>
+          )}
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-sm font-medium text-zinc-200">
+            Lobby video (dashboard hero)
+          </label>
+          <input
+            type="file"
+            accept="video/mp4,video/webm,video/ogg"
+            onChange={(e) => void uploadLobbyVideo(e.target.files?.[0] ?? null)}
+            className="w-full max-w-md cursor-pointer rounded-lg border border-white/10 bg-[#0c0c0f] px-3 py-2 text-sm text-zinc-200 file:mr-3 file:rounded-md file:border-0 file:bg-zinc-800 file:px-3 file:py-1.5 file:text-xs file:font-medium file:text-zinc-200"
+          />
+          {uploadingLobbyVideo && (
+            <p className="mt-1 text-xs text-amber-200/80">Uploading lobby video…</p>
+          )}
+          {lobbyPreview && (
+            <div className="mt-3 inline-flex items-center gap-3 rounded-xl border border-fuchsia-400/25 bg-fuchsia-500/10 px-3 py-2">
+              <video
+                src={lobbyPreview}
+                className="h-16 w-28 rounded-lg object-cover ring-1 ring-fuchsia-400/30"
+                muted
+                playsInline
+                preload="metadata"
+              />
+              <p className="text-xs text-fuchsia-100/85">Lobby video is active on dashboard hero</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+}

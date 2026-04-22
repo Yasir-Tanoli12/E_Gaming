@@ -6,6 +6,7 @@ import { usersApi, type ApiUser } from "@/lib/users-api";
 import { authApi } from "@/lib/auth-api";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { AdminBrandingPanel } from "@/components/admin/AdminBrandingPanel";
 
 export default function AdminDashboardPage() {
   const PAGE_SIZE = 10;
@@ -122,6 +123,8 @@ export default function AdminDashboardPage() {
           </Button>
         </Link>
       </div>
+
+      <AdminBrandingPanel />
 
       <section className="rounded-xl border border-white/[0.08] bg-white/[0.02] p-5 sm:p-6">
         <h2 className="text-sm font-semibold text-white">Invite administrator</h2>
