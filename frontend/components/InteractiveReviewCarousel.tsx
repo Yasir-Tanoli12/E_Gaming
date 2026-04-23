@@ -24,16 +24,21 @@ function PersonIcon() {
 
 type ViewMode = "mobile" | "desktop";
 
-function buildStack(reviews: ReviewItem[], mode: ViewMode): { item: ReviewItem; key: string }[] {
+type StackCard =
+  | { kind: "spacer"; key: string }
+  | { kind: "review"; key: string; item: ReviewItem };
+
+function buildStack(reviews: ReviewItem[], mode: ViewMode): StackCard[] {
   if (reviews.length === 0) return [];
   const minSlots = mode === "mobile" ? 3 : 4;
   const cap = mode === "mobile" ? 7 : 8;
   const target = Math.min(cap, Math.max(minSlots, reviews.length));
-  const out: { item: ReviewItem; key: string }[] = [];
+  const out: StackCard[] = [{ kind: "spacer", key: "spacer-start" }];
   for (let i = 0; i < target; i++) {
     const item = reviews[i % reviews.length]!;
-    out.push({ item, key: `${item.id}-${i}` });
+    out.push({ kind: "review", item, key: `${item.id}-${i}` });
   }
+  out.push({ kind: "spacer", key: "spacer-end" });
   return out;
 }
 
@@ -174,7 +179,7 @@ export function InteractiveReviewCarousel({ reviews }: { reviews: ReviewItem[] }
         className="relative mx-auto flex h-[min(320px,52vw)] w-full max-w-[90rem] items-center justify-center sm:h-[400px]"
         style={{ transformStyle: "preserve-3d" }}
       >
-        {stack.map(({ item, key }, i) => {
+        {stack.map((card, i) => {
           const d = i - centerFloat;
           const abs = Math.abs(d);
           const mobile = mode === "mobile";
@@ -189,41 +194,53 @@ export function InteractiveReviewCarousel({ reviews }: { reviews: ReviewItem[] }
           const scale = isHover ? Math.max(scaleBase, 1.12) + 0.1 : scaleBase;
           const z = 100 - Math.round(abs * 11) + (isHover ? 28 : 0);
 
+          const isSpacer = card.kind === "spacer";
+
           return (
             <article
-              key={key}
+              key={card.key}
               className="absolute w-[min(72vw,290px)] will-change-transform sm:w-[min(74vw,360px)] lg:w-[min(68vw,340px)]"
               style={{
                 zIndex: z,
                 transform: `translateX(${tx}px) translateY(${ty}px) translateZ(${tz}px) rotateY(${rotY}deg) rotateX(${rotX}deg) scale(${scale})`,
                 transformStyle: "preserve-3d",
                 transition: `transform 0.32s ${ELASTIC}, box-shadow 0.22s ${ELASTIC}`,
-                boxShadow: isHover ? SHADOW_HOVER : SHADOW_IDLE,
+                boxShadow: isSpacer ? "none" : isHover ? SHADOW_HOVER : SHADOW_IDLE,
               }}
               onPointerEnter={() => setHovered(i)}
               onPointerLeave={() => setHovered((h) => (h === i ? null : h))}
             >
               <div
-                className="flex gap-4 rounded-2xl border-[3px] border-[#161015] bg-[#E4DDE3] p-5 sm:gap-5 sm:p-6"
+                className={`flex rounded-2xl border-[3px] p-5 sm:p-6 ${
+                  isSpacer
+                    ? "border-[#161015]/55 bg-[#D8CFD6]/40"
+                    : "gap-4 border-[#161015] bg-[#E4DDE3] sm:gap-5"
+                }`}
                 style={{
-                  boxShadow: "inset 0 0 0 2px #EA3699",
+                  boxShadow: isSpacer ? "inset 0 0 0 2px rgba(234,54,153,0.35)" : "inset 0 0 0 2px #EA3699",
                 }}
               >
-                <PersonIcon />
-                <div className="min-w-0 flex-1">
-                  <p className="text-lg font-black uppercase tracking-wide text-[#EB523F] sm:text-xl">
-                    {item.reviewer}
-                  </p>
-                  <p className="mt-2 line-clamp-4 text-base font-semibold leading-snug text-[#161015] sm:text-[1.05rem]">
-                    {item.message}
-                  </p>
-                  <p className="mt-3 text-xl font-black tracking-widest text-[#AAE847] sm:text-2xl">
-                    {"★".repeat(Math.min(5, Math.max(1, Math.round(item.rating))))}
-                    <span className="ml-2 align-middle text-xs font-bold text-[#EA3699]">
-                      {item.rating}/5
-                    </span>
-                  </p>
-                </div>
+                {isSpacer ? (
+                  <div className="h-[9.6rem] w-full" aria-hidden />
+                ) : (
+                  <>
+                    <PersonIcon />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-lg font-black uppercase tracking-wide text-[#EB523F] sm:text-xl">
+                        {card.item.reviewer}
+                      </p>
+                      <p className="mt-2 line-clamp-4 text-base font-semibold leading-snug text-[#161015] sm:text-[1.05rem]">
+                        {card.item.message}
+                      </p>
+                      <p className="mt-3 text-xl font-black tracking-widest text-[#AAE847] sm:text-2xl">
+                        {"★".repeat(Math.min(5, Math.max(1, Math.round(card.item.rating))))}
+                        <span className="ml-2 align-middle text-xs font-bold text-[#EA3699]">
+                          {card.item.rating}/5
+                        </span>
+                      </p>
+                    </div>
+                  </>
+                )}
               </div>
             </article>
           );

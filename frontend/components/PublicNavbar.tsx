@@ -16,8 +16,8 @@ type NavItem =
 const NAV_ITEMS: NavItem[] = [
   { label: "HOME", href: "/dashboard", matchPath: (p) => p === "/dashboard" },
   { label: "GAMES", href: "/games", matchPath: (p) => p === "/games" },
-  { label: "ABOUT US", href: "/about-us", matchPath: (p) => p === "/about-us" },
   { label: "BLOGS", href: "/blogs", matchPath: (p) => p === "/blogs" },
+  { label: "ABOUT US", href: "/about-us", matchPath: (p) => p === "/about-us" },
   { label: "GUIDELINES", href: "/privacy-policy", matchPath: (p) => p === "/privacy-policy" },
   { label: "CONTACT US", href: "/contact-us", matchPath: (p) => p === "/contact-us" },
 ];

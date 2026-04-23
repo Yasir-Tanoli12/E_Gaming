@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { contentApi, type SiteContent } from "@/lib/content-api";
+import { BrandTextureBackdrop } from "@/components/legal/BrandTextureBackdrop";
 import { PublicNavbar } from "@/components/PublicNavbar";
 
 export default function BlogsPage() {
@@ -43,13 +44,10 @@ export default function BlogsPage() {
   const listBlogs = blogs.filter((blog) => blog.id !== selectedBlog?.id);
 
   return (
-    <div className="blog-radiant-page min-h-screen text-[#2a1808]">
+    <div className="relative min-h-screen overflow-x-clip text-[#161015]">
+      <BrandTextureBackdrop className="fixed inset-0 z-0" />
       <PublicNavbar />
-      <div className="px-4 py-10">
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="blog-radiant-orb blog-radiant-orb-left" />
-        <div className="blog-radiant-orb blog-radiant-orb-right" />
-      </div>
+      <div className="relative z-10 px-4 py-10">
 
       <div className="relative mx-auto max-w-7xl">
         <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
@@ -66,10 +64,10 @@ export default function BlogsPage() {
               </span>
             )}
             <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-[#9a7000]">Neon Editorial</p>
-            <h1 className="mt-2 text-4xl font-black text-[#7a0b0b] md:text-5xl">Blogs</h1>
-            <p className="mt-2 max-w-2xl text-sm text-[#5b3b18]">
-              Fresh posts, updates, and stories with a glowing SWEEPSTOWN vibe.
+            <p className="text-xs uppercase tracking-[0.2em] text-[#EB523F]">Neon Editorial</p>
+            <h1 className="sw-text-wobble mt-2 text-4xl font-black text-[#161015] md:text-5xl">Blogs</h1>
+            <p className="mt-2 max-w-2xl text-sm text-zinc-700">
+              Fresh posts, updates, and stories in the SWEEPSTOWN style.
             </p>
             </div>
           </div>
@@ -101,16 +99,16 @@ export default function BlogsPage() {
                   ) : (
                     <div className="h-[290px] w-full bg-[radial-gradient(circle_at_20%_20%,rgba(153,8,8,0.35),transparent_40%),radial-gradient(circle_at_80%_80%,rgba(237,197,55,0.3),transparent_38%),linear-gradient(120deg,#0f0808,#1a0c08)] md:h-[360px]" />
                   )}
-                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0a0808]/55 via-[#0a0808]/20 to-transparent" />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#161015]/65 via-[#161015]/25 to-transparent" />
                 </div>
                 <div className="relative z-10 mt-4">
-                  <p className="text-xs uppercase tracking-[0.2em] text-[#9a7000]">Featured Story</p>
-                  <h2 className="mt-2 text-2xl font-black text-[#7a0b0b] md:text-3xl">{selectedBlog.title}</h2>
+                  <p className="text-xs uppercase tracking-[0.2em] text-[#EA3699]">Featured Story</p>
+                  <h2 className="mt-2 text-2xl font-black text-[#161015] md:text-3xl">{selectedBlog.title}</h2>
                   {selectedBlog.excerpt && (
-                    <p className="mt-2 text-sm text-[#5b3b18]">{selectedBlog.excerpt}</p>
+                    <p className="mt-2 text-sm text-zinc-700">{selectedBlog.excerpt}</p>
                   )}
                   {selectedBlog.content && (
-                    <p className="mt-3 text-sm text-[#2f210f]">{selectedBlog.content}</p>
+                    <p className="mt-3 text-sm text-zinc-700">{selectedBlog.content}</p>
                   )}
                 </div>
               </article>
@@ -137,9 +135,9 @@ export default function BlogsPage() {
                       )}
                     </div>
                     <div className="min-w-0">
-                      <h3 className="truncate text-base font-bold text-[#7a0b0b]">{blog.title}</h3>
+                      <h3 className="truncate text-base font-bold text-[#161015]">{blog.title}</h3>
                       {blog.excerpt && (
-                        <p className="mt-1 line-clamp-2 text-xs text-[#5b3b18]">{blog.excerpt}</p>
+                        <p className="mt-1 line-clamp-2 text-xs text-zinc-700">{blog.excerpt}</p>
                       )}
                     </div>
                   </div>
