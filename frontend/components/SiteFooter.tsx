@@ -65,7 +65,7 @@ export function SiteFooter() {
                   ST
                 </span>
               )}
-              <h3 className="sw-text-wobble text-xl font-black text-[#EEEDEE]">SWEEPSTOWN</h3>
+              <h3 className="sw-brand-wordmark sw-text-wobble text-xl text-[#EEEDEE]">SWEEPSTOWN</h3>
             </div>
             <p className="mt-3 text-sm text-[#EEEDEE]/85">
               Play trending games with credentials. Get access from our support team or jump in straight away.
@@ -73,7 +73,7 @@ export function SiteFooter() {
           </div>
 
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#AAE847]">Quick Links</p>
+            <p className="sw-subtext-anton text-xs font-bold uppercase tracking-[0.2em] text-[#AAE847]">Quick Links</p>
             <div className="mt-3 space-y-2 text-sm">
               <Link href="/games" className="block text-[#EEEDEE]/85 transition hover:text-[#AAE847]">
                 Games
@@ -94,7 +94,7 @@ export function SiteFooter() {
           </div>
 
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#AAE847]">Resources</p>
+            <p className="sw-subtext-anton text-xs font-bold uppercase tracking-[0.2em] text-[#AAE847]">Resources</p>
             <div className="mt-3 space-y-2 text-sm">
               <a
                 href={privacyPolicyPdfUrl}
@@ -116,7 +116,7 @@ export function SiteFooter() {
           </div>
 
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-[#AAE847]">Contact</p>
+            <p className="sw-subtext-anton text-xs font-bold uppercase tracking-[0.2em] text-[#AAE847]">Contact</p>
             <div className="mt-3 space-y-2 text-sm text-[#EEEDEE]/85">
               {contacts?.email?.trim() ? (
                 <a
@@ -140,7 +140,9 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-8 flex flex-col items-center justify-between gap-3 border-t-2 border-[#EB523F]/35 pt-4 text-xs text-[#EEEDEE]/70 md:flex-row">
-          <p>© {new Date().getFullYear()} SWEEPSTOWN. All rights reserved.</p>
+          <p>
+            © {new Date().getFullYear()} <span className="sw-brand-wordmark align-middle text-[0.92em]">SWEEPSTOWN</span>. All rights reserved.
+          </p>
           <p>Built for players who love to play.</p>
         </div>
       </div>

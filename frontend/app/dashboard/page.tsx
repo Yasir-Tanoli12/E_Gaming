@@ -269,7 +269,11 @@ export default function UserDashboardPage() {
                   ✕
                 </button>
               </div>
-              <img src={newsPoster.imageUrl} alt={newsPoster.title ?? "News"} className="max-h-[70vh] w-full object-cover" />
+              <img
+                src={resolveUploadMediaUrl(newsPoster.imageUrl) ?? ""}
+                alt={newsPoster.title ?? "News"}
+                className="max-h-[70vh] w-full object-cover"
+              />
             </div>
           </div>
         )}

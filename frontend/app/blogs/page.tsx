@@ -67,7 +67,7 @@ export default function BlogsPage() {
             <p className="text-xs uppercase tracking-[0.2em] text-[#EB523F]">Neon Editorial</p>
             <h1 className="sw-text-wobble mt-2 text-4xl font-black text-[#161015] md:text-5xl">Blogs</h1>
             <p className="mt-2 max-w-2xl text-sm text-zinc-700">
-              Fresh posts, updates, and stories in the SWEEPSTOWN style.
+              Fresh posts, updates, and stories in the <span className="sw-brand-wordmark text-[0.95em] align-middle">SWEEPSTOWN</span> style.
             </p>
             </div>
           </div>

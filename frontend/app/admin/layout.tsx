@@ -113,10 +113,10 @@ export default function AdminLayout({
                 </span>
               )}
               <div className="min-w-0 leading-tight">
-                <span className="block truncate text-sm font-semibold text-white sm:text-base">
+                <span className="sw-brand-wordmark block truncate text-sm text-white sm:text-base">
                   SWEEPSTOWN
                 </span>
-                <span className="hidden text-[11px] font-medium uppercase tracking-wider text-zinc-500 sm:block">
+                <span className="sw-subtext-anton hidden text-[11px] font-medium uppercase tracking-wider text-zinc-500 sm:block">
                   Admin
                 </span>
               </div>

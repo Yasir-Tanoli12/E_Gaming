@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { newsApi, type NewsPoster } from "@/lib/news-api";
 import { gamesApi } from "@/lib/games-api";
+import { resolveUploadMediaUrl } from "@/lib/media-url";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
@@ -152,7 +153,11 @@ export default function AdminNewsPage() {
               {items.map((item) => (
                 <tr key={item.id} className="border-b border-white/[0.05] last:border-0">
                   <td className="px-4 py-3">
-                    <img src={item.imageUrl} alt="" className="h-12 w-24 rounded object-cover" />
+                    <img
+                      src={resolveUploadMediaUrl(item.imageUrl) ?? ""}
+                      alt=""
+                      className="h-12 w-24 rounded object-cover"
+                    />
                   </td>
                   <td className="px-4 py-3 text-zinc-200">{item.title ?? "—"}</td>
                   <td className="px-4 py-3">

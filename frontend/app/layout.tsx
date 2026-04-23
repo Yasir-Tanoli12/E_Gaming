@@ -1,12 +1,21 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Anton, Geist_Mono, Poppins } from "next/font/google";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { ConditionalSiteFooter } from "@/components/ConditionalSiteFooter";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const poppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  display: "swap",
+  preload: true,
+});
+
+const anton = Anton({
+  variable: "--font-anton",
+  subsets: ["latin"],
+  weight: "400",
   display: "swap",
   preload: true,
 });
@@ -31,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} min-w-0 antialiased`}
+        className={`${poppins.variable} ${anton.variable} ${geistMono.variable} min-w-0 antialiased`}
       >
         <AuthProvider>
           {children}
