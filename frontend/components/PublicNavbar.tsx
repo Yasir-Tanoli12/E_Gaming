@@ -116,7 +116,7 @@ export function PublicNavbar({ variant = "default" }: PublicNavbarProps) {
                 <Link
                   key={item.label}
                   href={item.href}
-                  className={`sw-subtext-anton group relative overflow-hidden rounded-full px-4 py-2 text-sm font-bold transition-transform duration-200 ${
+                  className={`sw-funky-nav group relative overflow-hidden rounded-full px-4 py-2 text-sm font-bold transition-transform duration-200 ${
                     active
                       ? "border-2 border-[#161015] bg-gradient-to-r from-[#EB523F] via-[#EA3699] to-[#AAE847] text-[#161015] shadow-[4px_4px_0_#161015]"
                       : "text-[#EEEDEE]/90 hover:-translate-y-0.5 hover:scale-[1.03] hover:text-[#AAE847]"
@@ -198,7 +198,7 @@ export function PublicNavbar({ variant = "default" }: PublicNavbarProps) {
                   key={item.label}
                   href={item.href}
                   onClick={() => setMobileNavOpen(false)}
-                  className={`sw-subtext-anton rounded-xl px-4 py-3 text-base font-semibold transition ${active ? "border border-[#AAE847]/50 bg-gradient-to-r from-[#EB523F]/35 to-[#EA3699]/35 text-[#EEEDEE]" : "text-[#EEEDEE]/90 hover:bg-[#EB523F]/15"}`}
+                  className={`sw-funky-nav rounded-xl px-4 py-3 text-base font-semibold transition ${active ? "border border-[#AAE847]/50 bg-gradient-to-r from-[#EB523F]/35 to-[#EA3699]/35 text-[#EEEDEE]" : "text-[#EEEDEE]/90 hover:bg-[#EB523F]/15"}`}
                 >
                   {item.label}
                 </Link>
