@@ -22,10 +22,12 @@ function PersonIcon() {
   );
 }
 
-function buildStack(reviews: ReviewItem[]): { item: ReviewItem; key: string }[] {
+type ViewMode = "mobile" | "desktop";
+
+function buildStack(reviews: ReviewItem[], mode: ViewMode): { item: ReviewItem; key: string }[] {
   if (reviews.length === 0) return [];
-  const minSlots = 5;
-  const cap = 11;
+  const minSlots = mode === "mobile" ? 3 : 4;
+  const cap = mode === "mobile" ? 7 : 8;
   const target = Math.min(cap, Math.max(minSlots, reviews.length));
   const out: { item: ReviewItem; key: string }[] = [];
   for (let i = 0; i < target; i++) {
@@ -38,7 +40,8 @@ function buildStack(reviews: ReviewItem[]): { item: ReviewItem; key: string }[] 
 type DragState = { pointerId: number; startX: number; startBias: number };
 
 export function InteractiveReviewCarousel({ reviews }: { reviews: ReviewItem[] }) {
-  const stack = useMemo(() => buildStack(reviews), [reviews]);
+  const [mode, setMode] = useState<ViewMode>("desktop");
+  const stack = useMemo(() => buildStack(reviews, mode), [reviews, mode]);
   const wrapRef = useRef<HTMLDivElement>(null);
   const targetBias = useRef(0);
   const smoothBias = useRef(0);
@@ -64,6 +67,14 @@ export function InteractiveReviewCarousel({ reviews }: { reviews: ReviewItem[] }
     return () => {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
     };
+  }, []);
+
+  useEffect(() => {
+    const media = window.matchMedia("(max-width: 640px)");
+    const sync = () => setMode(media.matches ? "mobile" : "desktop");
+    sync();
+    media.addEventListener("change", sync);
+    return () => media.removeEventListener("change", sync);
   }, []);
 
   const kickRaf = useCallback(() => {
@@ -166,8 +177,10 @@ export function InteractiveReviewCarousel({ reviews }: { reviews: ReviewItem[] }
         {stack.map(({ item, key }, i) => {
           const d = i - centerFloat;
           const abs = Math.abs(d);
-          const spread = 118;
-          const tx = d * spread + bias * 22;
+          const mobile = mode === "mobile";
+          const spread = mobile ? 132 : 154;
+          const tx = d * spread + bias * (mobile ? 22 : 18);
+          const ty = mobile ? abs * 7 : abs * 5;
           const tz = -abs * 12;
           const rotY = d * -4 + bias * -5;
           const rotX = bias * -3 + d * 0.8;
@@ -179,10 +192,10 @@ export function InteractiveReviewCarousel({ reviews }: { reviews: ReviewItem[] }
           return (
             <article
               key={key}
-              className="absolute w-[min(100%,400px)] will-change-transform sm:w-[min(100%,440px)]"
+              className="absolute w-[min(72vw,290px)] will-change-transform sm:w-[min(74vw,360px)] lg:w-[min(68vw,340px)]"
               style={{
                 zIndex: z,
-                transform: `translateX(${tx}px) translateZ(${tz}px) rotateY(${rotY}deg) rotateX(${rotX}deg) scale(${scale})`,
+                transform: `translateX(${tx}px) translateY(${ty}px) translateZ(${tz}px) rotateY(${rotY}deg) rotateX(${rotX}deg) scale(${scale})`,
                 transformStyle: "preserve-3d",
                 transition: `transform 0.32s ${ELASTIC}, box-shadow 0.22s ${ELASTIC}`,
                 boxShadow: isHover ? SHADOW_HOVER : SHADOW_IDLE,
