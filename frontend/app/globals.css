@@ -25,6 +25,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-poppins);
   --font-display: var(--font-anton);
+  --font-funky: var(--font-bungee);
   --font-mono: var(--font-geist-mono);
 }
 
@@ -45,26 +46,35 @@ body {
   letter-spacing: 0.04em;
 }
 
+.sw-funky-nav {
+  font-family: var(--font-bungee), var(--font-anton), Impact, Arial Black, sans-serif;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+  text-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.28),
+    0 3px 8px rgba(0, 0, 0, 0.35);
+}
+
 .sw-brand-wordmark {
   display: inline-block;
   font-family: var(--font-anton), Impact, Arial Black, sans-serif;
   font-weight: 400;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
-  line-height: 0.88;
-  transform: skewX(-12deg) scale(1.02);
+  line-height: 0.86;
+  transform: skewX(-13deg) scale(1.06);
   transform-origin: 50% 65%;
-  background: linear-gradient(180deg, #ff8cf0 0%, #ff4fd8 26%, #ea3699 54%, #b60f77 100%);
+  background: linear-gradient(180deg, #ffc2fb 0%, #ff7ce9 18%, #ff41d2 42%, #ea3699 66%, #bf0f7d 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  -webkit-text-stroke: 2.25px #161015;
+  -webkit-text-stroke: 2.8px #120d12;
   text-shadow:
-    0 1px 0 #fcb4f4,
-    0 0 0 #161015,
-    0 3px 0 #161015,
-    0 6px 0 #120c11,
-    0 11px 18px rgba(22, 16, 21, 0.55);
+    0 0 16px rgba(255, 112, 225, 0.72),
+    0 2px 0 #fff1fd,
+    0 5px 0 #120d12,
+    0 9px 0 #0c090c,
+    0 15px 28px rgba(10, 7, 10, 0.65);
 }
 
 /* Energetic heading wobble — transform only */

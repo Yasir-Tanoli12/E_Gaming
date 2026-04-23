@@ -140,9 +140,7 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-8 flex flex-col items-center justify-between gap-3 border-t-2 border-[#EB523F]/35 pt-4 text-xs text-[#EEEDEE]/70 md:flex-row">
-          <p>
-            © {new Date().getFullYear()} <span className="sw-brand-wordmark align-middle text-[0.92em]">SWEEPSTOWN</span>. All rights reserved.
-          </p>
+          <p>© {new Date().getFullYear()} SWEEPSTOWN. All rights reserved.</p>
           <p>Built for players who love to play.</p>
         </div>
       </div>
