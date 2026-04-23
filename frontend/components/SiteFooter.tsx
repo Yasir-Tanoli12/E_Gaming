@@ -73,7 +73,7 @@ export function SiteFooter() {
           </div>
 
           <div>
-            <p className="sw-subtext-anton text-xs font-bold uppercase tracking-[0.2em] text-[#AAE847]">Quick Links</p>
+            <p className="sw-funky-nav text-xs font-bold uppercase tracking-[0.2em] text-[#AAE847]">Quick Links</p>
             <div className="mt-3 space-y-2 text-sm">
               <Link href="/games" className="block text-[#EEEDEE]/85 transition hover:text-[#AAE847]">
                 Games
@@ -94,7 +94,7 @@ export function SiteFooter() {
           </div>
 
           <div>
-            <p className="sw-subtext-anton text-xs font-bold uppercase tracking-[0.2em] text-[#AAE847]">Resources</p>
+            <p className="sw-funky-nav text-xs font-bold uppercase tracking-[0.2em] text-[#AAE847]">Resources</p>
             <div className="mt-3 space-y-2 text-sm">
               <a
                 href={privacyPolicyPdfUrl}
@@ -116,7 +116,7 @@ export function SiteFooter() {
           </div>
 
           <div>
-            <p className="sw-subtext-anton text-xs font-bold uppercase tracking-[0.2em] text-[#AAE847]">Contact</p>
+            <p className="sw-funky-nav text-xs font-bold uppercase tracking-[0.2em] text-[#AAE847]">Contact</p>
             <div className="mt-3 space-y-2 text-sm text-[#EEEDEE]/85">
               {contacts?.email?.trim() ? (
                 <a
