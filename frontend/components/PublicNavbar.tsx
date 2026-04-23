@@ -104,7 +104,7 @@ export function PublicNavbar({ variant = "default" }: PublicNavbarProps) {
                 ST
               </span>
             )}
-            <span className="sw-brand-wordmark sw-text-wobble inline-block text-[1.85rem] leading-none transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-110 sm:text-[2rem]">
+            <span className="sw-brand-wordmark sw-text-wobble inline-block text-[2rem] leading-none transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-110 sm:text-[2.2rem]">
               SWEEPSTOWN
             </span>
           </Link>
