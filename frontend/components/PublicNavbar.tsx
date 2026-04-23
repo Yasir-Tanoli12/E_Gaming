@@ -104,7 +104,7 @@ export function PublicNavbar({ variant = "default" }: PublicNavbarProps) {
                 ST
               </span>
             )}
-            <span className="sw-brand-wordmark sw-text-wobble inline-block text-[2rem] leading-none transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-110 sm:text-[2.2rem]">
+            <span className="sw-brand-wordmark sw-text-wobble inline-block text-[1.85rem] leading-none transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 sm:text-[2rem]">
               SWEEPSTOWN
             </span>
           </Link>
@@ -116,10 +116,10 @@ export function PublicNavbar({ variant = "default" }: PublicNavbarProps) {
                 <Link
                   key={item.label}
                   href={item.href}
-                  className={`sw-funky-nav group relative overflow-hidden rounded-full px-5 py-2.5 text-base font-bold transition-transform duration-200 ${
+                  className={`sw-subtext-anton group relative overflow-hidden rounded-full px-4 py-2 text-sm font-bold transition-transform duration-200 ${
                     active
                       ? "border-2 border-[#161015] bg-gradient-to-r from-[#EB523F] via-[#EA3699] to-[#AAE847] text-[#161015] shadow-[4px_4px_0_#161015]"
-                      : "text-[#EEEDEE] hover:-translate-y-0.5 hover:scale-[1.04] hover:text-[#AAE847]"
+                      : "text-[#EEEDEE]/90 hover:-translate-y-0.5 hover:scale-[1.03] hover:text-[#AAE847]"
                   }`}
                 >
                   {!active && (
@@ -178,7 +178,7 @@ export function PublicNavbar({ variant = "default" }: PublicNavbarProps) {
           className={`absolute right-0 top-0 flex h-full w-[min(320px,85vw)] flex-col border-l-[3px] border-[#161015] bg-[#161015]/98 shadow-[6px_0_0_#EB523F] transition-transform duration-300 ease-out ${mobileNavOpen ? "translate-x-0" : "translate-x-full"}`}
         >
           <div className="flex items-center justify-between border-b-2 border-[#EB523F]/40 px-4 py-4">
-            <span className="sw-funky-nav text-lg font-bold text-white">Menu</span>
+            <span className="sw-subtext-anton text-lg font-bold text-white">Menu</span>
             <button
               type="button"
               onClick={() => setMobileNavOpen(false)}
@@ -198,7 +198,7 @@ export function PublicNavbar({ variant = "default" }: PublicNavbarProps) {
                   key={item.label}
                   href={item.href}
                   onClick={() => setMobileNavOpen(false)}
-                  className={`sw-funky-nav rounded-xl px-4 py-3 text-lg font-semibold transition ${active ? "border border-[#AAE847]/50 bg-gradient-to-r from-[#EB523F]/35 to-[#EA3699]/35 text-[#EEEDEE]" : "text-[#EEEDEE] hover:bg-[#EB523F]/15"}`}
+                  className={`sw-subtext-anton rounded-xl px-4 py-3 text-base font-semibold transition ${active ? "border border-[#AAE847]/50 bg-gradient-to-r from-[#EB523F]/35 to-[#EA3699]/35 text-[#EEEDEE]" : "text-[#EEEDEE]/90 hover:bg-[#EB523F]/15"}`}
                 >
                   {item.label}
                 </Link>
