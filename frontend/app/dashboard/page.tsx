@@ -14,11 +14,11 @@ import { Button } from "@/components/ui/Button";
 import { PublicNavbar } from "@/components/PublicNavbar";
 import { SocialContactIcons } from "@/components/SocialContactIcons";
 import { InteractiveReviewCarousel } from "@/components/InteractiveReviewCarousel";
-
-/** Once the user accepts the 18+ notice, do not show it again on this browser. */
-const AGE_WARNING_ACK_KEY = "dashboard_age_warning_acknowledged";
+import { BrandTextureBackdrop } from "@/components/legal/BrandTextureBackdrop";
+import { useLobbyAudio } from "@/contexts/LobbyAudioContext";
 
 export default function UserDashboardPage() {
+  const { lobbySoundAllowed, allowLobbySound } = useLobbyAudio();
   const contentQuery = usePublicSiteContent();
   const gamesQuery = useGamesList();
   const topGamesQuery = useGamesTop();
@@ -73,20 +73,14 @@ export default function UserDashboardPage() {
   useEffect(() => {
     if (!contentQuery.isSuccess || !content) return;
     setAgeWarningReady(true);
-    const alreadyAcknowledged =
-      typeof window !== "undefined" &&
-      localStorage.getItem(AGE_WARNING_ACK_KEY) === "1";
-    setShowAgeWarning(!alreadyAcknowledged);
-  }, [contentQuery.isSuccess, content]);
+    setShowAgeWarning(!lobbySoundAllowed);
+  }, [contentQuery.isSuccess, content, lobbySoundAllowed]);
 
   useEffect(() => {
     if (!contentQuery.isError) return;
     setAgeWarningReady(true);
-    const alreadyAcknowledged =
-      typeof window !== "undefined" &&
-      localStorage.getItem(AGE_WARNING_ACK_KEY) === "1";
-    setShowAgeWarning(!alreadyAcknowledged);
-  }, [contentQuery.isError]);
+    setShowAgeWarning(!lobbySoundAllowed);
+  }, [contentQuery.isError, lobbySoundAllowed]);
 
   useEffect(() => {
     if (!newsPoster || typeof window === "undefined") return;
@@ -142,9 +136,24 @@ export default function UserDashboardPage() {
     if (!video || !heroVideo) return;
 
     const tryPlay = () => {
-      video.defaultMuted = true;
-      video.muted = true;
-      video.play().then(() => setHeroVideoBlocked(false)).catch(() => setHeroVideoBlocked(true));
+      const wantSound = lobbySoundAllowed;
+      video.defaultMuted = !wantSound;
+      video.muted = !wantSound;
+      video
+        .play()
+        .then(() => setHeroVideoBlocked(false))
+        .catch(() => {
+          if (!video.muted) {
+            video.muted = true;
+            video.defaultMuted = true;
+            video
+              .play()
+              .then(() => setHeroVideoBlocked(false))
+              .catch(() => setHeroVideoBlocked(true));
+          } else {
+            setHeroVideoBlocked(true);
+          }
+        });
     };
 
     tryPlay();
@@ -161,18 +170,15 @@ export default function UserDashboardPage() {
       video.removeEventListener("canplay", onCanPlay);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [heroVideo]);
+  }, [heroVideo, lobbySoundAllowed]);
 
   return (
-    <div className="relative min-h-screen w-full min-w-0 max-w-full overflow-x-clip bg-[#E9DFE5] text-[#161015]">
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute -left-24 top-20 h-80 w-80 animate-float rounded-full bg-[#EB523F]/18 blur-[100px]" />
-        <div className="absolute right-0 top-40 h-96 w-96 animate-float-delayed rounded-full bg-[#EA3699]/22 blur-[110px]" />
-      </div>
+    <div className="relative min-h-screen w-full min-w-0 max-w-full overflow-x-clip text-[#161015]">
+      <BrandTextureBackdrop className="fixed inset-0 z-0" />
 
       <section
         id="home"
-        className="relative isolate flex min-h-[100dvh] w-full min-w-0 max-w-full scroll-mt-24 flex-col overflow-x-hidden border-b border-[#EB523F]/30"
+        className="relative z-[1] isolate flex min-h-[100dvh] w-full min-w-0 max-w-full scroll-mt-24 flex-col overflow-x-hidden border-b border-[#EB523F]/30"
       >
         {/* Full-bleed lobby video (fills entire hero, including behind navbar) */}
         <div className="absolute inset-0 z-0 min-h-full w-full bg-[#161015]">
@@ -181,7 +187,7 @@ export default function UserDashboardPage() {
               ref={heroVideoRef}
               src={heroVideo}
               autoPlay
-              muted
+              muted={!lobbySoundAllowed}
               loop
               playsInline
               preload="auto"
@@ -200,11 +206,19 @@ export default function UserDashboardPage() {
               type="button"
               className="absolute inset-0 z-20 flex items-center justify-center bg-black/40 text-sm font-semibold text-white backdrop-blur-[2px]"
               onClick={() => {
+                allowLobbySound();
                 const video = heroVideoRef.current;
                 if (!video) return;
-                video.defaultMuted = true;
-                video.muted = true;
-                video.play().then(() => setHeroVideoBlocked(false)).catch(() => {});
+                video.defaultMuted = false;
+                video.muted = false;
+                video
+                  .play()
+                  .then(() => setHeroVideoBlocked(false))
+                  .catch(() => {
+                    video.muted = true;
+                    video.defaultMuted = true;
+                    video.play().then(() => setHeroVideoBlocked(false)).catch(() => {});
+                  });
               }}
             >
               Tap to play lobby video
@@ -248,11 +262,7 @@ export default function UserDashboardPage() {
               <div className="mt-5 flex items-center justify-center gap-3">
                 <Button
                   onClick={() => {
-                    try {
-                      localStorage.setItem(AGE_WARNING_ACK_KEY, "1");
-                    } catch {
-                      /* private mode / quota */
-                    }
+                    allowLobbySound();
                     setShowAgeWarning(false);
                   }}
                 >

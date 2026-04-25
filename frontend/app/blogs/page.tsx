@@ -38,33 +38,36 @@ export default function BlogsPage() {
   const listBlogs = blogs.filter((blog) => blog.id !== selectedBlog?.id);
 
   return (
-    <div className="relative min-h-screen overflow-x-clip text-[#161015]">
+    <div className="relative flex min-h-screen flex-col overflow-x-clip text-[#161015]">
       <BrandTextureBackdrop className="fixed inset-0 z-0" />
       <PublicNavbar />
-      <div className="relative z-10 px-4 py-10">
-
-      <div className="relative mx-auto max-w-7xl">
-        <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-3">
-            {logoUrl ? (
-              <img
-                src={logoUrl}
-                alt="SWEEPSTOWN logo"
-                className="h-12 w-12 rounded-full object-cover ring-1 ring-[#AAE847]/60 shadow-[0_0_24px_rgba(237,197,55,0.35)]"
-              />
-            ) : (
-              <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-[#EB523F] to-[#EA3699] text-sm font-black text-white shadow-[0_0_24px_rgba(237,197,55,0.35)]">
-                ST
+      <div className="relative z-10 mx-auto w-full min-w-0 max-w-7xl flex-1 px-[max(1rem,env(safe-area-inset-left))] pb-12 pe-[max(1rem,env(safe-area-inset-right))] pt-6 lg:pt-8">
+        <div className="mb-8 flex flex-wrap items-start gap-4 lg:mb-10">
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt="SWEEPSTOWN logo"
+              className="h-12 w-12 shrink-0 rounded-full object-cover ring-1 ring-[#AAE847]/60 shadow-[0_0_24px_rgba(237,197,55,0.35)]"
+            />
+          ) : (
+            <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-[#EB523F] to-[#EA3699] text-sm font-black text-white shadow-[0_0_24px_rgba(237,197,55,0.35)]">
+              ST
+            </span>
+          )}
+          <header className="sw-legal-animate-left min-w-0 flex-1 text-center lg:text-left">
+            <p className="text-[0.65rem] font-bold uppercase tracking-[0.35em] text-[#EB523F]">
+              Editorial
+            </p>
+            <h1 className="mt-2 text-4xl font-black leading-tight tracking-tight md:text-5xl">
+              <span className="text-[#161015]">Our </span>
+              <span className="bg-gradient-to-r from-[#EB523F] via-[#EA3699] to-[#AAE847] bg-clip-text text-transparent">
+                Blogs
               </span>
-            )}
-            <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-[#EB523F]">Neon Editorial</p>
-            <h1 className="sw-text-wobble mt-2 text-4xl font-black text-[#161015] md:text-5xl">Blogs</h1>
-            <p className="mt-2 max-w-2xl text-sm text-zinc-700">
+            </h1>
+            <p className="mx-auto mt-3 max-w-2xl text-sm font-medium leading-relaxed text-[#161015]/80 md:text-base lg:mx-0">
               Fresh posts, updates, and stories in the SWEEPSTOWN style.
             </p>
-            </div>
-          </div>
+          </header>
         </div>
 
         {loading ? (
@@ -140,7 +143,6 @@ export default function BlogsPage() {
             </div>
           </section>
         )}
-      </div>
       </div>
     </div>
   );

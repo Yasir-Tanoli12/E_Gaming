@@ -3,6 +3,7 @@
 import { memo, useState } from "react";
 import type { Game } from "@/lib/games-api";
 import { resolveUploadMediaUrl } from "@/lib/media-url";
+import { useLobbyAudio } from "@/contexts/LobbyAudioContext";
 
 interface GameCardProps {
   game: Game;
@@ -11,6 +12,7 @@ interface GameCardProps {
 }
 
 function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps) {
+  const { lobbySoundAllowed, allowLobbySound } = useLobbyAudio();
   const [hovered, setHovered] = useState(false);
   const [thumbFailedSrc, setThumbFailedSrc] = useState<string | null>(null);
   const [videoFailedSrc, setVideoFailedSrc] = useState<string | null>(null);
@@ -52,6 +54,9 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
   return (
     <div
       className="group relative w-full max-w-full min-w-0 overflow-hidden rounded-3xl border-[3px] border-[#161015] bg-[#161015] shadow-[6px_8px_0_#EB523F,0_0_0_2px_#EA3699] transition-transform duration-300 hover:-translate-y-1 hover:shadow-[8px_12px_0_#AAE847,0_0_0_3px_#EB523F]"
+      onPointerDownCapture={() => {
+        if (!lobbySoundAllowed) allowLobbySound();
+      }}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -77,7 +82,7 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
           <video
             src={videoUrl}
             autoPlay
-            muted
+            muted={!lobbySoundAllowed}
             loop
             playsInline
             preload={videoAsPrimary ? "auto" : "metadata"}

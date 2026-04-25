@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Anton, Bungee, Geist_Mono, Poppins } from "next/font/google";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { LobbyAudioProvider } from "@/contexts/LobbyAudioContext";
 import { AppQueryProvider } from "@/components/AppQueryProvider";
 import { ConditionalSiteFooter } from "@/components/ConditionalSiteFooter";
 import "./globals.css";
@@ -53,8 +54,10 @@ export default function RootLayout({
       >
         <AuthProvider>
           <AppQueryProvider>
-            {children}
-            <ConditionalSiteFooter />
+            <LobbyAudioProvider>
+              {children}
+              <ConditionalSiteFooter />
+            </LobbyAudioProvider>
           </AppQueryProvider>
         </AuthProvider>
       </body>
