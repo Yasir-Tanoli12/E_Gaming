@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { contentApi, type SiteContacts } from "@/lib/content-api";
+import type { SiteContacts } from "@/lib/content-api";
+import { usePublicSiteContent } from "@/lib/hooks/use-site-queries";
 import { SocialContactIcons } from "@/components/SocialContactIcons";
 
 type NavItem =
@@ -35,28 +36,14 @@ type PublicNavbarProps = {
 export function PublicNavbar({ variant = "default" }: PublicNavbarProps) {
   const pathname = usePathname();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
-  const [contacts, setContacts] = useState<SiteContacts | null>(null);
-  const [contactsError, setContactsError] = useState("");
-
-  useEffect(() => {
-    let active = true;
-    async function loadContacts() {
-      try {
-        const data = await contentApi.getPublic();
-        if (!active) return;
-        setContacts(data.contacts ?? null);
-        setContactsError("");
-      } catch (error) {
-        if (!active) return;
-        setContacts(null);
-        setContactsError(error instanceof Error ? error.message : "Failed to load contacts");
-      }
-    }
-    loadContacts();
-    return () => {
-      active = false;
-    };
-  }, []);
+  const { data: siteContent, error: siteContentError } = usePublicSiteContent();
+  const contacts: SiteContacts | null = siteContent?.contacts ?? null;
+  const contactsError =
+    siteContentError instanceof Error
+      ? siteContentError.message
+      : siteContentError
+        ? String(siteContentError)
+        : "";
 
   useEffect(() => {
     if (mobileNavOpen) document.body.style.overflow = "hidden";

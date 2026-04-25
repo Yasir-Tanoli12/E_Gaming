@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ApiError } from "@/lib/api";
-import { contentApi, type SiteContacts } from "@/lib/content-api";
+import type { SiteContacts } from "@/lib/content-api";
+import { contentApi } from "@/lib/content-api";
+import { usePublicSiteContent } from "@/lib/hooks/use-site-queries";
 import { mailtoHref } from "@/lib/contact-links";
 import { BrandTextureBackdrop } from "@/components/legal/BrandTextureBackdrop";
 import { PublicNavbar } from "@/components/PublicNavbar";
@@ -13,10 +15,16 @@ const panelBase =
   "relative z-[1] flex min-h-0 flex-1 flex-col rounded-2xl border-[3px] border-[#161015] bg-[#EEEDEE]/88 p-6 shadow-[inset_0_0_0_1px_rgba(22,16,21,0.08)] backdrop-blur-md sm:p-8 lg:min-h-[min(560px,calc(100svh-11rem))]";
 
 export default function ContactUsPage() {
-  const [contacts, setContacts] = useState<SiteContacts | null>(null);
-  const [loading, setLoading] = useState(true);
+  const contentQuery = usePublicSiteContent();
+  const contacts: SiteContacts | null = contentQuery.data?.contacts ?? null;
+  const loading = contentQuery.isPending;
+  const contactsError =
+    contentQuery.error instanceof Error
+      ? contentQuery.error.message
+      : contentQuery.error
+        ? String(contentQuery.error)
+        : "";
   const [submitting, setSubmitting] = useState(false);
-  const [contactsError, setContactsError] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [form, setForm] = useState({
@@ -25,21 +33,6 @@ export default function ContactUsPage() {
     subject: "",
     message: "",
   });
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const data = await contentApi.getPublic();
-        setContactsError("");
-        setContacts(data.contacts ?? null);
-      } catch (err) {
-        setContactsError(err instanceof Error ? err.message : "Failed to load contacts");
-      } finally {
-        setLoading(false);
-      }
-    }
-    void load();
-  }, []);
 
   const canSubmit = useMemo(() => {
     const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim());

@@ -22,7 +22,10 @@ export class NewsController {
 
   @Public()
   @Get('current')
-  @Header('Cache-Control', 'public, max-age=60, s-maxage=120')
+  @Header(
+    'Cache-Control',
+    'public, max-age=300, s-maxage=300, stale-while-revalidate=600',
+  )
   getCurrent() {
     return this.newsService.getCurrent();
   }

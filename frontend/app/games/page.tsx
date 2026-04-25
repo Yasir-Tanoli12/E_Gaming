@@ -1,41 +1,38 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { gamesApi, type Game } from "@/lib/games-api";
-import { contentApi, type SiteContent } from "@/lib/content-api";
+import { useCallback, useMemo, useState } from "react";
+import type { Game } from "@/lib/games-api";
+import {
+  useGamesList,
+  useGamesTop,
+  usePublicSiteContent,
+} from "@/lib/hooks/use-site-queries";
 import { GameCard } from "@/components/GameCard";
 import { PublicNavbar } from "@/components/PublicNavbar";
 import { SocialContactIcons } from "@/components/SocialContactIcons";
 import { Button } from "@/components/ui/Button";
 
 export default function GamesPage() {
-  const [games, setGames] = useState<Game[]>([]);
-  const [topGames, setTopGames] = useState<Game[]>([]);
-  const [content, setContent] = useState<SiteContent | null>(null);
+  const contentQuery = usePublicSiteContent();
+  const gamesQuery = useGamesList();
+  const topGamesQuery = useGamesTop();
+
+  const content = contentQuery.data ?? null;
+  const games = gamesQuery.data ?? [];
+  const topGames = topGamesQuery.data ?? [];
+
+  const loading =
+    contentQuery.isPending || gamesQuery.isPending || topGamesQuery.isPending;
+  const firstError = contentQuery.error || gamesQuery.error || topGamesQuery.error;
+  const error =
+    firstError instanceof Error
+      ? firstError.message
+      : firstError
+        ? String(firstError)
+        : "";
+
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [showCredentialOptions, setShowCredentialOptions] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const [publicContent, data, top] = await Promise.all([
-          contentApi.getPublicCached(),
-          gamesApi.list(),
-          gamesApi.listTop(),
-        ]);
-        setContent(publicContent);
-        setGames(data);
-        setTopGames(top);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load games");
-      } finally {
-        setLoading(false);
-      }
-    }
-    void load();
-  }, []);
 
   const topIds = useMemo(() => new Set(topGames.map((g) => g.id)), [topGames]);
   const orderedGames = useMemo(

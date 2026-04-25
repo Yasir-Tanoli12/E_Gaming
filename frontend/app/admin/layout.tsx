@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/Button";
-import { contentApi } from "@/lib/content-api";
+import { usePublicSiteContent } from "@/lib/hooks/use-site-queries";
 
 const ADMIN_NAV = [
   { label: "Dashboard", href: "/admin/dashboard" },
@@ -27,8 +27,9 @@ export default function AdminLayout({
   const router = useRouter();
   const pathname = usePathname();
   const { user, isInitialized, logout } = useAuth();
-  const [logoUrl, setLogoUrl] = useState("");
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const { data: siteContent } = usePublicSiteContent();
+  const logoUrl = siteContent?.contacts?.logoUrl ?? "";
 
   useEffect(() => {
     if (!isInitialized) return;
@@ -40,22 +41,6 @@ export default function AdminLayout({
       router.replace("/dashboard");
     }
   }, [user, isInitialized, router]);
-
-  useEffect(() => {
-    let cancelled = false;
-    async function loadLogo() {
-      try {
-        const data = await contentApi.getPublic();
-        if (!cancelled) setLogoUrl(data.contacts?.logoUrl || "");
-      } catch {
-        if (!cancelled) setLogoUrl("");
-      }
-    }
-    loadLogo();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
 
   useEffect(() => {
     if (mobileNavOpen) document.body.style.overflow = "hidden";

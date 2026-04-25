@@ -86,7 +86,10 @@ export class ContentController {
 
   @Public()
   @Get('public')
-  @Header('Cache-Control', 'public, max-age=60, s-maxage=120')
+  @Header(
+    'Cache-Control',
+    'public, max-age=300, s-maxage=300, stale-while-revalidate=600',
+  )
   getPublicContent() {
     return this.contentService.getPublicContent();
   }

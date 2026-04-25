@@ -1,35 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
-import { contentApi, type SiteContacts } from "@/lib/content-api";
+import type { SiteContacts } from "@/lib/content-api";
 import { getApiBaseUrl } from "@/lib/api";
 import { SocialContactIcons } from "@/components/SocialContactIcons";
 import { mailtoHref } from "@/lib/contact-links";
+import { usePublicSiteContent } from "@/lib/hooks/use-site-queries";
 
 export function SiteFooter() {
-  const [logoUrl, setLogoUrl] = useState("");
-  const [contacts, setContacts] = useState<SiteContacts | null>(null);
-
-  useEffect(() => {
-    let active = true;
-    async function loadContent() {
-      try {
-        const data = await contentApi.getPublicCached();
-        if (!active) return;
-        setContacts(data.contacts ?? null);
-        setLogoUrl(data.contacts?.logoUrl ?? "");
-      } catch {
-        if (!active) return;
-        setContacts(null);
-        setLogoUrl("");
-      }
-    }
-    void loadContent();
-    return () => {
-      active = false;
-    };
-  }, []);
+  const { data: siteContent } = usePublicSiteContent();
+  const contacts: SiteContacts | null = siteContent?.contacts ?? null;
+  const logoUrl = contacts?.logoUrl ?? "";
 
   const apiBaseUrl = getApiBaseUrl();
   const privacyPolicyPdfUrl = useMemo(

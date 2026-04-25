@@ -1,13 +1,16 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { newsApi, type NewsPoster } from "@/lib/news-api";
 import { gamesApi } from "@/lib/games-api";
 import { resolveUploadMediaUrl } from "@/lib/media-url";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { queryKeys } from "@/lib/query-keys";
 
 export default function AdminNewsPage() {
+  const queryClient = useQueryClient();
   const [items, setItems] = useState<NewsPoster[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -58,6 +61,7 @@ export default function AdminNewsPage() {
         isActive: form.isActive,
       });
       setForm({ title: "", imageUrl: "", isActive: true });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.newsCurrent });
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save");
@@ -69,6 +73,7 @@ export default function AdminNewsPage() {
   async function toggleActive(item: NewsPoster) {
     try {
       await newsApi.update(item.id, { isActive: !item.isActive });
+      void queryClient.invalidateQueries({ queryKey: queryKeys.newsCurrent });
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Update failed");
@@ -79,6 +84,7 @@ export default function AdminNewsPage() {
     if (!confirm("Delete this poster?")) return;
     try {
       await newsApi.remove(id);
+      void queryClient.invalidateQueries({ queryKey: queryKeys.newsCurrent });
       await load();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Delete failed");

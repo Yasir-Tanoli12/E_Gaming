@@ -1,28 +1,23 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { contentApi } from "@/lib/content-api";
+import { useMemo } from "react";
 import { PublicNavbar } from "@/components/PublicNavbar";
 import { LegalSplitVisual } from "@/components/legal/LegalSplitVisual";
+import { usePublicSiteContent } from "@/lib/hooks/use-site-queries";
 
 export default function PrivacyPolicyPage() {
-  const [privacyPolicy, setPrivacyPolicy] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-
-  useEffect(() => {
-    async function load() {
-      try {
-        const publicContent = await contentApi.getPublic();
-        setPrivacyPolicy((publicContent.privacyPolicy || "").trim());
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load privacy policy");
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, []);
+  const contentQuery = usePublicSiteContent();
+  const privacyPolicy = useMemo(
+    () => (contentQuery.data?.privacyPolicy ?? "").trim(),
+    [contentQuery.data?.privacyPolicy],
+  );
+  const loading = contentQuery.isPending;
+  const error =
+    contentQuery.error instanceof Error
+      ? contentQuery.error.message
+      : contentQuery.error
+        ? String(contentQuery.error)
+        : "";
 
   return (
     <div className="relative flex min-h-screen flex-col overflow-x-clip bg-[#E9DFE5] text-[#161015]">

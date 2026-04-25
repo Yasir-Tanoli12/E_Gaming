@@ -1,30 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { contentApi } from "@/lib/content-api";
+import { usePublicSiteContent } from "@/lib/hooks/use-site-queries";
 
 export default function AuthLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [logoUrl, setLogoUrl] = useState("");
-
-  useEffect(() => {
-    let cancelled = false;
-    async function loadLogo() {
-      try {
-        const data = await contentApi.getPublic();
-        if (!cancelled) setLogoUrl(data.contacts?.logoUrl || "");
-      } catch {
-        if (!cancelled) setLogoUrl("");
-      }
-    }
-    loadLogo();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+  const { data: siteContent } = usePublicSiteContent();
+  const logoUrl = siteContent?.contacts?.logoUrl ?? "";
 
   return (
     <div className="dark min-h-screen bg-gradient-to-br from-zinc-900 via-zinc-800 to-emerald-900/20 flex items-center justify-center p-4">

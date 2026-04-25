@@ -65,14 +65,20 @@ export class GamesController {
 
   @Public()
   @Get()
-  @Header('Cache-Control', 'public, max-age=60, s-maxage=120')
+  @Header(
+    'Cache-Control',
+    'public, max-age=300, s-maxage=300, stale-while-revalidate=600',
+  )
   findAll() {
     return this.gamesService.findAll();
   }
 
   @Public()
   @Get('top')
-  @Header('Cache-Control', 'public, max-age=60, s-maxage=120')
+  @Header(
+    'Cache-Control',
+    'public, max-age=300, s-maxage=300, stale-while-revalidate=600',
+  )
   findTopGames() {
     return this.gamesService.findTopGames();
   }

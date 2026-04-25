@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Anton, Bungee, Geist_Mono, Poppins } from "next/font/google";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { AppQueryProvider } from "@/components/AppQueryProvider";
 import { ConditionalSiteFooter } from "@/components/ConditionalSiteFooter";
 import "./globals.css";
 
@@ -51,8 +52,10 @@ export default function RootLayout({
         className={`${poppins.variable} ${anton.variable} ${bungee.variable} ${geistMono.variable} min-w-0 antialiased`}
       >
         <AuthProvider>
-          {children}
-          <ConditionalSiteFooter />
+          <AppQueryProvider>
+            {children}
+            <ConditionalSiteFooter />
+          </AppQueryProvider>
         </AuthProvider>
       </body>
     </html>

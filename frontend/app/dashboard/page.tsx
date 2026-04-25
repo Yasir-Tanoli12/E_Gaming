@@ -1,9 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { gamesApi, type Game } from "@/lib/games-api";
-import { newsApi, type NewsPoster } from "@/lib/news-api";
-import { contentApi, type SiteContent } from "@/lib/content-api";
+import type { Game } from "@/lib/games-api";
+import {
+  useGamesList,
+  useGamesTop,
+  useNewsCurrent,
+  usePublicSiteContent,
+} from "@/lib/hooks/use-site-queries";
 import { resolveUploadMediaUrl } from "@/lib/media-url";
 import { GameCard } from "@/components/GameCard";
 import { Button } from "@/components/ui/Button";
@@ -15,17 +19,39 @@ import { InteractiveReviewCarousel } from "@/components/InteractiveReviewCarouse
 const AGE_WARNING_ACK_KEY = "dashboard_age_warning_acknowledged";
 
 export default function UserDashboardPage() {
-  const [games, setGames] = useState<Game[]>([]);
-  const [topGames, setTopGames] = useState<Game[]>([]);
-  const [content, setContent] = useState<SiteContent | null>(null);
-  const [newsPoster, setNewsPoster] = useState<NewsPoster | null>(null);
+  const contentQuery = usePublicSiteContent();
+  const gamesQuery = useGamesList();
+  const topGamesQuery = useGamesTop();
+  const newsQuery = useNewsCurrent();
+
+  const content = contentQuery.data ?? null;
+  const games = gamesQuery.data ?? [];
+  const topGames = topGamesQuery.data ?? [];
+  const newsPoster = newsQuery.data ?? null;
+
+  const loading =
+    contentQuery.isPending ||
+    gamesQuery.isPending ||
+    topGamesQuery.isPending ||
+    newsQuery.isPending;
+
+  const firstError =
+    contentQuery.error ||
+    gamesQuery.error ||
+    topGamesQuery.error ||
+    newsQuery.error;
+  const error =
+    firstError instanceof Error
+      ? firstError.message
+      : firstError
+        ? String(firstError)
+        : "";
+
   const [showNews, setShowNews] = useState(false);
   const [showAgeWarning, setShowAgeWarning] = useState(false);
   const [ageWarningReady, setAgeWarningReady] = useState(false);
   const [selectedGame, setSelectedGame] = useState<Game | null>(null);
   const [showCredentialOptions, setShowCredentialOptions] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const heroVideoRef = useRef<HTMLVideoElement | null>(null);
   const [heroVideoBlocked, setHeroVideoBlocked] = useState(false);
 
@@ -45,44 +71,31 @@ export default function UserDashboardPage() {
   }, []);
 
   useEffect(() => {
-    async function load() {
-      try {
-        // Load content first so the first 18+ popup already uses admin text.
-        const publicContent = await contentApi.getPublicCached();
-        setContent(publicContent);
-        setAgeWarningReady(true);
-        const alreadyAcknowledged =
-          typeof window !== "undefined" &&
-          localStorage.getItem(AGE_WARNING_ACK_KEY) === "1";
-        setShowAgeWarning(!alreadyAcknowledged);
+    if (!contentQuery.isSuccess || !content) return;
+    setAgeWarningReady(true);
+    const alreadyAcknowledged =
+      typeof window !== "undefined" &&
+      localStorage.getItem(AGE_WARNING_ACK_KEY) === "1";
+    setShowAgeWarning(!alreadyAcknowledged);
+  }, [contentQuery.isSuccess, content]);
 
-        // Fetch independent dashboard resources in parallel for faster first interactive state.
-        const [data, top, poster] = await Promise.all([
-          gamesApi.list(),
-          gamesApi.listTop(),
-          newsApi.current(),
-        ]);
-        setGames(data);
-        setTopGames(top);
-        setNewsPoster(poster);
-        const seenKey = poster?.id ? `news_seen_${poster.id}` : null;
-        if (poster && seenKey && !localStorage.getItem(seenKey)) {
-          setShowNews(true);
-          localStorage.setItem(seenKey, "1");
-        }
-      } catch (err) {
-        setAgeWarningReady(true);
-        const alreadyAcknowledged =
-          typeof window !== "undefined" &&
-          localStorage.getItem(AGE_WARNING_ACK_KEY) === "1";
-        setShowAgeWarning(!alreadyAcknowledged);
-        setError(err instanceof Error ? err.message : "Failed to load games");
-      } finally {
-        setLoading(false);
-      }
+  useEffect(() => {
+    if (!contentQuery.isError) return;
+    setAgeWarningReady(true);
+    const alreadyAcknowledged =
+      typeof window !== "undefined" &&
+      localStorage.getItem(AGE_WARNING_ACK_KEY) === "1";
+    setShowAgeWarning(!alreadyAcknowledged);
+  }, [contentQuery.isError]);
+
+  useEffect(() => {
+    if (!newsPoster || typeof window === "undefined") return;
+    const seenKey = newsPoster.id ? `news_seen_${newsPoster.id}` : null;
+    if (seenKey && !localStorage.getItem(seenKey)) {
+      setShowNews(true);
+      localStorage.setItem(seenKey, "1");
     }
-    load();
-  }, []);
+  }, [newsPoster]);
 
   const topIds = useMemo(() => new Set(topGames.map((g) => g.id)), [topGames]);
   const orderedGames = useMemo(

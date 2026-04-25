@@ -1,29 +1,23 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { contentApi, type SiteContent } from "@/lib/content-api";
+import type { SiteContent } from "@/lib/content-api";
 import { BrandTextureBackdrop } from "@/components/legal/BrandTextureBackdrop";
 import { PublicNavbar } from "@/components/PublicNavbar";
+import { usePublicSiteContent } from "@/lib/hooks/use-site-queries";
 
 export default function BlogsPage() {
-  const [content, setContent] = useState<SiteContent | null>(null);
-  const [selectedBlogId, setSelectedBlogId] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const contentQuery = usePublicSiteContent();
+  const content: SiteContent | null = contentQuery.data ?? null;
+  const loading = contentQuery.isPending;
+  const error =
+    contentQuery.error instanceof Error
+      ? contentQuery.error.message
+      : contentQuery.error
+        ? String(contentQuery.error)
+        : "";
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const data = await contentApi.getPublic();
-        setContent(data);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to load blogs");
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, []);
+  const [selectedBlogId, setSelectedBlogId] = useState<string | null>(null);
 
   const blogs = useMemo(() => content?.blogs ?? [], [content?.blogs]);
   const logoUrl = content?.contacts?.logoUrl ?? "";

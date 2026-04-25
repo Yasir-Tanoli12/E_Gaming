@@ -1,4 +1,5 @@
 import { apiFormRequest, apiFormRequestWithProgress, apiRequest } from "./api";
+import { invalidatePublicContentQueries } from "./query-invalidation-bridge";
 
 export interface SiteContacts {
   facebook: string;
@@ -66,13 +67,15 @@ export interface ContactMessage {
   createdAt: string;
 }
 
-const PUBLIC_CONTENT_TTL_MS = 60_000;
+/** Aligns with client TanStack `staleTime` for `/content/public` (see `use-site-queries.ts`). */
+const PUBLIC_CONTENT_TTL_MS = 5 * 60 * 1000;
 let publicContentCache: { value: SiteContent; expiresAt: number } | null = null;
 let publicContentInFlight: Promise<SiteContent> | null = null;
 
 function clearPublicContentCache() {
   publicContentCache = null;
   publicContentInFlight = null;
+  invalidatePublicContentQueries();
 }
 
 export const contentApi = {

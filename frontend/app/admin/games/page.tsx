@@ -1,5 +1,6 @@
 "use client";
 
+import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
@@ -11,6 +12,7 @@ import { resolveUploadMediaUrl } from "@/lib/media-url";
 import { getVideoDurationSeconds } from "@/lib/video-duration";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { queryKeys } from "@/lib/query-keys";
 
 const MAX_GAME_MEDIA_BYTES = 500 * 1024 * 1024;
 const MAX_VIDEO_DURATION_SECONDS = 35;
@@ -18,6 +20,7 @@ const IMAGE_EXT_RE = /\.(jpe?g|png|webp|gif)$/i;
 const VIDEO_EXT_RE = /\.(mp4|webm|ogg|mov)$/i;
 
 export default function AdminGamesPage() {
+  const queryClient = useQueryClient();
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -58,6 +61,11 @@ export default function AdminGamesPage() {
   useEffect(() => {
     loadGames();
   }, []);
+
+  function invalidatePublicGamesQueries() {
+    void queryClient.invalidateQueries({ queryKey: queryKeys.gamesList });
+    void queryClient.invalidateQueries({ queryKey: queryKeys.gamesTop });
+  }
 
   function openAdd() {
     setEditing(null);
@@ -124,6 +132,7 @@ export default function AdminGamesPage() {
         await gamesApi.create(payload);
       }
       closeForm();
+      invalidatePublicGamesQueries();
       loadGames();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save");
@@ -138,6 +147,7 @@ export default function AdminGamesPage() {
     setError("");
     try {
       await gamesApi.remove(id);
+      invalidatePublicGamesQueries();
       loadGames();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to delete");
@@ -462,6 +472,7 @@ export default function AdminGamesPage() {
                           : Array.from(new Set([...topIds, g.id]));
                         await gamesApi.setTopGames(next);
                         setTopIds(next);
+                        invalidatePublicGamesQueries();
                       } catch (err) {
                         setError(
                           err instanceof Error ? err.message : "Failed to update top game",
@@ -569,6 +580,7 @@ export default function AdminGamesPage() {
                                 : Array.from(new Set([...topIds, g.id]));
                               await gamesApi.setTopGames(next);
                               setTopIds(next);
+                              invalidatePublicGamesQueries();
                             } catch (err) {
                               setError(
                                 err instanceof Error ? err.message : "Failed to update top game",
