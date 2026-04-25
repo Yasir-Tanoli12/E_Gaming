@@ -15,10 +15,9 @@ import { PublicNavbar } from "@/components/PublicNavbar";
 import { SocialContactIcons } from "@/components/SocialContactIcons";
 import { InteractiveReviewCarousel } from "@/components/InteractiveReviewCarousel";
 import { BrandTextureBackdrop } from "@/components/legal/BrandTextureBackdrop";
-import { useLobbyAudio } from "@/contexts/LobbyAudioContext";
+import { readLobbySoundAllowed, writeLobbySoundAllowed } from "@/lib/lobby-audio-storage";
 
 export default function UserDashboardPage() {
-  const { lobbySoundAllowed, allowLobbySound } = useLobbyAudio();
   const contentQuery = usePublicSiteContent();
   const gamesQuery = useGamesList();
   const topGamesQuery = useGamesTop();
@@ -73,14 +72,14 @@ export default function UserDashboardPage() {
   useEffect(() => {
     if (!contentQuery.isSuccess || !content) return;
     setAgeWarningReady(true);
-    setShowAgeWarning(!lobbySoundAllowed);
-  }, [contentQuery.isSuccess, content, lobbySoundAllowed]);
+    setShowAgeWarning(!readLobbySoundAllowed());
+  }, [contentQuery.isSuccess, content]);
 
   useEffect(() => {
     if (!contentQuery.isError) return;
     setAgeWarningReady(true);
-    setShowAgeWarning(!lobbySoundAllowed);
-  }, [contentQuery.isError, lobbySoundAllowed]);
+    setShowAgeWarning(!readLobbySoundAllowed());
+  }, [contentQuery.isError]);
 
   useEffect(() => {
     if (!newsPoster || typeof window === "undefined") return;
@@ -136,24 +135,9 @@ export default function UserDashboardPage() {
     if (!video || !heroVideo) return;
 
     const tryPlay = () => {
-      const wantSound = lobbySoundAllowed;
-      video.defaultMuted = !wantSound;
-      video.muted = !wantSound;
-      video
-        .play()
-        .then(() => setHeroVideoBlocked(false))
-        .catch(() => {
-          if (!video.muted) {
-            video.muted = true;
-            video.defaultMuted = true;
-            video
-              .play()
-              .then(() => setHeroVideoBlocked(false))
-              .catch(() => setHeroVideoBlocked(true));
-          } else {
-            setHeroVideoBlocked(true);
-          }
-        });
+      video.defaultMuted = true;
+      video.muted = true;
+      video.play().then(() => setHeroVideoBlocked(false)).catch(() => setHeroVideoBlocked(true));
     };
 
     tryPlay();
@@ -170,7 +154,7 @@ export default function UserDashboardPage() {
       video.removeEventListener("canplay", onCanPlay);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, [heroVideo, lobbySoundAllowed]);
+  }, [heroVideo]);
 
   return (
     <div className="relative min-h-screen w-full min-w-0 max-w-full overflow-x-clip text-[#161015]">
@@ -187,7 +171,7 @@ export default function UserDashboardPage() {
               ref={heroVideoRef}
               src={heroVideo}
               autoPlay
-              muted={!lobbySoundAllowed}
+              muted
               loop
               playsInline
               preload="auto"
@@ -206,19 +190,11 @@ export default function UserDashboardPage() {
               type="button"
               className="absolute inset-0 z-20 flex items-center justify-center bg-black/40 text-sm font-semibold text-white backdrop-blur-[2px]"
               onClick={() => {
-                allowLobbySound();
                 const video = heroVideoRef.current;
                 if (!video) return;
-                video.defaultMuted = false;
-                video.muted = false;
-                video
-                  .play()
-                  .then(() => setHeroVideoBlocked(false))
-                  .catch(() => {
-                    video.muted = true;
-                    video.defaultMuted = true;
-                    video.play().then(() => setHeroVideoBlocked(false)).catch(() => {});
-                  });
+                video.defaultMuted = true;
+                video.muted = true;
+                video.play().then(() => setHeroVideoBlocked(false)).catch(() => {});
               }}
             >
               Tap to play lobby video
@@ -262,7 +238,7 @@ export default function UserDashboardPage() {
               <div className="mt-5 flex items-center justify-center gap-3">
                 <Button
                   onClick={() => {
-                    allowLobbySound();
+                    writeLobbySoundAllowed();
                     setShowAgeWarning(false);
                   }}
                 >
