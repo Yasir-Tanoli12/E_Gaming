@@ -118,21 +118,20 @@ export function PublicNavbar({ variant = "default" }: PublicNavbarProps) {
             onMouseEnter={() => warmNavTarget("/dashboard")}
             onFocus={() => warmNavTarget("/dashboard")}
             onPointerDown={() => warmNavTarget("/dashboard")}
-            className="group relative flex items-center gap-3 text-[#EEEDEE]"
+            className="relative flex items-center gap-3 text-[#EEEDEE]"
           >
-            <span className="absolute -inset-2 -z-10 rounded-xl bg-gradient-to-r from-[#EB523F]/40 to-[#EA3699]/35 opacity-0 blur-xl transition duration-500 group-hover:opacity-100" />
             {logoUrl ? (
               <img
                 src={logoUrl}
                 alt="SWEEPSTOWN logo"
-                className="h-10 w-10 rounded-full border-2 border-[#AAE847] object-cover shadow-[3px_3px_0_#161015] transition-transform duration-300 group-hover:scale-105"
+                className="h-10 w-10 rounded-full border-2 border-[#AAE847] object-cover shadow-[3px_3px_0_#161015]"
               />
             ) : (
               <span className="inline-flex h-10 w-10 items-center justify-center rounded-full border-2 border-[#161015] bg-gradient-to-br from-[#EB523F] to-[#EA3699] text-sm font-black text-[#EEEDEE] shadow-[3px_3px_0_#161015]">
                 ST
               </span>
             )}
-            <span className="sw-brand-wordmark sw-text-wobble inline-block text-[1.85rem] leading-none transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:scale-105 sm:text-[2rem]">
+            <span className="sw-brand-wordmark inline-block text-[1.85rem] leading-none sm:text-[2rem]">
               SWEEPSTOWN
             </span>
           </Link>

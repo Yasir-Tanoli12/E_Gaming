@@ -62,22 +62,7 @@ body {
   letter-spacing: 0.045em;
   text-transform: uppercase;
   line-height: 0.9;
-  transform: skewX(-8deg) scale(1.1);
-  transform-origin: 50% 65%;
-  background: linear-gradient(180deg, #fff87d 0%, #c9ff3f 28%, #48ffd2 56%, #4fe7ff 78%, #1ac7ff 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-stroke: 2.2px #120d12;
-  text-shadow:
-    0 0 8px rgba(255, 246, 138, 0.95),
-    0 0 18px rgba(83, 255, 230, 0.92),
-    0 0 34px rgba(170, 255, 98, 0.95),
-    0 0 56px rgba(170, 255, 98, 0.75),
-    0 0 88px rgba(140, 255, 92, 0.55),
-    0 3px 0 #120d12,
-    0 8px 0 #0b090b,
-    0 14px 24px rgba(8, 7, 10, 0.72);
+  color: #ffffff;
 }
 
 /* Energetic heading wobble — transform only */

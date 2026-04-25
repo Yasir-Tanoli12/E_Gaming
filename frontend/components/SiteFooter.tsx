@@ -47,7 +47,7 @@ export function SiteFooter() {
                   ST
                 </span>
               )}
-              <h3 className="sw-brand-wordmark sw-text-wobble text-xl text-[#EEEDEE]">SWEEPSTOWN</h3>
+              <h3 className="sw-brand-wordmark text-xl">SWEEPSTOWN</h3>
             </div>
             <p className="mt-3 text-sm text-[#EEEDEE]/85">
               Play trending games with credentials. Get access from our support team or jump in straight away.
