@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, type CSSProperties } from "react";
 import type { Game } from "@/lib/games-api";
 import {
   useGamesList,
@@ -158,7 +158,13 @@ export default function GamesPage() {
         ) : (
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {orderedGames.map((game, i) => (
-              <div key={game.id} className="animate-fade-in" style={{ animationDelay: `${i * 70}ms` }}>
+              <div
+                key={game.id}
+                className="game-card-appear"
+                style={
+                  { "--game-card-stagger": `${Math.min(i * 60, 280)}ms` } as CSSProperties
+                }
+              >
                 <GameCard game={game} isTop={topIds.has(game.id)} onPlayRequest={handleGamePlayRequest} />
               </div>
             ))}

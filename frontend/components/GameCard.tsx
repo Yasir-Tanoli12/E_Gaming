@@ -1,7 +1,8 @@
 "use client";
 
-import { memo, useEffect, useRef, useState } from "react";
+import { memo, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Game } from "@/lib/games-api";
+import { useNarrowViewport } from "@/lib/use-narrow-viewport";
 import { resolveUploadMediaUrl } from "@/lib/media-url";
 
 interface GameCardProps {
@@ -11,7 +12,10 @@ interface GameCardProps {
 }
 
 function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
   const previewVideoRef = useRef<HTMLVideoElement>(null);
+  const narrow = useNarrowViewport();
+  const [inView, setInView] = useState(true);
   const [hovered, setHovered] = useState(false);
   const [thumbFailedSrc, setThumbFailedSrc] = useState<string | null>(null);
   const [videoFailedSrc, setVideoFailedSrc] = useState<string | null>(null);
@@ -32,17 +36,45 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
   const videoAsPrimary =
     Boolean(videoUrl && !videoError && (!imageUrl || thumbError));
 
+  useLayoutEffect(() => {
+    if (!narrow) {
+      setInView(true);
+      return;
+    }
+    const el = rootRef.current;
+    if (!el) return;
+
+    const io = new IntersectionObserver(
+      ([e]) => setInView(!!e?.isIntersecting),
+      { rootMargin: "160px 0px", threshold: 0.01 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [narrow]);
+
   useEffect(() => {
     const v = previewVideoRef.current;
     if (!v || !videoUrl || videoError) return;
     v.muted = !hovered;
-    if (hovered) {
-      void v.play().catch(() => {
-        v.muted = true;
-        void v.play().catch(() => {});
-      });
+
+    if (narrow && !inView) {
+      v.pause();
+      return;
     }
-  }, [hovered, videoUrl, videoError]);
+
+    if (narrow) {
+      const wantMotion = videoAsPrimary || hovered;
+      if (!wantMotion) {
+        v.pause();
+        return;
+      }
+    }
+
+    void v.play().catch(() => {
+      v.muted = true;
+      void v.play().catch(() => {});
+    });
+  }, [hovered, videoUrl, videoError, narrow, inView, videoAsPrimary]);
 
   function handlePlay() {
     if (onPlayRequest) {
@@ -62,8 +94,11 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
     setHovered(false);
   }
 
+  const videoPreload = narrow ? "none" : videoAsPrimary ? "auto" : "metadata";
+
   return (
     <div
+      ref={rootRef}
       className="group relative w-full max-w-full min-w-0 overflow-hidden rounded-3xl border-[3px] border-[#161015] bg-[#161015] shadow-[6px_8px_0_#EB523F,0_0_0_2px_#EA3699] transition-transform duration-300 hover:-translate-y-1 hover:shadow-[8px_12px_0_#AAE847,0_0_0_3px_#EB523F]"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -90,11 +125,11 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
           <video
             ref={previewVideoRef}
             src={videoUrl}
-            autoPlay
+            autoPlay={!narrow}
             muted={!hovered}
             loop
             playsInline
-            preload={videoAsPrimary ? "auto" : "metadata"}
+            preload={videoPreload}
             onError={() => setVideoFailedSrc(videoUrl)}
             className={`absolute inset-0 h-full w-full object-cover transition-all duration-500 pointer-events-none ${
               hovered || videoAsPrimary

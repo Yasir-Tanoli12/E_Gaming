@@ -102,8 +102,8 @@ export function PublicNavbar({ variant = "default" }: PublicNavbarProps) {
 
   const headerSurface =
     variant === "overlay"
-      ? "border-b border-[#EA3699]/30 bg-gradient-to-b from-[#161015]/78 via-[#1f0a14]/65 to-[#161015]/50 backdrop-blur-xl"
-      : "border-b-[3px] border-[#161015] bg-[#161015]/95 backdrop-blur-xl";
+      ? "border-b border-[#EA3699]/30 bg-gradient-to-b from-[#161015]/88 via-[#1f0a14]/80 to-[#161015]/72 max-md:backdrop-blur-none md:backdrop-blur-xl"
+      : "border-b-[3px] border-[#161015] bg-[#161015] max-md:backdrop-blur-none md:bg-[#161015]/95 md:backdrop-blur-xl";
 
   return (
     <>
@@ -203,7 +203,7 @@ export function PublicNavbar({ variant = "default" }: PublicNavbarProps) {
         className={`fixed inset-0 z-[60] lg:hidden ${mobileNavOpen ? "visible" : "invisible"}`}
       >
         <div
-          className={`absolute inset-0 bg-black/70 backdrop-blur-sm transition-opacity duration-300 ${mobileNavOpen ? "opacity-100" : "opacity-0"}`}
+          className={`absolute inset-0 bg-black/75 transition-opacity duration-300 ${mobileNavOpen ? "opacity-100" : "opacity-0"}`}
           onClick={() => setMobileNavOpen(false)}
         />
         <div

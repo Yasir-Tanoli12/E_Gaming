@@ -184,6 +184,51 @@ body {
   opacity: 0;
 }
 
+/* Game grids: stagger only on md+ — on phones stagger left cards invisible (opacity 0) for hundreds of ms. */
+@media (min-width: 768px) {
+  @keyframes game-card-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 10px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: translate3d(0, 0, 0);
+    }
+  }
+
+  .game-card-appear {
+    animation: game-card-in 0.42s ease-out both;
+    animation-delay: var(--game-card-stagger, 0ms);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-card-appear {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .game-card-appear {
+    opacity: 1;
+  }
+
+  .sw-text-wobble {
+    animation: none;
+    transform: none;
+    will-change: auto;
+  }
+
+  .animate-orbit,
+  .animate-orbit-reverse {
+    animation: none;
+  }
+}
+
 .animation-delay-200 {
   animation-delay: 200ms;
 }
