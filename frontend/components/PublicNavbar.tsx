@@ -1,10 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import type { SiteContacts } from "@/lib/content-api";
-import { usePublicSiteContent } from "@/lib/hooks/use-site-queries";
+import {
+  prefetchPublicRouteData,
+  usePublicSiteContent,
+} from "@/lib/hooks/use-site-queries";
 import { SocialContactIcons } from "@/components/SocialContactIcons";
 
 type NavItem =
@@ -35,8 +39,41 @@ type PublicNavbarProps = {
 
 export function PublicNavbar({ variant = "default" }: PublicNavbarProps) {
   const pathname = usePathname();
+  const queryClient = useQueryClient();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const { data: siteContent, error: siteContentError } = usePublicSiteContent();
+
+  const warmNavTarget = useCallback(
+    (href: string) => {
+      prefetchPublicRouteData(queryClient, href);
+    },
+    [queryClient],
+  );
+
+  useEffect(() => {
+    if (!siteContent) return;
+    let cancelled = false;
+    const run = () => {
+      if (cancelled) return;
+      prefetchPublicRouteData(queryClient, "/dashboard");
+      prefetchPublicRouteData(queryClient, "/games");
+    };
+
+    let idleId: number | undefined;
+    let timeoutId: number | undefined;
+
+    if (typeof window.requestIdleCallback === "function") {
+      idleId = window.requestIdleCallback(run, { timeout: 2500 });
+    } else {
+      timeoutId = window.setTimeout(run, 400);
+    }
+
+    return () => {
+      cancelled = true;
+      if (idleId != null) window.cancelIdleCallback(idleId);
+      if (timeoutId != null) window.clearTimeout(timeoutId);
+    };
+  }, [siteContent, queryClient]);
   const contacts: SiteContacts | null = siteContent?.contacts ?? null;
   const contactsError =
     siteContentError instanceof Error
@@ -77,6 +114,10 @@ export function PublicNavbar({ variant = "default" }: PublicNavbarProps) {
         <div className="mx-auto flex w-full min-w-0 max-w-7xl items-center justify-between gap-3 py-4 ps-[max(1rem,env(safe-area-inset-left))] pe-[max(1rem,env(safe-area-inset-right))] sm:gap-4">
           <Link
             href="/dashboard"
+            prefetch
+            onMouseEnter={() => warmNavTarget("/dashboard")}
+            onFocus={() => warmNavTarget("/dashboard")}
+            onPointerDown={() => warmNavTarget("/dashboard")}
             className="group relative flex items-center gap-3 text-[#EEEDEE]"
           >
             <span className="absolute -inset-2 -z-10 rounded-xl bg-gradient-to-r from-[#EB523F]/40 to-[#EA3699]/35 opacity-0 blur-xl transition duration-500 group-hover:opacity-100" />
@@ -103,6 +144,10 @@ export function PublicNavbar({ variant = "default" }: PublicNavbarProps) {
                 <Link
                   key={item.label}
                   href={item.href}
+                  prefetch
+                  onMouseEnter={() => warmNavTarget(item.href)}
+                  onFocus={() => warmNavTarget(item.href)}
+                  onPointerDown={() => warmNavTarget(item.href)}
                   className={`sw-funky-nav group relative overflow-hidden rounded-full px-4 py-2 text-sm font-bold transition-transform duration-200 ${
                     active
                       ? "border-2 border-[#161015] bg-gradient-to-r from-[#EB523F] via-[#EA3699] to-[#AAE847] text-[#161015] shadow-[4px_4px_0_#161015]"
@@ -184,6 +229,8 @@ export function PublicNavbar({ variant = "default" }: PublicNavbarProps) {
                 <Link
                   key={item.label}
                   href={item.href}
+                  prefetch
+                  onPointerDown={() => warmNavTarget(item.href)}
                   onClick={() => setMobileNavOpen(false)}
                   className={`sw-funky-nav rounded-xl px-4 py-3 text-base font-semibold transition ${active ? "border border-[#AAE847]/50 bg-gradient-to-r from-[#EB523F]/35 to-[#EA3699]/35 text-[#EEEDEE]" : "text-[#EEEDEE]/90 hover:bg-[#EB523F]/15"}`}
                 >
