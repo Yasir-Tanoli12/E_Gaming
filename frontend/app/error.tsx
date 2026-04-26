@@ -21,7 +21,7 @@ export default function Error({
         <p className="text-xs uppercase tracking-[0.2em] text-red-300">Something went wrong</p>
         <h1 className="mt-2 text-2xl font-black">We hit a rendering error</h1>
         <p className="mt-3 text-sm text-zinc-300">
-          The page crashed while rendering. Try again, or return to the dashboard.
+          The page crashed while rendering. Try again, or return home.
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           <button
@@ -32,10 +32,10 @@ export default function Error({
             Try again
           </button>
           <Link
-            href="/dashboard"
+            href="/"
             className="rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-200 transition hover:bg-zinc-800"
           >
-            Go to dashboard
+            Go home
           </Link>
         </div>
       </div>

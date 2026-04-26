@@ -30,7 +30,7 @@ export function prefetchPublicRouteData(queryClient: QueryClient, href: string) 
     ...opts,
   });
 
-  if (path === "/dashboard" || path === "/games") {
+  if (path === "/" || path === "/dashboard" || path === "/games") {
     void queryClient.prefetchQuery({
       queryKey: queryKeys.gamesList,
       queryFn: () => gamesApi.list(),
@@ -43,7 +43,7 @@ export function prefetchPublicRouteData(queryClient: QueryClient, href: string) 
     });
   }
 
-  if (path === "/dashboard") {
+  if (path === "/" || path === "/dashboard") {
     void queryClient.prefetchQuery({
       queryKey: queryKeys.newsCurrent,
       queryFn: () => newsApi.current(),

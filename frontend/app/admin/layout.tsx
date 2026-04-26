@@ -38,7 +38,7 @@ export default function AdminLayout({
       return;
     }
     if (user.role !== "ADMIN") {
-      router.replace("/dashboard");
+      router.replace("/");
     }
   }, [user, isInitialized, router]);
 
@@ -123,7 +123,7 @@ export default function AdminLayout({
           <div className="flex shrink-0 items-center gap-2 sm:gap-3">
             <div className="hidden items-center gap-3 xl:flex">
               <Link
-                href="/dashboard"
+                href="/"
                 className="text-sm text-zinc-500 transition hover:text-zinc-300"
               >
                 Public site
@@ -209,7 +209,7 @@ export default function AdminLayout({
             ))}
             <div className="my-3 border-t border-white/10" />
             <Link
-              href="/dashboard"
+              href="/"
               onClick={() => setMobileNavOpen(false)}
               className="rounded-lg px-4 py-3 text-[15px] font-medium text-zinc-400 hover:bg-white/[0.04] hover:text-white"
             >

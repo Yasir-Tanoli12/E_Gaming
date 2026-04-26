@@ -19,7 +19,11 @@ type NavItem =
   };
 
 const NAV_ITEMS: NavItem[] = [
-  { label: "HOME", href: "/dashboard", matchPath: (p) => p === "/dashboard" },
+  {
+    label: "HOME",
+    href: "/",
+    matchPath: (p) => p === "/" || p === "/dashboard",
+  },
   { label: "GAMES", href: "/games", matchPath: (p) => p === "/games" },
   { label: "BLOGS", href: "/blogs", matchPath: (p) => p === "/blogs" },
   { label: "ABOUT US", href: "/about-us", matchPath: (p) => p === "/about-us" },
@@ -55,7 +59,7 @@ export function PublicNavbar({ variant = "default" }: PublicNavbarProps) {
     let cancelled = false;
     const run = () => {
       if (cancelled) return;
-      prefetchPublicRouteData(queryClient, "/dashboard");
+      prefetchPublicRouteData(queryClient, "/");
       prefetchPublicRouteData(queryClient, "/games");
     };
 
@@ -113,11 +117,11 @@ export function PublicNavbar({ variant = "default" }: PublicNavbarProps) {
         />
         <div className="mx-auto flex w-full min-w-0 max-w-7xl items-center justify-between gap-3 py-4 ps-[max(1rem,env(safe-area-inset-left))] pe-[max(1rem,env(safe-area-inset-right))] sm:gap-4">
           <Link
-            href="/dashboard"
+            href="/"
             prefetch
-            onMouseEnter={() => warmNavTarget("/dashboard")}
-            onFocus={() => warmNavTarget("/dashboard")}
-            onPointerDown={() => warmNavTarget("/dashboard")}
+            onMouseEnter={() => warmNavTarget("/")}
+            onFocus={() => warmNavTarget("/")}
+            onPointerDown={() => warmNavTarget("/")}
             className="relative flex items-center gap-3 text-[#EEEDEE]"
           >
             {logoUrl ? (

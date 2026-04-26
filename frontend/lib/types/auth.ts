@@ -10,7 +10,7 @@ export interface User {
 }
 
 export function getDashboardPath(user: User): string {
-  return user.role === "ADMIN" ? "/admin/dashboard" : "/dashboard";
+  return user.role === "ADMIN" ? "/admin/dashboard" : "/";
 }
 
 export interface AuthTokens {
