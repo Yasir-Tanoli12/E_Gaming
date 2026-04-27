@@ -91,9 +91,9 @@ export default function UserDashboardPage() {
   useEffect(() => {
     if (!newsPoster || typeof window === "undefined") return;
     const seenKey = newsPoster.id ? `news_seen_${newsPoster.id}` : null;
-    if (seenKey && !localStorage.getItem(seenKey)) {
+    if (seenKey && !sessionStorage.getItem(seenKey)) {
       setShowNews(true);
-      localStorage.setItem(seenKey, "1");
+      sessionStorage.setItem(seenKey, "1");
     }
   }, [newsPoster]);
 

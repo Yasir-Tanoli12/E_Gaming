@@ -1,10 +1,14 @@
-/** Same key as dashboard age gate — entering the site counts as engagement for lobby media sound. */
+/**
+ * Per **browser tab session** only (sessionStorage). Clears when the tab/window is
+ * closed, so the 18+ gate and lobby sound engagement apply again on the next visit.
+ * Tab switches within the same session do not clear this.
+ */
 export const LOBBY_SOUND_ACK_KEY = "dashboard_age_warning_acknowledged";
 
 export function readLobbySoundAllowed(): boolean {
   if (typeof window === "undefined") return false;
   try {
-    return localStorage.getItem(LOBBY_SOUND_ACK_KEY) === "1";
+    return sessionStorage.getItem(LOBBY_SOUND_ACK_KEY) === "1";
   } catch {
     return false;
   }
@@ -12,7 +16,7 @@ export function readLobbySoundAllowed(): boolean {
 
 export function writeLobbySoundAllowed(): void {
   try {
-    localStorage.setItem(LOBBY_SOUND_ACK_KEY, "1");
+    sessionStorage.setItem(LOBBY_SOUND_ACK_KEY, "1");
   } catch {
     /* private mode */
   }
