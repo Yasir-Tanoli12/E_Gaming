@@ -264,8 +264,8 @@ export default function UserDashboardPage() {
 
         {showNews && newsPoster && (
           <div className="fixed inset-0 z-[70] flex items-center justify-center bg-[#161015]/50 p-4 backdrop-blur-sm">
-            <div className="w-full max-w-3xl overflow-hidden rounded-2xl border-[3px] border-[#161015] bg-[#EEEDEE] shadow-[6px_8px_0_#161015,0_0_0_3px_#EA3699]">
-              <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-3">
+            <div className="flex max-h-[min(92dvh,100dvh-1rem)] w-full max-w-3xl flex-col overflow-hidden rounded-2xl border-[3px] border-[#161015] bg-[#EEEDEE] shadow-[6px_8px_0_#161015,0_0_0_3px_#EA3699]">
+              <div className="flex shrink-0 items-center justify-between border-b border-zinc-200 px-4 py-3">
                 <h3 className="font-semibold text-zinc-800">{newsPoster.title ?? "Latest News"}</h3>
                 <button
                   type="button"
@@ -275,11 +275,15 @@ export default function UserDashboardPage() {
                   ✕
                 </button>
               </div>
-              <img
-                src={resolveUploadMediaUrl(newsPoster.imageUrl) ?? ""}
-                alt={newsPoster.title ?? "News"}
-                className="max-h-[70vh] w-full object-cover"
-              />
+              <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+                <img
+                  src={resolveUploadMediaUrl(newsPoster.imageUrl) ?? ""}
+                  alt={newsPoster.title ?? "News"}
+                  className="block w-full max-w-full object-contain object-top"
+                  loading="eager"
+                  decoding="async"
+                />
+              </div>
             </div>
           </div>
         )}
