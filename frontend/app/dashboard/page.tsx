@@ -263,7 +263,7 @@ export default function UserDashboardPage() {
         )}
 
         {showNews && newsPoster && (
-          <div className="fixed inset-0 z-[70] flex items-center justify-center bg-white/90 backdrop-blur-sm p-4">
+          <div className="fixed inset-0 z-[70] flex items-center justify-center bg-[#161015]/50 p-4 backdrop-blur-sm">
             <div className="w-full max-w-3xl overflow-hidden rounded-2xl border-[3px] border-[#161015] bg-[#EEEDEE] shadow-[6px_8px_0_#161015,0_0_0_3px_#EA3699]">
               <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-3">
                 <h3 className="font-semibold text-zinc-800">{newsPoster.title ?? "Latest News"}</h3>
