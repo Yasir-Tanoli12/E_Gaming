@@ -373,6 +373,26 @@ export class ContentService {
     return result;
   }
 
+  /**
+   * Lightweight public shape for clients that only need the site logo (e.g. favicon).
+   */
+  async getPublicLogo() {
+    await this.bootstrapFromLegacyFile();
+    const contact = await this.prisma.withPoolRetry(() =>
+      this.prisma.contact.findUnique({
+        where: { id: 'default' },
+        select: { logoUrl: true, updatedAt: true },
+      }),
+    );
+    if (!contact) {
+      return { logoUrl: null as string | null, updatedAt: new Date(0).toISOString() };
+    }
+    return {
+      logoUrl: contact.logoUrl,
+      updatedAt: contact.updatedAt.toISOString(),
+    };
+  }
+
   async getAdminContent() {
     await this.bootstrapFromLegacyFile();
     const [contacts, blogs, faqs, reviews, privacyPolicy, aboutUsBlog, ageWarningBlog] =

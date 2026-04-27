@@ -95,6 +95,16 @@ export class ContentController {
   }
 
   @Public()
+  @Get('logo')
+  @Header(
+    'Cache-Control',
+    'public, max-age=60, s-maxage=60, stale-while-revalidate=120',
+  )
+  getPublicLogo() {
+    return this.contentService.getPublicLogo();
+  }
+
+  @Public()
   @Post('contact-messages')
   createContactMessage(@Body() dto: CreateContactMessageDto) {
     return this.contentService.createContactMessage(dto);

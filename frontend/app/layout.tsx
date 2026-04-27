@@ -3,6 +3,7 @@ import { Anton, Bungee, Geist_Mono, Poppins } from "next/font/google";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { AppQueryProvider } from "@/components/AppQueryProvider";
 import { ConditionalSiteFooter } from "@/components/ConditionalSiteFooter";
+import { DynamicFavicon } from "@/components/DynamicFavicon";
 import "./globals.css";
 
 const poppins = Poppins({
@@ -39,6 +40,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "SWEEPSTOWN",
   description: "SWEEPSTOWN platform",
+  icons: {
+    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
+  },
 };
 
 export default function RootLayout({
@@ -51,6 +55,7 @@ export default function RootLayout({
       <body
         className={`${poppins.variable} ${anton.variable} ${bungee.variable} ${geistMono.variable} min-w-0 antialiased`}
       >
+        <DynamicFavicon />
         <AuthProvider>
           <AppQueryProvider>
             {children}
