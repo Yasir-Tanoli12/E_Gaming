@@ -4,7 +4,19 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { AppQueryProvider } from "@/components/AppQueryProvider";
 import { ConditionalSiteFooter } from "@/components/ConditionalSiteFooter";
 import { DynamicFavicon } from "@/components/DynamicFavicon";
+import { fetchPublicLogoForMetadata } from "@/lib/fetch-public-logo";
 import "./globals.css";
+
+function iconTypeFromUrl(href: string): string | undefined {
+  const path = href.split("?")[0].toLowerCase();
+  if (path.endsWith(".svg")) return "image/svg+xml";
+  if (path.endsWith(".png")) return "image/png";
+  if (path.endsWith(".jpg") || path.endsWith(".jpeg")) return "image/jpeg";
+  if (path.endsWith(".webp")) return "image/webp";
+  if (path.endsWith(".ico")) return "image/x-icon";
+  if (path.endsWith(".gif")) return "image/gif";
+  return undefined;
+}
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -37,13 +49,19 @@ const geistMono = Geist_Mono({
   preload: true,
 });
 
-export const metadata: Metadata = {
-  title: "SWEEPSTOWN",
-  description: "SWEEPSTOWN platform",
-  icons: {
-    icon: [{ url: "/favicon.svg", type: "image/svg+xml" }],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { iconHref, isFallback } = await fetchPublicLogoForMetadata();
+  const type = isFallback ? "image/svg+xml" : iconTypeFromUrl(iconHref);
+  return {
+    title: "SWEEPSTOWN",
+    description: "SWEEPSTOWN platform",
+    icons: {
+      icon: type
+        ? [{ url: iconHref, type }]
+        : [{ url: iconHref }],
+    },
+  };
+}
 
 export default function RootLayout({
   children,

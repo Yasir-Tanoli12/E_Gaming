@@ -1,38 +1,39 @@
 "use client";
 
 import { useEffect } from "react";
+import { withFaviconCacheBuster } from "@/lib/favicon-url";
+import { resolveUploadMediaUrl } from "@/lib/media-url";
 
 const STORAGE_KEY = "sweepstown:favicon-logo";
 const DEFAULT_ICON = "/favicon.svg";
 
 type Stored = { logoUrl: string; updatedAt: string };
 
-function getIconLink(): HTMLLinkElement {
-  let link = document.querySelector<HTMLLinkElement>("link#dynamic-favicon");
-  if (link) return link;
-  const existing = document.querySelector<HTMLLinkElement>("link[rel~='icon']");
-  if (existing) {
-    existing.id = "dynamic-favicon";
-    return existing;
-  }
-  link = document.createElement("link");
-  link.id = "dynamic-favicon";
-  link.rel = "icon";
-  document.head.appendChild(link);
-  return link;
+function isAppleTouchIcon(el: HTMLLinkElement): boolean {
+  const rel = (el.getAttribute("rel") ?? "").toLowerCase();
+  return rel.includes("apple-touch");
 }
 
-function applyIconHref(logoUrl: string) {
-  const link = getIconLink();
-  const normalized = (() => {
-    try {
-      return new URL(logoUrl, window.location.origin).href;
-    } catch {
-      return logoUrl;
+/**
+ * Set every `link[rel=*icon]` the browser may use for the tab (not Apple touch).
+ */
+function setTabFaviconHref(absoluteHref: string) {
+  const all = document.querySelectorAll<HTMLLinkElement>("link[rel*='icon']");
+  let any = false;
+  for (const el of all) {
+    if (isAppleTouchIcon(el)) continue;
+    any = true;
+    el.removeAttribute("sizes");
+    if (el.href !== absoluteHref) {
+      el.href = absoluteHref;
     }
-  })();
-  if (link.href === normalized) return;
-  link.href = logoUrl;
+  }
+  if (!any) {
+    const link = document.createElement("link");
+    link.rel = "icon";
+    link.href = absoluteHref;
+    document.head.appendChild(link);
+  }
 }
 
 export function DynamicFavicon() {
@@ -54,7 +55,10 @@ export function DynamicFavicon() {
     const cached = readCache();
     if (cached) {
       try {
-        applyIconHref(cached.logoUrl);
+        const resolved = resolveUploadMediaUrl(cached.logoUrl) ?? cached.logoUrl;
+        setTabFaviconHref(
+          withFaviconCacheBuster(resolved, cached.updatedAt)
+        );
       } catch {
         // ignore
       }
@@ -69,7 +73,11 @@ export function DynamicFavicon() {
           updatedAt?: string;
         };
         if (data.logoUrl) {
-          applyIconHref(data.logoUrl);
+          const href = withFaviconCacheBuster(
+            data.logoUrl,
+            data.updatedAt ?? ""
+          );
+          setTabFaviconHref(href);
           try {
             localStorage.setItem(
               STORAGE_KEY,
@@ -87,7 +95,9 @@ export function DynamicFavicon() {
           } catch {
             // ignore
           }
-          applyIconHref(DEFAULT_ICON);
+          setTabFaviconHref(
+            new URL(DEFAULT_ICON, window.location.origin).href
+          );
         }
       } catch (err) {
         console.error("Failed to load logo:", err);
