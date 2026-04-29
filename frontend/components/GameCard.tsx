@@ -182,11 +182,7 @@ function GameCardComponent({ game, isTop = false, onPlayRequest }: GameCardProps
         <div className="absolute right-3 top-3 z-30 rounded-full border-2 border-[#161015] bg-[#AAE847] px-2 py-1 text-[10px] font-black uppercase tracking-wider text-[#161015] shadow-[2px_2px_0_#161015]">
           TOP
         </div>
-      ) : (
-        <div className="absolute right-3 top-3 z-30 rounded-full border-2 border-[#EA3699]/70 bg-[#161015]/95 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-[#EEEDEE]">
-          Hot
-        </div>
-      )}
+      ) : null}
     </div>
   );
 }
