@@ -224,7 +224,7 @@ export default function UserDashboardPage() {
             </h1>
             <p className="mt-6 max-w-xl text-base text-[#EEEDEE]/85 drop-shadow-[0_1px_12px_rgba(0,0,0,0.5)] sm:text-lg">
               Browse our curated games. Play instantly with your credentials or
-              get access from our support team. Click any game card to play or buy credentials.
+              get access from our support team. Click any game card to play or get access.
             </p>
           </div>
         </div>
@@ -340,7 +340,7 @@ export default function UserDashboardPage() {
                       variant="secondary"
                       onClick={() => setShowCredentialOptions(true)}
                     >
-                      Buy Credentials
+                      Get Access
                     </Button>
                   </div>
                 </>

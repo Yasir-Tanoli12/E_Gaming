@@ -118,7 +118,7 @@ export default function GamesPage() {
                       Play Now
                     </Button>
                     <Button variant="secondary" onClick={() => setShowCredentialOptions(true)}>
-                      Buy Credentials
+                      Get Access
                     </Button>
                   </div>
                 </>
